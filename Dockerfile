@@ -29,4 +29,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/html
 
 EXPOSE 80
-HEALTHCHECK --interval=30s --timeout=3s CMD wget -qO- http://localhost/ >/dev/null || exit 1
+# 127.0.0.1 explícito: "localhost" pode resolver para ::1 primeiro (IPv6),
+# e um nginx.conf customizado escapa da auto-config de IPv6 do entrypoint
+# do nginx:alpine — isso causava "Connection refused" no healthcheck.
+HEALTHCHECK --interval=30s --timeout=3s CMD wget -qO- http://127.0.0.1/ >/dev/null || exit 1
