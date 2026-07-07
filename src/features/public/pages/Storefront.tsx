@@ -9,6 +9,7 @@ import { Spinner } from "@/components/ui";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { BuyerAuthModal } from "@/features/auth/components/BuyerAuthModal";
 import { useLogClickEvent, type ClickKind } from "@/features/tracking/queries";
+import { Seo } from "@/components/Seo";
 
 function StoreStat({ value, label }: { value: string | number; label: string }) {
   return (
@@ -81,6 +82,14 @@ export function Storefront() {
 
   return (
     <div className="min-h-screen bg-white font-sans">
+      <Seo
+        title={`${seller.name} — Loja na Revvio`}
+        description={
+          seller.bio ||
+          `Veículos à venda na ${seller.name}${location ? ` em ${location}` : ""}. Confira o estoque e fale direto com a loja pela Revvio.`
+        }
+        path={`/loja/${seller.slug}`}
+      />
       <PublicTopBar />
 
       {/* Breadcrumb */}

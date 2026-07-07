@@ -13,6 +13,7 @@ import { maskPhone } from "@/lib/masks";
 import { Icon } from "../components/icons";
 import { ImageLightbox } from "../components/ImageLightbox";
 import { Input, Textarea, Spinner } from "@/components/ui-light";
+import { Seo } from "@/components/Seo";
 
 /* ── Galeria (faixa de até 3 fotos, com navegação) ────────── */
 function VehicleGallery({ images }: { images: string[] }) {
@@ -420,8 +421,25 @@ export function VehicleDetails() {
       value: v.leilao ? "Sim (com passagem por leilão)" : "Não (sem passagem por leilão)",
     });
 
+  const seoTitle = `${v.make} ${v.model}${v.year ? ` ${v.year}` : ""} — ${formatCurrency(v.price)}`;
+  const seoDesc = [
+    `${v.make} ${v.model}${v.year ? ` ${v.year}` : ""}`,
+    v.mileage != null ? `${formatNumber(v.mileage)} km` : null,
+    v.fuel ? fuelLabels[v.fuel] ?? v.fuel : null,
+    v.transmission ? transmissionLabels[v.transmission] ?? v.transmission : null,
+  ]
+    .filter(Boolean)
+    .join(" · ") + ` — à venda na Revvio por ${formatCurrency(v.price)}.`;
+
   return (
     <PublicShell current="comprar">
+      <Seo
+        title={seoTitle}
+        description={seoDesc}
+        path={`/veiculo/${v.id}`}
+        image={v.images?.[0]}
+        type="product"
+      />
       <VehicleGallery images={v.images} />
 
       <div className="mx-auto max-w-[1180px] px-5 py-8 sm:px-7">

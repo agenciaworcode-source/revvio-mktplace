@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Sitemap base com as rotas públicas fixas. As URLs dinâmicas de
+  veículos (/veiculo/:id) e lojas (/loja/:slug) devem ser adicionadas
+  por uma Edge Function do Supabase que lista os registros ativos
+  (ver Fase 2 do plano de SEO).
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://loja.revvio.com.br/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://loja.revvio.com.br/comprar</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://loja.revvio.com.br/vender</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://loja.revvio.com.br/politica-de-privacidade</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://loja.revvio.com.br/termos-e-condicoes</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+</urlset>

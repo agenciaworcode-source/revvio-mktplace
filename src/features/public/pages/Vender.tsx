@@ -4,6 +4,7 @@ import { PublicTopBar } from "../components/PublicTopBar";
 import { Icon } from "../components/icons";
 import { usePricingPlans, type PricingPlan } from "../queries";
 import { Spinner } from "@/components/ui";
+import { Seo } from "@/components/Seo";
 
 /* ============================================================
    REVVIO — Página "Vender" (captação de garagistas + planos)
@@ -218,6 +219,11 @@ export function Vender() {
 
   return (
     <div className="min-h-screen bg-white font-sans">
+      <Seo
+        title="Anuncie e venda seu veículo"
+        description="Crie a sua mini-loja na Revvio e anuncie carros, motos e caminhões. Sem comissão por venda, contato direto com o comprador pelo WhatsApp."
+        path="/vender"
+      />
       <PublicTopBar current="vender" />
 
       {/* HERO */}

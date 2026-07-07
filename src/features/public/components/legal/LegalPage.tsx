@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { PublicShell } from "../../PublicShell";
 import { Icon } from "../icons";
+import { Seo } from "@/components/Seo";
 
 export type LegalSection = {
   id: string;
@@ -17,14 +18,18 @@ export function LegalPage({
   updatedAt,
   intro,
   sections,
+  path,
 }: {
   title: string;
   updatedAt: string;
   intro: string;
   sections: LegalSection[];
+  /** Rota da página, para canonical/og:url (ex.: "/termos-e-condicoes"). */
+  path?: string;
 }) {
   return (
     <PublicShell>
+      <Seo title={title} description={intro} path={path} />
       {/* cabeçalho */}
       <section className="border-b border-hair bg-cloud">
         <div className="mx-auto max-w-[980px] px-5 py-12 sm:px-7">

@@ -145,6 +145,7 @@ export function TermosCondicoes() {
       updatedAt="22 de junho de 2026"
       intro="Leia atentamente estes Termos antes de utilizar a plataforma REVVIO. O uso do site implica na aceitação integral destas condições."
       sections={SECTIONS}
+      path="/termos-e-condicoes"
     />
   );
 }

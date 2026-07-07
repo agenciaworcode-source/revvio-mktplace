@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Áreas autenticadas / sem valor de indexação
+Disallow: /painel
+Disallow: /dashboard
+Disallow: /minha-conta
+Disallow: /login
+Disallow: /cadastro
+Disallow: /cadastro-vendedor
+Disallow: /definir-senha
+
+Sitemap: https://loja.revvio.com.br/sitemap.xml

@@ -6,6 +6,7 @@ import { MarketplaceCard } from "../components/MarketplaceCard";
 import { Icon } from "../components/icons";
 import { bodyLabels, fuelLabels, transmissionLabels } from "../vehicleLabels";
 import { Spinner } from "@/components/ui";
+import { Seo } from "@/components/Seo";
 
 const inputCls =
   "w-full rounded-lg border border-[#e3e5e9] bg-[#fbfbfc] px-3 py-2.5 text-[13.5px] text-slate-900 outline-none placeholder:text-[#b0b7c0] focus:border-brand";
@@ -137,6 +138,11 @@ export function Marketplace() {
 
   return (
     <PublicShell current="comprar">
+      <Seo
+        title="Comprar veículos"
+        description="Encontre carros, motos e caminhões com procedência no marketplace da Revvio. Filtre por marca, modelo, ano e preço e fale direto com a loja."
+        path="/comprar"
+      />
       {/* Hero */}
       <div
         className="text-white"

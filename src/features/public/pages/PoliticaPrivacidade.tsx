@@ -171,6 +171,7 @@ export function PoliticaPrivacidade() {
       updatedAt="22 de junho de 2026"
       intro="Esta Política descreve como o REVVIO coleta, utiliza e protege os seus dados pessoais, em conformidade com a LGPD (Lei nº 13.709/2018)."
       sections={SECTIONS}
+      path="/politica-de-privacidade"
     />
   );
 }
