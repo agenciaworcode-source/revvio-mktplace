@@ -8,6 +8,8 @@ import {
   useInviteVendedor,
   useSetVendedorRate,
   useSetVendedorStatus,
+  useUpdateVendedor,
+  useDeleteVendedor,
 } from "../queries";
 import {
   Alert,
@@ -21,6 +23,7 @@ import {
   PageHeader,
   Spinner,
 } from "@/components/ui-light";
+import type { Seller } from "@/lib/database.types";
 
 const schema = z.object({
   name: z.string().min(2, "Informe o nome"),
@@ -75,12 +78,106 @@ function InviteForm({ lojaId, onClose }: { lojaId?: string; onClose: () => void 
   );
 }
 
+/* ── Editar dados cadastrais do vendedor ────────────────── */
+function EditVendedorModal({ member, lojaId, onClose }: { member: Seller; lojaId?: string; onClose: () => void }) {
+  const update = useUpdateVendedor(lojaId);
+  const [name, setName] = useState(member.name);
+  const [phone, setPhone] = useState(member.phone ?? "");
+  const [whatsapp, setWhatsapp] = useState(member.whatsapp ?? "");
+
+  async function save() {
+    try {
+      await update.mutateAsync({
+        id: member.id,
+        name: name.trim(),
+        phone: phone.trim() || null,
+        whatsapp: whatsapp.trim() || null,
+      });
+      onClose();
+    } catch {
+      /* erro via update.isError */
+    }
+  }
+
+  return (
+    <Modal open onClose={onClose} title="Editar vendedor" closeOnBackdrop={false}>
+      <div className="flex flex-col gap-4">
+        <Field label="Nome">
+          <Input value={name} onChange={(e) => setName(e.target.value)} />
+        </Field>
+        <Field label="E-mail">
+          <Input value={member.email ?? ""} disabled />
+        </Field>
+        <Field label="Telefone">
+          <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(00) 00000-0000" />
+        </Field>
+        <Field label="WhatsApp">
+          <Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="(00) 00000-0000" />
+        </Field>
+        {update.isError && (
+          <Alert variant="error">
+            {update.error instanceof Error ? update.error.message : "Erro ao salvar."}
+          </Alert>
+        )}
+        <div className="flex justify-end gap-3">
+          <Button variant="ghost" onClick={onClose} disabled={update.isPending}>
+            Cancelar
+          </Button>
+          <Button onClick={save} loading={update.isPending} disabled={!name.trim()}>
+            Salvar
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+/* ── Excluir vendedor ───────────────────────────────────── */
+function DeleteVendedorModal({ member, lojaId, onClose }: { member: Seller; lojaId?: string; onClose: () => void }) {
+  const del = useDeleteVendedor(lojaId);
+
+  async function confirm() {
+    try {
+      await del.mutateAsync(member.id);
+      onClose();
+    } catch {
+      /* erro via del.isError */
+    }
+  }
+
+  return (
+    <Modal open onClose={onClose} title="Excluir vendedor">
+      <div className="flex flex-col gap-4">
+        <p className="text-sm text-slate-600">
+          Excluir o vendedor <strong className="text-slate-900">{member.name}</strong>? Essa ação
+          não pode ser desfeita. Vendedores com vendas registradas não podem ser excluídos.
+        </p>
+        {del.isError && (
+          <Alert variant="error">
+            {del.error instanceof Error ? del.error.message : "Não foi possível excluir."}
+          </Alert>
+        )}
+        <div className="flex justify-end gap-3">
+          <Button variant="ghost" onClick={onClose} disabled={del.isPending}>
+            Cancelar
+          </Button>
+          <Button variant="danger" onClick={confirm} loading={del.isPending}>
+            Excluir
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
 export function Equipe() {
   const { lojaId } = useAuth();
   const { data, isLoading } = useTeam(lojaId ?? undefined);
   const setRate = useSetVendedorRate(lojaId ?? undefined);
   const setStatus = useSetVendedorStatus(lojaId ?? undefined);
   const [inviting, setInviting] = useState(false);
+  const [editing, setEditing] = useState<Seller | null>(null);
+  const [deleting, setDeleting] = useState<Seller | null>(null);
 
   return (
     <div>
@@ -136,18 +233,35 @@ export function Equipe() {
                     />
                   </td>
                   <td className="px-5 py-3 text-right">
-                    <Button
-                      variant="outline"
-                      className="px-3 py-1 text-xs"
-                      onClick={() =>
-                        setStatus.mutate({
-                          id: v.id,
-                          status: v.status === "active" ? "suspended" : "active",
-                        })
-                      }
-                    >
-                      {v.status === "active" ? "Suspender" : "Reativar"}
-                    </Button>
+                    <div className="flex justify-end gap-1.5">
+                      <Button
+                        variant="outline"
+                        className="px-3 py-1 text-xs"
+                        onClick={() => setEditing(v)}
+                      >
+                        Editar
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="px-3 py-1 text-xs"
+                        disabled={setStatus.isPending}
+                        onClick={() =>
+                          setStatus.mutate({
+                            id: v.id,
+                            status: v.status === "active" ? "suspended" : "active",
+                          })
+                        }
+                      >
+                        {v.status === "active" ? "Suspender" : "Reativar"}
+                      </Button>
+                      <Button
+                        variant="danger"
+                        className="px-3 py-1 text-xs"
+                        onClick={() => setDeleting(v)}
+                      >
+                        Excluir
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -159,6 +273,13 @@ export function Equipe() {
       <Modal open={inviting} onClose={() => setInviting(false)} title="Convidar vendedor" closeOnBackdrop={false}>
         <InviteForm lojaId={lojaId ?? undefined} onClose={() => setInviting(false)} />
       </Modal>
+
+      {editing && (
+        <EditVendedorModal member={editing} lojaId={lojaId ?? undefined} onClose={() => setEditing(null)} />
+      )}
+      {deleting && (
+        <DeleteVendedorModal member={deleting} lojaId={lojaId ?? undefined} onClose={() => setDeleting(null)} />
+      )}
     </div>
   );
 }

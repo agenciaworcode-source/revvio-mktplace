@@ -7,10 +7,12 @@ import {
   useAffiliateSaleSignals,
   useAffiliates,
   useAffiliatesEnabled,
+  useDeleteAffiliate,
   useInviteAffiliate,
   useLojaAffiliateReport,
   useSetAffiliateRate,
   useSetAffiliateStatus,
+  useUpdateAffiliate,
 } from "../queries";
 import {
   Alert,
@@ -81,11 +83,105 @@ function InviteForm({ lojaId, onClose }: { lojaId?: string; onClose: () => void 
   );
 }
 
+/* ── Editar dados cadastrais do afiliado ────────────────── */
+function EditAffiliateModal({ a, lojaId, onClose }: { a: Seller; lojaId?: string; onClose: () => void }) {
+  const update = useUpdateAffiliate(lojaId);
+  const [name, setName] = useState(a.name);
+  const [phone, setPhone] = useState(a.phone ?? "");
+  const [whatsapp, setWhatsapp] = useState(a.whatsapp ?? "");
+
+  async function save() {
+    try {
+      await update.mutateAsync({
+        id: a.id,
+        name: name.trim(),
+        phone: phone.trim() || null,
+        whatsapp: whatsapp.trim() || null,
+      });
+      onClose();
+    } catch {
+      /* erro via update.isError */
+    }
+  }
+
+  return (
+    <Modal open onClose={onClose} title="Editar afiliado" closeOnBackdrop={false}>
+      <div className="flex flex-col gap-4">
+        <Field label="Nome">
+          <Input value={name} onChange={(e) => setName(e.target.value)} />
+        </Field>
+        <Field label="E-mail">
+          <Input value={a.email ?? ""} disabled />
+        </Field>
+        <Field label="Telefone">
+          <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(00) 00000-0000" />
+        </Field>
+        <Field label="WhatsApp">
+          <Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="(00) 00000-0000" />
+        </Field>
+        {update.isError && (
+          <Alert variant="error">
+            {update.error instanceof Error ? update.error.message : "Erro ao salvar."}
+          </Alert>
+        )}
+        <div className="flex justify-end gap-3">
+          <Button variant="ghost" onClick={onClose} disabled={update.isPending}>
+            Cancelar
+          </Button>
+          <Button onClick={save} loading={update.isPending} disabled={!name.trim()}>
+            Salvar
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+/* ── Excluir afiliado ───────────────────────────────────── */
+function DeleteAffiliateModal({ a, lojaId, onClose }: { a: Seller; lojaId?: string; onClose: () => void }) {
+  const del = useDeleteAffiliate(lojaId);
+
+  async function confirm() {
+    try {
+      await del.mutateAsync(a.id);
+      onClose();
+    } catch {
+      /* erro via del.isError */
+    }
+  }
+
+  return (
+    <Modal open onClose={onClose} title="Excluir afiliado">
+      <div className="flex flex-col gap-4">
+        <p className="text-sm text-slate-600">
+          Excluir o afiliado <strong className="text-slate-900">{a.name}</strong>? Essa ação não
+          pode ser desfeita. Afiliados com vendas registradas não podem ser excluídos.
+        </p>
+        {del.isError && (
+          <Alert variant="error">
+            {del.error instanceof Error ? del.error.message : "Não foi possível excluir."}
+          </Alert>
+        )}
+        <div className="flex justify-end gap-3">
+          <Button variant="ghost" onClick={onClose} disabled={del.isPending}>
+            Cancelar
+          </Button>
+          <Button variant="danger" onClick={confirm} loading={del.isPending}>
+            Excluir
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
 function AffiliateRow({ a, lojaId }: { a: Seller; lojaId?: string }) {
   const setRate = useSetAffiliateRate(lojaId);
   const setStatus = useSetAffiliateStatus(lojaId);
   const [rate, setRateValue] = useState(String(a.commission_rate ?? 0));
   const [rowError, setRowError] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const suspended = a.status === "suspended";
 
   useEffect(() => {
@@ -125,16 +221,26 @@ function AffiliateRow({ a, lojaId }: { a: Seller; lojaId?: string }) {
       </td>
       <td className="px-5 py-3 text-slate-500">{a.created_at ? formatDate(a.created_at) : "—"}</td>
       <td className="px-5 py-3 text-right">
-        <Button
-          variant="outline"
-          disabled={setStatus.isPending}
-          onClick={() => {
-            setRowError(null);
-            setStatus.mutate({ id: a.id, status: suspended ? "active" : "suspended" }, { onError: (e) => setRowError(e instanceof Error ? e.message : "Erro ao atualizar o status.") });
-          }}
-        >
-          {suspended ? "Reativar" : "Suspender"}
-        </Button>
+        <div className="flex justify-end gap-1.5">
+          <Button variant="outline" onClick={() => setEditing(true)}>
+            Editar
+          </Button>
+          <Button
+            variant="outline"
+            disabled={setStatus.isPending}
+            onClick={() => {
+              setRowError(null);
+              setStatus.mutate({ id: a.id, status: suspended ? "active" : "suspended" }, { onError: (e) => setRowError(e instanceof Error ? e.message : "Erro ao atualizar o status.") });
+            }}
+          >
+            {suspended ? "Reativar" : "Suspender"}
+          </Button>
+          <Button variant="danger" onClick={() => setDeleting(true)}>
+            Excluir
+          </Button>
+        </div>
+        {editing && <EditAffiliateModal a={a} lojaId={lojaId} onClose={() => setEditing(false)} />}
+        {deleting && <DeleteAffiliateModal a={a} lojaId={lojaId} onClose={() => setDeleting(false)} />}
       </td>
     </tr>
   );

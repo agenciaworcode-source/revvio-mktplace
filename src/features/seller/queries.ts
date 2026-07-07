@@ -381,6 +381,36 @@ export function useSetVendedorStatus(lojaId?: string) {
   });
 }
 
+/** Dados cadastrais que o garagista pode editar num membro da equipe. */
+export type TeamMemberEdit = { name: string; phone?: string | null; whatsapp?: string | null };
+
+export function useUpdateVendedor(lojaId?: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { id: string } & TeamMemberEdit) => {
+      const { id, ...fields } = input;
+      const { error } = await supabase.from("rv_sellers").update(fields).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["team", lojaId] }),
+  });
+}
+
+/** Exclui um vendedor da loja (RPC delete_team_member, escopada ao garagista).
+ *  Bloqueada no servidor se a pessoa tiver vendas registradas. */
+export function useDeleteVendedor(lojaId?: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.rpc("delete_team_member" as never, {
+        p_seller_id: id,
+      } as never);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["team", lojaId] }),
+  });
+}
+
 /* ── Comissões da loja (visão do garagista) ─────────────── */
 export type LojaCommission = Commission & {
   vendedor: { name: string } | null;
@@ -499,6 +529,33 @@ export function useSetAffiliateStatus(lojaId?: string) {
         .from("rv_sellers")
         .update({ status: input.status })
         .eq("id", input.id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["affiliates", lojaId] }),
+  });
+}
+
+export function useUpdateAffiliate(lojaId?: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { id: string } & TeamMemberEdit) => {
+      const { id, ...fields } = input;
+      const { error } = await supabase.from("rv_sellers").update(fields).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["affiliates", lojaId] }),
+  });
+}
+
+/** Exclui um afiliado da loja (RPC delete_team_member, escopada ao garagista).
+ *  Bloqueada no servidor se a pessoa tiver vendas registradas. */
+export function useDeleteAffiliate(lojaId?: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.rpc("delete_team_member" as never, {
+        p_seller_id: id,
+      } as never);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["affiliates", lojaId] }),
