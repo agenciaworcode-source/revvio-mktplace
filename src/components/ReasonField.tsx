@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Field, Input, Select } from "@/components/ui-light";
 
 export const SALE_REASONS = [
+  "Vendido na Revvio",
+  "Vendido particular",
   "Comprei outro veículo",
   "Não uso mais",
   "Mudança de cidade/país",
