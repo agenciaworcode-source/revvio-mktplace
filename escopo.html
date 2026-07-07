@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>REVVIO 2.0 — Marketplace Multi-Vendedores</title>
+  <style>
+    :root {
+      --green: #10b981;
+      --green-dark: #059669;
+      --green-light: #d1fae5;
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-400: #94a3b8;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --white: #ffffff;
+      --amber: #f59e0b;
+      --blue: #3b82f6;
+      --purple: #8b5cf6;
+      --red: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--slate-900);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ── Slide base ─────────────────────────────────── */
+    .slide {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 80px;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    @media (max-width: 768px) {
+      .slide { padding: 40px 24px; }
+    }
+
+    /* ── Noise texture overlay ──────────────────────── */
+    .slide::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      opacity: 0.4;
+    }
+
+    /* ── NAV dots ───────────────────────────────────── */
+    .nav-dots {
+      position: fixed;
+      right: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 100;
+    }
+    .nav-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      cursor: pointer;
+      transition: all .3s;
+      border: none;
+    }
+    .nav-dot.active,
+    .nav-dot:hover { background: var(--green); transform: scale(1.4); }
+
+    /* ── Tag / badge ────────────────────────────────── */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(16,185,129,.15);
+      color: var(--green);
+      border: 1px solid rgba(16,185,129,.3);
+      margin-bottom: 20px;
+    }
+
+    .tag-amber {
+      background: rgba(245,158,11,.12);
+      color: var(--amber);
+      border-color: rgba(245,158,11,.3);
+    }
+    .tag-blue {
+      background: rgba(59,130,246,.12);
+      color: var(--blue);
+      border-color: rgba(59,130,246,.3);
+    }
+    .tag-purple {
+      background: rgba(139,92,246,.12);
+      color: var(--purple);
+      border-color: rgba(139,92,246,.3);
+    }
+
+    /* ── Headline ───────────────────────────────────── */
+    h1 {
+      font-size: clamp(36px, 6vw, 80px);
+      font-weight: 900;
+      line-height: 1.0;
+      letter-spacing: -2px;
+    }
+    h2 {
+      font-size: clamp(28px, 4vw, 52px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1px;
+    }
+    h3 { font-size: clamp(18px, 2.5vw, 26px); font-weight: 700; }
+
+    .accent { color: var(--green); }
+    .muted { color: var(--slate-400); }
+
+    /* ── Highlight text ─────────────────────────────── */
+    .highlight {
+      background: linear-gradient(135deg, var(--green) 0%, #34d399 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── Slide 1 — Hero ─────────────────────────────── */
+    #s1 {
+      background: radial-gradient(ellipse 80% 60% at 60% 40%, rgba(16,185,129,.18) 0%, transparent 70%),
+                  var(--slate-900);
+    }
+
+    .hero-eyebrow { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--green); font-weight: 700; margin-bottom: 16px; }
+    .hero-sub {
+      font-size: clamp(16px, 2vw, 22px);
+      color: var(--slate-400);
+      max-width: 600px;
+      margin-top: 20px;
+      line-height: 1.6;
+    }
+    .hero-cta-row { display: flex; gap: 12px; margin-top: 40px; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--green);
+      color: #fff;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background .2s, transform .2s;
+    }
+    .btn-primary:hover { background: var(--green-dark); transform: translateY(-2px); }
+    .btn-outline {
+      background: transparent;
+      color: var(--slate-400);
+      border: 1px solid rgba(255,255,255,.15);
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-outline:hover { border-color: var(--green); color: var(--green); }
+
+    .hero-version {
+      margin-top: 60px;
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .version-chip {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(255,255,255,.04);
+      font-size: 13px;
+    }
+    .version-chip .dot { width:8px; height:8px; border-radius:50%; }
+    .dot-gray { background: var(--slate-600); }
+    .dot-green { background: var(--green); }
+
+    /* ── Grid layouts ───────────────────────────────── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+    @media (max-width: 900px) {
+      .grid-3 { grid-template-columns: 1fr 1fr; }
+      .grid-4 { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    }
+
+    /* ── Cards ──────────────────────────────────────── */
+    .card {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      padding: 24px;
+      transition: transform .2s, border-color .2s;
+    }
+    .card:hover { transform: translateY(-4px); border-color: rgba(16,185,129,.3); }
+
+    .card-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      margin-bottom: 14px;
+    }
+    .icon-green { background: rgba(16,185,129,.15); }
+    .icon-blue  { background: rgba(59,130,246,.15); }
+    .icon-amber { background: rgba(245,158,11,.15); }
+    .icon-purple{ background: rgba(139,92,246,.15); }
+    .icon-red   { background: rgba(239,68,68,.15); }
+
+    .card h3 { margin-bottom: 8px; font-size: 17px; }
+    .card p { color: var(--slate-400); font-size: 14px; line-height: 1.6; }
+
+    /* ── Comparison table ───────────────────────────── */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .compare-table th, .compare-table td {
+      padding: 14px 18px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+    }
+    .compare-table th { color: var(--slate-400); font-weight: 600; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+    .compare-table td:first-child { color: var(--slate-400); }
+    .check { color: var(--green); font-size: 16px; }
+    .cross { color: rgba(255,255,255,.2); font-size: 16px; }
+    .highlight-col { color: var(--green); font-weight: 600; }
+
+    /* ── Timeline ───────────────────────────────────── */
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+    .tl-item {
+      display: flex;
+      gap: 24px;
+      position: relative;
+    }
+    .tl-item:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 19px;
+      top: 44px;
+      bottom: 0;
+      width: 2px;
+      background: rgba(255,255,255,.08);
+    }
+    .tl-dot {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 2px solid var(--green);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-weight: 800;
+      font-size: 14px;
+      color: var(--green);
+      background: var(--slate-900);
+    }
+    .tl-content { padding-bottom: 32px; }
+    .tl-content h3 { margin-bottom: 6px; }
+    .tl-content p { color: var(--slate-400); font-size: 14px; line-height: 1.6; }
+    .tl-duration {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--amber);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    /* ── Architecture diagram ───────────────────────── */
+    .arch {
+      display: flex;
+      gap: 2px;
+      flex-wrap: wrap;
+      align-items: stretch;
+    }
+    .arch-layer {
+      flex: 1;
+      min-width: 160px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 12px;
+      padding: 20px 16px;
+    }
+    .arch-layer h4 {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--slate-400);
+      margin-bottom: 14px;
+      font-weight: 700;
+    }
+    .arch-pill {
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .pill-green  { background: rgba(16,185,129,.15); color: var(--green); }
+    .pill-blue   { background: rgba(59,130,246,.15); color: var(--blue); }
+    .pill-amber  { background: rgba(245,158,11,.15); color: var(--amber); }
+    .pill-purple { background: rgba(139,92,246,.15); color: var(--purple); }
+    .pill-gray   { background: rgba(255,255,255,.06); color: var(--slate-400); }
+
+    /* ── KPI row ────────────────────────────────────── */
+    .kpi-row { display: flex; gap: 20px; flex-wrap: wrap; margin: 32px 0; }
+    .kpi {
+      flex: 1;
+      min-width: 140px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 14px;
+      padding: 20px 18px;
+    }
+    .kpi .num {
+      font-size: 36px;
+      font-weight: 900;
+      line-height: 1;
+      color: var(--green);
+      margin-bottom: 6px;
+    }
+    .kpi .label { font-size: 13px; color: var(--slate-400); }
+
+    /* ── Feature pill list ──────────────────────────── */
+    .pill-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .pill {
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      background: rgba(255,255,255,.07);
+      color: var(--slate-200);
+      border: 1px solid rgba(255,255,255,.1);
+    }
+    .pill.new {
+      background: rgba(16,185,129,.12);
+      color: var(--green);
+      border-color: rgba(16,185,129,.25);
+    }
+    .pill.new::before { content: '✦ '; font-size: 10px; }
+
+    /* ── DB schema box ──────────────────────────────── */
+    .schema-box {
+      background: rgba(0,0,0,.3);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 12px;
+      padding: 20px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      color: #a5f3fc;
+      overflow-x: auto;
+    }
+    .schema-box .entity { color: #fbbf24; font-weight: 700; }
+    .schema-box .pk   { color: #f472b6; }
+    .schema-box .fk   { color: #34d399; }
+    .schema-box .field{ color: #e2e8f0; }
+    .schema-box .new-field { color: #a78bfa; font-weight: 700; }
+
+    /* ── Role diagram ───────────────────────────────── */
+    .role-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .role-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .role-icon { font-size: 28px; flex-shrink: 0; }
+    .role-name { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+    .role-desc { font-size: 13px; color: var(--slate-400); }
+    .role-perms { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .perm { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
+    .perm-green  { background: rgba(16,185,129,.15); color: var(--green); }
+    .perm-blue   { background: rgba(59,130,246,.15); color: var(--blue); }
+    .perm-amber  { background: rgba(245,158,11,.15); color: var(--amber); }
+    .perm-purple { background: rgba(139,92,246,.15); color: var(--purple); }
+
+    /* ── Slide specific backgrounds ─────────────────── */
+    #s2 { background: radial-gradient(ellipse 60% 50% at 20% 50%, rgba(59,130,246,.1) 0%, transparent 70%), var(--slate-900); }
+    #s3 { background: radial-gradient(ellipse 70% 60% at 80% 30%, rgba(139,92,246,.12) 0%, transparent 70%), var(--slate-900); }
+    #s4 { background: var(--slate-900); }
+    #s5 { background: radial-gradient(ellipse 80% 60% at 30% 60%, rgba(16,185,129,.1) 0%, transparent 70%), var(--slate-900); }
+    #s6 { background: var(--slate-900); }
+    #s7 { background: radial-gradient(ellipse 60% 50% at 70% 40%, rgba(245,158,11,.1) 0%, transparent 70%), var(--slate-900); }
+    #s8 { background: radial-gradient(ellipse 80% 80% at 50% 50%, rgba(16,185,129,.12) 0%, transparent 70%), var(--slate-900); }
+
+    /* ── Section header ─────────────────────────────── */
+    .section-header { margin-bottom: 40px; }
+    .section-header p { color: var(--slate-400); font-size: 16px; margin-top: 10px; max-width: 560px; line-height: 1.6; }
+
+    /* ── divider ────────────────────────────────────── */
+    hr.div { border: none; border-top: 1px solid rgba(255,255,255,.07); margin: 32px 0; }
+
+    /* ── Progress bar ───────────────────────────────── */
+    .progress-bar {
+      height: 4px;
+      background: rgba(255,255,255,.07);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--green), #34d399);
+    }
+
+    /* ── Scroll progress ────────────────────────────── */
+    #scroll-progress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      background: var(--green);
+      z-index: 200;
+      transition: width .1s;
+    }
+
+    /* ── Footer ─────────────────────────────────────── */
+    .slide-footer {
+      position: absolute;
+      bottom: 24px;
+      right: 80px;
+      font-size: 12px;
+      color: rgba(255,255,255,.2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .slide-footer .slide-num { color: var(--green); font-weight: 700; }
+  </style>
+</head>
+<body>
+
+<div id="scroll-progress"></div>
+
+<!-- NAV dots -->
+<div class="nav-dots">
+  <button class="nav-dot active" onclick="scrollTo(0)" title="Capa"></button>
+  <button class="nav-dot" onclick="scrollToSlide('s2')" title="Visão Geral"></button>
+  <button class="nav-dot" onclick="scrollToSlide('s3')" title="Arquitetura"></button>
+  <button class="nav-dot" onclick="scrollToSlide('s4')" title="Banco de Dados"></button>
+  <button class="nav-dot" onclick="scrollToSlide('s5')" title="Roles"></button>
+  <button class="nav-dot" onclick="scrollToSlide('s6')" title="Features"></button>
+  <button class="nav-dot" onclick="scrollToSlide('s7')" title="Roadmap"></button>
+  <button class="nav-dot" onclick="scrollToSlide('s8')" title="Próximos Passos"></button>
+</div>
+
+<!-- ─────────────────────────── SLIDE 1 — HERO ──────────────────────────── -->
+<section class="slide" id="s1">
+  <div class="hero-eyebrow">Plano de Evolução · 2026</div>
+  <h1>REVVIO <span class="highlight">2.0</span></h1>
+  <h1 style="color:var(--slate-400); font-size: clamp(28px, 5vw, 64px)">Marketplace Multi-Vendedores</h1>
+  <p class="hero-sub">
+    Transformando o REVVIO em um marketplace de intermediação de veículos —
+    cada vendedor com sua mini-loja pública, painel de gestão próprio, controle financeiro por comissões e registro completo de vendas realizadas.
+  </p>
+  <div class="hero-cta-row">
+    <button class="btn-primary" onclick="scrollToSlide('s2')">Ver o Plano →</button>
+    <button class="btn-outline" onclick="scrollToSlide('s7')">Roadmap</button>
+  </div>
+
+  <div class="hero-version">
+    <div class="version-chip">
+      <span class="dot dot-gray"></span>
+      <span style="color:var(--slate-400)">v1.0 atual</span>
+      <span class="muted">· Admin único</span>
+    </div>
+    <div style="display:flex;align-items:center;color:var(--slate-600);font-size:20px;padding:0 4px">→</div>
+    <div class="version-chip" style="border-color:rgba(16,185,129,.3)">
+      <span class="dot dot-green"></span>
+      <span style="color:var(--green)">v2.0 novo</span>
+      <span class="muted">· Multi-Vendedores + Comissões</span>
+    </div>
+  </div>
+
+  <div class="slide-footer"><span class="slide-num">01</span>/ 08 · REVVIO</div>
+</section>
+
+<!-- ─────────────────────────── SLIDE 2 — OVERVIEW ───────────────────────── -->
+<section class="slide" id="s2">
+  <div class="section-header">
+    <div class="tag">Visão Geral</div>
+    <h2>De <span class="highlight">admin único</span> para<br>o <span class="highlight">multi</span>-vendedores</h2>
+    <p>O modelo de negócio é intermediação: a plataforma conecta vendedores aos compradores e cobra comissão por venda realizada.</p>
+  </div>
+
+  <div style="overflow-x:auto">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Capacidade</th>
+          <th>v1.0 · Atual</th>
+          <th class="highlight-col">v2.0 · Multi-Vendedores</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Nº de vendedores</td>
+          <td>1 (admin hardcoded)</td>
+          <td class="highlight-col">Ilimitado ✦</td>
+        </tr>
+        <tr>
+          <td>Perfil público do vendedor</td>
+          <td><span class="cross">✗</span> não existe</td>
+          <td class="highlight-col"><span class="check">✓</span> Mini-loja /loja/<em>slug</em></td>
+        </tr>
+        <tr>
+          <td>Isolamento de dados</td>
+          <td><span class="cross">✗</span> tudo compartilhado</td>
+          <td class="highlight-col"><span class="check">✓</span> por seller_id (RLS)</td>
+        </tr>
+        <tr>
+          <td>Painel do vendedor</td>
+          <td><span class="cross">✗</span> painel único admin</td>
+          <td class="highlight-col"><span class="check">✓</span> /painel — cada vendedor</td>
+        </tr>
+        <tr>
+          <td>Controle financeiro</td>
+          <td><span class="cross">✗</span> não existe</td>
+          <td class="highlight-col"><span class="check">✓</span> Vendas + Comissões</td>
+        </tr>
+        <tr>
+          <td>Registro de vendas</td>
+          <td><span class="cross">✗</span> apenas status "vendido"</td>
+          <td class="highlight-col"><span class="check">✓</span> Dados do comprador, preço, método</td>
+        </tr>
+        <tr>
+          <td>Comissão por venda</td>
+          <td><span class="cross">✗</span> não existe</td>
+          <td class="highlight-col"><span class="check">✓</span> % configurável por vendedor</td>
+        </tr>
+        <tr>
+          <td>Aprovação de vendedores</td>
+          <td>Não existe</td>
+          <td class="highlight-col"><span class="check">✓</span> Admin aprova/suspende</td>
+        </tr>
+        <tr>
+          <td>Conceito de Owner (proprietário do carro)</td>
+          <td><span class="check">✓</span> existe</td>
+          <td class="highlight-col"><span class="check">✓</span> mantido — coexiste com Seller</td>
+        </tr>
+        <tr>
+          <td>Dashboard admin global</td>
+          <td>Único dashboard</td>
+          <td class="highlight-col"><span class="check">✓</span> /dashboard com visão consolidada</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="kpi-row" style="margin-top:40px">
+    <div class="kpi"><div class="num">∞</div><div class="label">Vendedores simultâneos</div></div>
+    <div class="kpi"><div class="num">2</div><div class="label">Camadas de permissão (admin/seller)</div></div>
+    <div class="kpi"><div class="num">100%</div><div class="label">Isolamento de dados (RLS)</div></div>
+    <div class="kpi"><div class="num">R$</div><div class="label">Controle financeiro completo</div></div>
+  </div>
+
+  <div class="slide-footer"><span class="slide-num">02</span>/ 08 · REVVIO</div>
+</section>
+
+<!-- ─────────────────────────── SLIDE 3 — ARQUITETURA ────────────────────── -->
+<section class="slide" id="s3">
+  <div class="section-header">
+    <div class="tag tag-blue">Arquitetura</div>
+    <h2>Stack e camadas do <span class="highlight">sistema</span></h2>
+    <p>A base tecnológica atual é mantida. Adicionamos a camada multi-vendedores e financeira sobre ela.</p>
+  </div>
+
+  <div class="arch" style="gap:12px">
+    <div class="arch-layer">
+      <h4>Frontend (React + Vite)</h4>
+      <div class="arch-pill pill-gray">Home Marketplace</div>
+      <div class="arch-pill pill-gray">VehicleDetails</div>
+      <div class="arch-pill pill-gray">Login / Auth</div>
+      <div class="arch-pill pill-green">Mini-Loja /loja/:slug</div>
+      <div class="arch-pill pill-green">Painel Vendedor /painel</div>
+      <div class="arch-pill pill-green">Cadastro Vendedor</div>
+      <div class="arch-pill pill-green">Admin Sellers</div>
+      <div class="arch-pill pill-green">Admin Financeiro</div>
+    </div>
+    <div class="arch-layer">
+      <h4>Backend (Express + TS)</h4>
+      <div class="arch-pill pill-gray">vehicleRoutes</div>
+      <div class="arch-pill pill-gray">leadRoutes</div>
+      <div class="arch-pill pill-gray">authRoutes</div>
+      <div class="arch-pill pill-green">sellerRoutes</div>
+      <div class="arch-pill pill-green">salesRoutes</div>
+      <div class="arch-pill pill-green">commissionRoutes</div>
+    </div>
+    <div class="arch-layer">
+      <h4>Middleware</h4>
+      <div class="arch-pill pill-gray">authMiddleware</div>
+      <div class="arch-pill pill-green">roleMiddleware</div>
+      <div class="arch-pill pill-green">requireAdmin</div>
+      <div class="arch-pill pill-green">requireOwnership</div>
+    </div>
+    <div class="arch-layer">
+      <h4>Supabase</h4>
+      <div class="arch-pill pill-gray">vehicles</div>
+      <div class="arch-pill pill-gray">auth.users</div>
+      <div class="arch-pill pill-blue">sellers</div>
+      <div class="arch-pill pill-blue">sales</div>
+      <div class="arch-pill pill-blue">commissions</div>
+      <div class="arch-pill pill-blue">RLS policies</div>
+    </div>
+    <div class="arch-layer">
+      <h4>Infra / Deploy</h4>
+      <div class="arch-pill pill-gray">Docker + Nginx</div>
+      <div class="arch-pill pill-gray">Sharp · WebP</div>
+      <div class="arch-pill pill-gray">Coolify</div>
+      <div class="arch-pill pill-amber">Supabase Realtime</div>
+      <div class="arch-pill pill-amber">N8N Webhooks</div>
+    </div>
+  </div>
+
+  <hr class="div">
+
+  <div class="grid-3" style="margin-top:24px">
+    <div class="card">
+      <div class="card-icon icon-green">🔒</div>
+      <h3>Row Level Security</h3>
+      <p>Todas as queries do Supabase filtradas automaticamente por <code style="color:var(--green)">seller_id</code> via RLS policies — vendedor só vê seus próprios dados.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon icon-blue">🏪</div>
+      <h3>Mini-Loja Pública</h3>
+      <p>Cada vendedor ganha uma URL pública <code style="color:var(--blue)">/loja/nome-do-vendedor</code> com banner, bio, catálogo filtrado e WhatsApp direto.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon icon-amber">💰</div>
+      <h3>Comissão Inteligente</h3>
+      <p>Ao registrar uma venda, o sistema calcula automaticamente a comissão da plataforma com base na <code style="color:var(--amber)">commission_rate</code> configurada.</p>
+    </div>
+  </div>
+
+  <div class="slide-footer"><span class="slide-num">03</span>/ 08 · REVVIO</div>
+</section>
+
+<!-- ─────────────────────────── SLIDE 4 — BANCO DE DADOS ─────────────────── -->
+<section class="slide" id="s4">
+  <div class="section-header">
+    <div class="tag tag-purple">Banco de Dados</div>
+    <h2>Migração do <span class="highlight">schema</span></h2>
+    <p>3 tabelas novas em roxo. A tabela <code style="color:var(--purple)">vehicles</code> recebe apenas a FK <code style="color:var(--purple)">seller_id</code>.</p>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <p style="font-size:13px; color:var(--slate-400); margin-bottom:12px; text-transform:uppercase; letter-spacing:1px; font-weight:700">Tabelas novas</p>
+      <div class="schema-box">
+<span class="entity">sellers</span>
+  <span class="pk">id</span>              uuid PK
+  <span class="fk">user_id</span>         uuid → auth.users
+  <span class="new-field">name</span>            varchar(255)
+  <span class="new-field">slug</span>            varchar(100) UNIQUE
+  <span class="new-field">phone</span>           varchar(20)
+  <span class="new-field">cpf_cnpj</span>        varchar(20)
+  <span class="new-field">bio</span>             text
+  <span class="new-field">avatar_url</span>      text
+  <span class="new-field">banner_url</span>      text
+  <span class="new-field">city / state</span>    varchar
+  <span class="new-field">whatsapp</span>        varchar(20)
+  <span class="new-field">instagram</span>       varchar(100)
+  <span class="new-field">commission_rate</span> decimal(5,2) → 5%
+  <span class="new-field">status</span>          pending | active | suspended
+  <span class="new-field">role</span>            seller | admin
+
+<span class="entity">sales</span>
+  <span class="pk">id</span>              uuid PK
+  <span class="fk">vehicle_id</span>      int → vehicles
+  <span class="fk">seller_id</span>       uuid → sellers
+  <span class="new-field">buyer_name</span>      varchar(255)
+  <span class="new-field">buyer_phone</span>     varchar(20)
+  <span class="new-field">sale_price</span>      decimal(12,2)
+  <span class="new-field">sale_date</span>       date
+  <span class="new-field">payment_method</span>  pix | financiamento | à vista
+
+<span class="entity">commissions</span>
+  <span class="pk">id</span>              uuid PK
+  <span class="fk">sale_id</span>         uuid → sales
+  <span class="fk">seller_id</span>       uuid → sellers
+  <span class="new-field">amount</span>          decimal(12,2) → valor R$
+  <span class="new-field">rate</span>            decimal(5,2) → % aplicado
+  <span class="new-field">status</span>          pending | paid | overdue
+  <span class="new-field">due_date</span>        date
+  <span class="new-field">paid_at</span>         timestamptz
+      </div>
+    </div>
+
+    <div>
+      <p style="font-size:13px; color:var(--slate-400); margin-bottom:12px; text-transform:uppercase; letter-spacing:1px; font-weight:700">Tabela existente — alteração mínima</p>
+      <div class="schema-box">
+<span class="entity">vehicles</span>  <span style="color:#64748b">← sem refactor</span>
+  id              ...
+  make, model     ...
+  price           ...
+  status          ...
+  owner_name      ...  <span style="color:#64748b">← mantido (proprietário do carro)</span>
+  owner_phone     ...  <span style="color:#64748b">← mantido</span>
+  images[]        ...
+  <span class="new-field">seller_id</span>       uuid → sellers  ← NOVO
+
+<span class="entity">Modelo de Negócio</span>  <span style="color:#34d399">← intermediação</span>
+  <span style="color:#94a3b8">Owner</span>    = proprietário original do veículo
+  <span style="color:#34d399">Seller</span>   = vendedor na plataforma REVVIO
+  Os dois conceitos coexistem ✓
+
+<span class="entity">RLS Policies</span>  <span style="color:#34d399">← automático</span>
+  vehicles: seller_id = current_seller()
+  sales:    seller_id = current_seller()
+  commissions: seller_id = current_seller()
+  <span class="new-field">+ admin bypass policy</span>
+      </div>
+
+      <div style="margin-top:16px; padding:14px 18px; border-radius:10px; background:rgba(139,92,246,.1); border:1px solid rgba(139,92,246,.25)">
+        <p style="font-size:13px; color:var(--purple); font-weight:700; margin-bottom:6px">⚡ Migração não destrutiva</p>
+        <p style="font-size:13px; color:var(--slate-400); line-height:1.6">Adicionamos <code style="color:var(--purple)">seller_id</code> como coluna nullable, populamos com o vendedor padrão (admin atual) e só então ativamos o RLS. Zero downtime.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer"><span class="slide-num">04</span>/ 08 · REVVIO</div>
+</section>
+
+<!-- ─────────────────────────── SLIDE 5 — ROLES ──────────────────────────── -->
+<section class="slide" id="s5">
+  <div class="section-header">
+    <div class="tag">Permissões</div>
+    <h2>Sistema de <span class="highlight">Roles</span></h2>
+    <p>Duas camadas de acesso — cada nível enxerga apenas o que precisa.</p>
+  </div>
+
+  <div class="grid-2" style="gap:28px; align-items:start">
+    <div class="role-stack">
+      <div class="role-item" style="background:rgba(239,68,68,.07); border-color:rgba(239,68,68,.2)">
+        <div class="role-icon">👑</div>
+        <div>
+          <div class="role-name" style="color:#f87171">Admin da Plataforma</div>
+          <div class="role-desc">Controle total do REVVIO. Acesso via <code>/dashboard</code>.</div>
+          <div class="role-perms">
+            <span class="perm perm-green">Aprovar vendedores</span>
+            <span class="perm perm-green">Configurar comissões</span>
+            <span class="perm perm-green">Ver todos os veículos</span>
+            <span class="perm perm-green">Gestão financeira global</span>
+            <span class="perm perm-green">Suspender vendedores</span>
+            <span class="perm perm-green">Gerenciar todas as vendas</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="role-item" style="background:rgba(16,185,129,.07); border-color:rgba(16,185,129,.2)">
+        <div class="role-icon">🚗</div>
+        <div>
+          <div class="role-name" style="color:var(--green)">Vendedor</div>
+          <div class="role-desc">Vendedor cadastrado na plataforma. Acesso via <code>/painel</code>.</div>
+          <div class="role-perms">
+            <span class="perm perm-green">CRUD seus veículos</span>
+            <span class="perm perm-green">Registrar vendas</span>
+            <span class="perm perm-blue">Ver seu financeiro</span>
+            <span class="perm perm-blue">Editar perfil / mini-loja</span>
+            <span class="perm perm-amber">Ver suas comissões</span>
+            <span class="perm perm-amber">Gerador WhatsApp</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="role-item" style="background:rgba(59,130,246,.07); border-color:rgba(59,130,246,.2)">
+        <div class="role-icon">👤</div>
+        <div>
+          <div class="role-name" style="color:#60a5fa">Visitante (público)</div>
+          <div class="role-desc">Acessa o marketplace, detalhes de veículos e mini-lojas de vendedores.</div>
+          <div class="role-perms">
+            <span class="perm perm-blue">Ver marketplace</span>
+            <span class="perm perm-blue">Ver mini-lojas</span>
+            <span class="perm perm-blue">Ver detalhes do veículo</span>
+            <span class="perm perm-amber">Enviar lead / WhatsApp</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-icon icon-purple">🔐</div>
+        <h3>Fluxo de autenticação</h3>
+        <p style="margin-top:8px; font-size:13px; line-height:1.8; color:var(--slate-300)">
+          1. Vendedor se cadastra em <code>/cadastro-vendedor</code><br>
+          2. Status fica como <span style="color:var(--amber)">pending</span> até admin aprovar<br>
+          3. Admin aprova → status <span style="color:var(--green)">active</span><br>
+          4. Vendedor faz login → redireciona para <code>/painel</code><br>
+          5. Admin faz login → redireciona para <code>/dashboard</code><br>
+          6. Middleware verifica role e seller_id em cada request
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-icon icon-amber">🔄</div>
+        <h3>Owner vs Seller — Coexistência</h3>
+        <p style="margin-top:8px; font-size:13px; line-height:1.8; color:var(--slate-300)">
+          <strong style="color:var(--slate-200)">Owner</strong> = proprietário original do veículo (dados do dono do carro)<br>
+          <strong style="color:var(--green)">Seller</strong> = vendedor intermediário na plataforma REVVIO<br><br>
+          O modelo é <span style="color:var(--green)">intermediação</span>: o seller cadastra o veículo de um owner e intermedia a venda. Ambos são entidades distintas no sistema.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer"><span class="slide-num">05</span>/ 08 · REVVIO</div>
+</section>
+
+<!-- ─────────────────────────── SLIDE 6 — FEATURES ───────────────────────── -->
+<section class="slide" id="s6">
+  <div class="section-header">
+    <div class="tag tag-blue">Features</div>
+    <h2>Funcionalidades da <span class="highlight">v2.0</span></h2>
+    <p>Mantemos 100% do que já funciona e adicionamos o ecossistema de multi-vendedores e financeiro.</p>
+  </div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-icon icon-green">🏪</div>
+      <h3>Mini-Loja Pública</h3>
+      <p>Cada vendedor tem sua página pública em <code>/loja/slug</code> com banner, avatar, bio, catálogo filtrado e botão WhatsApp direto.</p>
+      <div class="pill-list">
+        <span class="pill new">Novo</span>
+        <span class="pill">/loja/:slug</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon icon-blue">📊</div>
+      <h3>Painel do Vendedor</h3>
+      <p>Dashboard personalizado com KPIs: veículos ativos, vendidos, faturamento mensal, comissões pendentes e gráficos.</p>
+      <div class="pill-list">
+        <span class="pill new">Novo</span>
+        <span class="pill">/painel</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon icon-amber">💰</div>
+      <h3>Controle Financeiro</h3>
+      <p>Registro de vendas com dados do comprador, preço, método de pagamento. Comissão calculada automaticamente por venda.</p>
+      <div class="pill-list">
+        <span class="pill new">Novo</span>
+        <span class="pill">Vendas + Comissões</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon icon-purple">👑</div>
+      <h3>Admin — Gestão de Vendedores</h3>
+      <p>Lista de vendedores com status, ações de aprovar/suspender, configuração de comissão individual por vendedor.</p>
+      <div class="pill-list">
+        <span class="pill new">Novo</span>
+        <span class="pill">/dashboard/sellers</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon icon-green">📈</div>
+      <h3>Admin — Financeiro Global</h3>
+      <p>Visão consolidada: total de vendas, comissões a receber, comissões pagas. Breakdown por vendedor com filtros e exportação.</p>
+      <div class="pill-list">
+        <span class="pill new">Novo</span>
+        <span class="pill">/dashboard/financial</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon icon-blue">📝</div>
+      <h3>Cadastro de Vendedores</h3>
+      <p>Formulário público de registro: nome, e-mail, telefone, CPF/CNPJ, cidade, senha. Aprovação pelo admin antes de liberar acesso.</p>
+      <div class="pill-list">
+        <span class="pill new">Novo</span>
+        <span class="pill">/cadastro-vendedor</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon icon-amber">🛒</div>
+      <h3>Marketplace com Vendedores</h3>
+      <p>Home pública agora exibe badge do vendedor em cada veículo, seção "Nossos Vendedores" e link para mini-lojas.</p>
+      <div class="pill-list">
+        <span class="pill">Já tem base</span>
+        <span class="pill new">Ajuste seller</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon icon-green">📱</div>
+      <h3>WhatsApp do Vendedor</h3>
+      <p>Detalhes do veículo agora mostram "Vendido por" com card do vendedor e WhatsApp direto do seller, não mais genérico.</p>
+      <div class="pill-list">
+        <span class="pill">Já existe</span>
+        <span class="pill new">Ajuste seller</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon icon-purple">🔔</div>
+      <h3>Realtime Multi-Vendedor</h3>
+      <p>Admin recebe notificação quando vendedor cadastra veículo. Vendedor recebe notificação quando admin aprova/rejeita.</p>
+      <div class="pill-list">
+        <span class="pill">Já existe</span>
+        <span class="pill new">Ajuste seller</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer"><span class="slide-num">06</span>/ 08 · REVVIO</div>
+</section>
+
+<!-- ─────────────────────────── SLIDE 7 — ROADMAP ───────────────────────── -->
+<section class="slide" id="s7">
+  <div class="section-header">
+    <div class="tag tag-amber">Roadmap</div>
+    <h2>Fases de <span class="highlight">Implementação</span></h2>
+    <p>6 fases incrementais — cada uma entrega valor independentemente.</p>
+  </div>
+
+  <div class="grid-2" style="gap:40px; align-items:start">
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot">1</div>
+        <div class="tl-content">
+          <span class="tl-duration">Fase 1 · Database</span>
+          <h3>Modelagem de Dados</h3>
+          <p>Criar tabelas <code>sellers</code>, <code>sales</code>, <code>commissions</code> no Supabase. Adicionar <code>seller_id</code> na tabela <code>vehicles</code>. Configurar RLS policies e triggers.</p>
+          <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--slate-400);margin-top:4px">
+            <span>Supabase SQL</span><span>Prioridade Alta</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot">2</div>
+        <div class="tl-content">
+          <span class="tl-duration">Fase 2 · Backend</span>
+          <h3>APIs e Middlewares</h3>
+          <p>roleMiddleware, sellerController, salesController, commissionController. Modificar vehicleController para seller_id e ownership. Novas rotas REST.</p>
+          <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--slate-400);margin-top:4px">
+            <span>Express + TypeScript</span><span>Prioridade Alta</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot">3</div>
+        <div class="tl-content">
+          <span class="tl-duration">Fase 3 · Frontend Auth</span>
+          <h3>Roles, Login e Painel do Vendedor</h3>
+          <p>AuthContext com seller/role, login com redirect por role, cadastro de vendedor, SellerDashboard, SellerVehicles, SellerSales, SellerFinancial, SellerProfile.</p>
+          <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--slate-400);margin-top:4px">
+            <span>React + Context</span><span>Prioridade Alta</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot">4</div>
+        <div class="tl-content">
+          <span class="tl-duration">Fase 4 · Mini-Loja</span>
+          <h3>Perfil Público do Vendedor</h3>
+          <p>Página <code>/loja/:slug</code> com banner, avatar, bio, catálogo filtrado. Ajustar VehicleCard e VehicleDetails com badge e WhatsApp do vendedor.</p>
+          <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--slate-400);margin-top:4px">
+            <span>Frontend Público</span><span>Prioridade Média</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot">5</div>
+        <div class="tl-content">
+          <span class="tl-duration">Fase 5 · Admin Panel</span>
+          <h3>Gestão de Vendedores e Financeiro</h3>
+          <p>AdminSellers (aprovar/suspender/configurar comissão), AdminFinancial (visão consolidada, breakdown por vendedor, exportação). KPIs globais no dashboard.</p>
+          <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--slate-400);margin-top:4px">
+            <span>Frontend Admin</span><span>Prioridade Média</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item" style="padding-bottom:0">
+        <div class="tl-dot">6</div>
+        <div class="tl-content" style="padding-bottom:0">
+          <span class="tl-duration">Fase 6 · Verificação</span>
+          <h3>Testes e Validação</h3>
+          <p>Testar isolamento de dados (vendedor A não vê vendedor B), fluxo completo de registro → aprovação → venda → comissão, responsividade mobile.</p>
+          <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--slate-400);margin-top:4px">
+            <span>QA</span><span>Prioridade Alta</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="margin-bottom:20px">
+        <p style="font-size:13px; color:var(--slate-400); text-transform:uppercase; letter-spacing:1px; font-weight:700; margin-bottom:16px">Módulos a criar</p>
+        <div class="pill-list">
+          <span class="pill new">sellerRoutes.ts</span>
+          <span class="pill new">sellerController.ts</span>
+          <span class="pill new">salesController.ts</span>
+          <span class="pill new">commissionController.ts</span>
+          <span class="pill new">roleMiddleware.ts</span>
+          <span class="pill new">SellerDashboard.tsx</span>
+          <span class="pill new">SellerVehicles.tsx</span>
+          <span class="pill new">SellerSales.tsx</span>
+          <span class="pill new">SellerFinancial.tsx</span>
+          <span class="pill new">SellerProfile.tsx</span>
+          <span class="pill new">SellerStore.tsx</span>
+          <span class="pill new">SellerRegister.tsx</span>
+          <span class="pill new">AdminSellers.tsx</span>
+          <span class="pill new">AdminFinancial.tsx</span>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <p style="font-size:13px; color:var(--slate-400); text-transform:uppercase; letter-spacing:1px; font-weight:700; margin-bottom:16px">Módulos a ajustar</p>
+        <div class="pill-list">
+          <span class="pill">vehicleController.ts</span>
+          <span class="pill">authMiddleware.ts</span>
+          <span class="pill">mapper.ts</span>
+          <span class="pill">vehicleRoutes.ts</span>
+          <span class="pill">AuthContext.tsx</span>
+          <span class="pill">DashboardLayout.tsx</span>
+          <span class="pill">AppSidebar.tsx</span>
+          <span class="pill">Login.tsx</span>
+          <span class="pill">VehicleCard.tsx</span>
+          <span class="pill">VehicleDetails.tsx</span>
+          <span class="pill">Home.tsx</span>
+          <span class="pill">App.tsx (rotas)</span>
+          <span class="pill">Dashboard.tsx</span>
+        </div>
+      </div>
+
+      <div class="card" style="background:rgba(16,185,129,.07); border-color:rgba(16,185,129,.25)">
+        <p style="font-size:13px; color:var(--green); font-weight:700; margin-bottom:6px">✦ Princípio de implantação</p>
+        <p style="font-size:13px; color:var(--slate-300); line-height:1.7">Cada fase é deployável independentemente. A Fase 1 não quebra nenhuma funcionalidade existente — apenas estende o schema, mantendo retrocompatibilidade total com os dados atuais.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer"><span class="slide-num">07</span>/ 08 · REVVIO</div>
+</section>
+
+<!-- ─────────────────────────── SLIDE 8 — CTA FINAL ─────────────────────── -->
+<section class="slide" id="s8">
+  <div style="max-width:700px; margin:auto; text-align:center">
+    <div class="tag" style="margin:0 auto 24px">Próximos Passos</div>
+    <h2 style="font-size:clamp(32px,5vw,64px)">Pronto para escalar o<br><span class="highlight">REVVIO</span>?</h2>
+    <p style="color:var(--slate-400); font-size:18px; margin-top:20px; line-height:1.7">
+      A arquitetura está definida, o plano está mapeado,<br>
+      e o codebase já tem a base sólida para crescer.
+    </p>
+
+    <div class="kpi-row" style="justify-content:center; margin:48px 0">
+      <div class="kpi" style="text-align:center; min-width:120px">
+        <div class="num">6</div>
+        <div class="label">Fases de entrega</div>
+      </div>
+      <div class="kpi" style="text-align:center; min-width:120px">
+        <div class="num">14</div>
+        <div class="label">Módulos novos</div>
+      </div>
+      <div class="kpi" style="text-align:center; min-width:120px">
+        <div class="num">13</div>
+        <div class="label">Ajustes nos existentes</div>
+      </div>
+      <div class="kpi" style="text-align:center; min-width:120px">
+        <div class="num">0</div>
+        <div class="label">Downtime esperado</div>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:12px; align-items:center">
+      <div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center">
+        <div style="padding:16px 24px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); font-size:14px; text-align:left; min-width:200px">
+          <div style="color:var(--green); font-weight:700; font-size:13px; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px">✓ Fase 1</div>
+          <div style="color:var(--slate-300)">Database Schema</div>
+          <div style="color:var(--slate-500); font-size:12px; margin-top:4px">sellers + sales + commissions</div>
+        </div>
+        <div style="padding:16px 24px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); font-size:14px; text-align:left; min-width:200px">
+          <div style="color:var(--blue); font-weight:700; font-size:13px; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px">→ Fase 2</div>
+          <div style="color:var(--slate-300)">Backend APIs</div>
+          <div style="color:var(--slate-500); font-size:12px; margin-top:4px">Controllers + Middlewares</div>
+        </div>
+        <div style="padding:16px 24px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); font-size:14px; text-align:left; min-width:200px">
+          <div style="color:var(--purple); font-weight:700; font-size:13px; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px">○ Fase 3-4</div>
+          <div style="color:var(--slate-300)">Painel Vendedor + Mini-Loja</div>
+          <div style="color:var(--slate-500); font-size:12px; margin-top:4px">Frontend multi-role</div>
+        </div>
+        <div style="padding:16px 24px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); font-size:14px; text-align:left; min-width:200px">
+          <div style="color:var(--amber); font-weight:700; font-size:13px; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px">○ Fase 5-6</div>
+          <div style="color:var(--slate-300)">Admin + Financeiro</div>
+          <div style="color:var(--slate-500); font-size:12px; margin-top:4px">Gestão e verificação</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:48px; padding:24px; border-radius:16px; background:linear-gradient(135deg, rgba(16,185,129,.15) 0%, rgba(16,185,129,.05) 100%); border:1px solid rgba(16,185,129,.3)">
+      <p style="font-size:15px; color:var(--slate-200); line-height:1.7">
+        <strong style="color:var(--green)">Stack preservada.</strong> React · TypeScript · Vite · Express · Supabase · Docker.<br>
+        Modelo de intermediação com comissão configurável. Migração incremental e reversível.
+      </p>
+    </div>
+  </div>
+
+  <div class="slide-footer"><span class="slide-num">08</span>/ 08 · REVVIO</div>
+</section>
+
+<script>
+  // Scroll progress
+  window.addEventListener('scroll', () => {
+    const total = document.body.scrollHeight - window.innerHeight;
+    const pct = (window.scrollY / total) * 100;
+    document.getElementById('scroll-progress').style.width = pct + '%';
+
+    // Nav dots
+    const slides = ['s1','s2','s3','s4','s5','s6','s7','s8'];
+    const dots = document.querySelectorAll('.nav-dot');
+    let active = 0;
+    slides.forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (el && window.scrollY >= el.offsetTop - window.innerHeight / 2) active = i;
+    });
+    dots.forEach((d, i) => d.classList.toggle('active', i === active));
+  });
+
+  function scrollToSlide(id) {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // Keyboard nav
+  document.addEventListener('keydown', e => {
+    const slides = ['s1','s2','s3','s4','s5','s6','s7','s8'];
+    const curr = slides.findIndex(id => {
+      const el = document.getElementById(id);
+      return el && window.scrollY >= el.offsetTop - window.innerHeight / 2;
+    });
+    if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+      e.preventDefault();
+      if (curr < slides.length - 1) scrollToSlide(slides[curr + 1]);
+    }
+    if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+      e.preventDefault();
+      if (curr > 0) scrollToSlide(slides[curr - 1]);
+    }
+  });
+</script>
+
+</body>
+</html>

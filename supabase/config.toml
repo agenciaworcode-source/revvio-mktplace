@@ -1,0 +1,60 @@
+project_id = "revvio"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+
+[auth]
+enabled = true
+site_url = "http://localhost:5173"
+additional_redirect_urls = ["http://localhost:5173"]
+jwt_expiry = 3600
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+enable_confirmations = false
+
+[storage]
+enabled = true
+
+# Edge Functions
+# asaas-billing é chamada pelo app (admin) com o JWT do usuário → exige JWT.
+[functions.asaas-billing]
+verify_jwt = true
+
+# asaas-webhook é chamada pelo ASAAS (sem JWT do Supabase) → JWT desligado.
+# A autenticidade é validada pelo header asaas-access-token (ASAAS_WEBHOOK_TOKEN).
+[functions.asaas-webhook]
+verify_jwt = false
+
+# send-email é chamada pelos triggers do banco (pg_net) → sem JWT.
+# A autenticidade é validada pelo header x-email-secret (EMAIL_TRIGGER_SECRET).
+[functions.send-email]
+verify_jwt = false
+
+[functions.invite-vendedor]
+verify_jwt = true
+
+# invite-affiliate é chamada pelo app (garagista autenticado) → exige JWT.
+[functions.invite-affiliate]
+verify_jwt = true
+
+# signup-checkout é o cadastro público do garagista (sem conta ainda) → sem JWT.
+[functions.signup-checkout]
+verify_jwt = false
+
+# cnpj-lookup: consulta pública de CNPJ p/ o cadastro do garagista → sem JWT.
+[functions.cnpj-lookup]
+verify_jwt = false

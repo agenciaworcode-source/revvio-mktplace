@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="420" viewBox="0 0 1280 420">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0c1322"/>
+      <stop offset="1" stop-color="#08090c"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="420" fill="url(#g)"/>
+  <circle cx="980" cy="80" r="320" fill="#10b981" opacity="0.16"/>
+  <text x="64" y="210" fill="#ffffff" font-family="sans-serif" font-size="48" font-weight="800">REVVIO</text>
+  <text x="64" y="262" fill="#9aa3af" font-family="sans-serif" font-size="22">Banner — substitua por sua imagem em public/home/</text>
+</svg>

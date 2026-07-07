@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background: #0f172a;
+  color: #fff;
+  font-family: system-ui, "Segoe UI", sans-serif;
+}
+
+/* Autofill: mantém o fundo claro do input e a fonte escura (sobrepõe o tema
+   escuro que o navegador aplicaria por causa do color-scheme: dark). */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus {
+  -webkit-text-fill-color: #0f172a;
+  -webkit-box-shadow: 0 0 0 1000px #fbfbfc inset;
+  box-shadow: 0 0 0 1000px #fbfbfc inset;
+  caret-color: #0f172a;
+  transition: background-color 9999s ease-in-out 0s;
+}
