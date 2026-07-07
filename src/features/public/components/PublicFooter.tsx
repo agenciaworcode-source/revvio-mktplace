@@ -84,11 +84,26 @@ export function PublicFooter() {
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate-500">
             Portal de compra e venda de veículos com procedência e contato direto com a loja.
           </p>
-          <p className="mt-4 flex items-center gap-2 text-sm text-slate-500">
+          <a
+            href="mailto:contato@revvio.com.br"
+            className="mt-4 flex items-center gap-2 text-sm text-slate-500 hover:text-brand"
+          >
             <Icon name="mail" size={15} className="text-brand" /> contato@revvio.com.br
+          </a>
+          <a
+            href="https://wa.me/5514981800854"
+            target="_blank"
+            rel="noreferrer"
+            className="mt-1.5 flex items-center gap-2 text-sm text-slate-500 hover:text-brand"
+          >
+            <Icon name="whatsapp" size={15} className="text-brand" /> (14) 98180-0854
+          </a>
+          <p className="mt-1.5 flex items-start gap-2 text-sm text-slate-500">
+            <Icon name="mapPin" size={15} className="mt-0.5 shrink-0 text-brand" />
+            Av. Ipiranga, 207 — Centro, Marília — SP, 17509-210
           </p>
           <p className="mt-1.5 flex items-center gap-2 text-sm text-slate-500">
-            <Icon name="whatsapp" size={15} className="text-brand" /> (00) 00000-0000
+            <Icon name="clock" size={15} className="text-brand" /> Seg. a sex., das 9h às 18h
           </p>
           <div className="mt-5 flex gap-2.5">
             {SOCIAL.map((s) => {

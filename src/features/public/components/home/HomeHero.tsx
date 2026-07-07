@@ -16,9 +16,12 @@ export function HomeHero({ bannerUrl }: { bannerUrl?: string | null }) {
 
   return (
     <section className="relative z-20">
-      {/* banner placeholder — altura cheia (vai até o fim da busca) */}
+      {/* banner: usa o enviado pelo admin; senão, foto de banco de imagens */}
       <img
-        src={bannerUrl || "/home/banner-placeholder.svg"}
+        src={
+          bannerUrl ||
+          "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1600&h=548&q=75"
+        }
         alt="Banner REVVIO"
         className="h-[460px] w-full object-cover sm:h-[548px]"
       />

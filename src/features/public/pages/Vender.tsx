@@ -538,9 +538,14 @@ export function Vender() {
             >
               Escolher meu plano
             </button>
-            <button className="rounded-xl border border-white/30 bg-white/15 px-8 py-[15px] text-[15.5px] font-bold text-white hover:bg-white/25">
+            <a
+              href="https://wa.me/5514981800854?text=Ol%C3%A1!%20Quero%20anunciar%20na%20Revvio."
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-xl border border-white/30 bg-white/15 px-8 py-[15px] text-[15.5px] font-bold text-white hover:bg-white/25"
+            >
               Falar no WhatsApp
-            </button>
+            </a>
           </div>
         </div>
       </section>
@@ -550,7 +555,8 @@ export function Vender() {
         <div className="mb-2.5 font-display text-xl font-extrabold tracking-tight text-white">
           REVV<span className="text-brand">IO</span>
         </div>
-        REVVIO Marketplace · Gestão e venda de veículos · © 2026
+        Av. Ipiranga, 207 — Centro, Marília — SP · (14) 98180-0854 · contato@revvio.com.br
+        <div className="mt-1.5">REVVIO Marketplace · Gestão e venda de veículos · © 2026</div>
       </footer>
     </div>
   );

@@ -154,8 +154,9 @@ const SECTIONS: LegalSection[] = [
         <LegalList
           items={[
             <>E-mail: <strong>contato@revvio.com.br</strong></>,
-            <>Telefone: <strong>(00) 00000-0000</strong></>,
-            "Atendimento: segunda a sexta, das 8h às 18h.",
+            <>Telefone / WhatsApp: <strong>(14) 98180-0854</strong></>,
+            <>Endereço: <strong>Av. Ipiranga, 207 — Centro, Marília — SP, 17509-210</strong></>,
+            "Atendimento: segunda a sexta, das 9h às 18h.",
           ]}
         />
       </>

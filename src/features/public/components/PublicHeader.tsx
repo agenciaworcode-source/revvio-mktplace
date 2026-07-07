@@ -25,14 +25,22 @@ export function PublicHeader({
 
   return (
     <header className="sticky top-0 z-40">
-      {/* faixa de contato (placeholders) */}
+      {/* faixa de contato */}
       <div className="bg-ink text-slate-300">
         <div className="mx-auto flex h-9 max-w-[1280px] items-center gap-6 px-5 text-[12.5px] sm:px-7">
-          <span className="inline-flex items-center gap-1.5">
+          <a href="mailto:contato@revvio.com.br" className="inline-flex items-center gap-1.5 hover:text-white">
             <Icon name="mail" size={14} /> contato@revvio.com.br
-          </span>
-          <span className="hidden items-center gap-1.5 sm:inline-flex">
-            <Icon name="whatsapp" size={14} /> (00) 00000-0000
+          </a>
+          <a
+            href="https://wa.me/5514981800854"
+            target="_blank"
+            rel="noreferrer"
+            className="hidden items-center gap-1.5 hover:text-white sm:inline-flex"
+          >
+            <Icon name="whatsapp" size={14} /> (14) 98180-0854
+          </a>
+          <span className="ml-auto hidden items-center gap-1.5 md:inline-flex">
+            <Icon name="mapPin" size={14} /> Av. Ipiranga, 207 · Centro, Marília — SP
           </span>
         </div>
         <div className="h-[2px] w-full bg-brand" />

@@ -37,9 +37,9 @@ export function HomeQuemSomos() {
         </div>
         <div className="relative">
           <img
-            src="/home/quem-somos-placeholder.svg"
-            alt=""
-            className="w-full rounded-2xl"
+            src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=720&h=560&q=75"
+            alt="Veículo em destaque na Revvio"
+            className="aspect-[4/3] w-full rounded-2xl object-cover"
           />
           <span className="absolute bottom-4 left-4 inline-flex items-center gap-1.5 rounded-lg bg-brand px-3.5 py-2 text-sm font-bold text-white">
             <Icon name="star" size={15} /> Plataforma confiável
