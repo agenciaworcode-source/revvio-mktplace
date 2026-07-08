@@ -15,6 +15,7 @@ import {
 } from "@/components/panel";
 import { Icon } from "@/features/public/components/icons";
 import { formatCurrency } from "@/lib/format";
+import { AFFILIATES_ENABLED } from "@/config/features";
 import {
   Alert,
   Button,
@@ -266,15 +267,17 @@ function PlanFormModal({
             />
             Plano ativo
           </label>
-          <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
-            <input
-              type="checkbox"
-              className="h-4 w-4 accent-brand"
-              checked={state.affiliates_enabled}
-              onChange={(e) => set("affiliates_enabled", e.target.checked)}
-            />
-            Habilita afiliados neste plano
-          </label>
+          {AFFILIATES_ENABLED && (
+            <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
+              <input
+                type="checkbox"
+                className="h-4 w-4 accent-brand"
+                checked={state.affiliates_enabled}
+                onChange={(e) => set("affiliates_enabled", e.target.checked)}
+              />
+              Habilita afiliados neste plano
+            </label>
+          )}
         </div>
 
         <div className="mt-2 flex items-center justify-between border-t border-hair pt-4">

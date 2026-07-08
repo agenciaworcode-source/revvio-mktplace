@@ -16,6 +16,7 @@ import {
 } from "../queries";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { maskPhone } from "@/lib/masks";
+import { AFFILIATES_ENABLED } from "@/config/features";
 import { ReasonField, SALE_REASONS } from "@/components/ReasonField";
 import {
   Alert,
@@ -90,7 +91,7 @@ function RegisterSaleForm({ onClose }: { onClose: () => void }) {
   const watchedVehicle = watch("vehicle_id");
 
   useEffect(() => {
-    if (isVendedor) {
+    if (!AFFILIATES_ENABLED || isVendedor) {
       setSuggestion(null);
       return;
     }
@@ -153,7 +154,7 @@ function RegisterSaleForm({ onClose }: { onClose: () => void }) {
         <input type="hidden" value={`vendedor:${personId ?? ""}`} {...register("responsavel")} />
       ) : (
         <>
-        {suggestion && (
+        {AFFILIATES_ENABLED && suggestion && (
           <Alert variant="info">
             Este comprador veio pelo link do afiliado <strong>{suggestion.name}</strong>. Pré-selecionamos
             ele como responsável — você pode confirmar ou trocar.
@@ -178,7 +179,7 @@ function RegisterSaleForm({ onClose }: { onClose: () => void }) {
                   </option>
                 ))}
             </optgroup>
-            {(affiliates.data ?? []).length > 0 && (
+            {AFFILIATES_ENABLED && (affiliates.data ?? []).length > 0 && (
               <optgroup label="Afiliados">
                 {(affiliates.data ?? []).map((a) => (
                   <option key={`a-${a.id}`} value={`afiliado:${a.id}`}>

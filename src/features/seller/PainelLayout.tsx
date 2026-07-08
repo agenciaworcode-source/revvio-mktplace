@@ -1,12 +1,14 @@
 import { useAuth } from "@/features/auth/AuthProvider";
 import { PanelShell, type PanelNavItem } from "@/components/PanelShell";
 import { useAffiliatesEnabled } from "./queries";
+import { AFFILIATES_ENABLED } from "@/config/features";
 
 export function PainelLayout() {
   const { seller, isGaragista, isAdmin } = useAuth();
   const manager = isGaragista || isAdmin;
   const { data: affiliatesOn } = useAffiliatesEnabled(seller?.pricing_plan_key);
-  const showAffiliates = manager && (isAdmin || affiliatesOn === true);
+  const showAffiliates =
+    AFFILIATES_ENABLED && manager && (isAdmin || affiliatesOn === true);
   const nav: PanelNavItem[] = [
     { to: "/painel", label: "Dashboard", icon: "grid", end: true },
     ...(manager

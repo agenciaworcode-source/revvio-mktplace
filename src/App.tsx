@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { ProtectedRoute, RoleRoute } from "@/features/auth/routeGuards";
 import { Placeholder } from "@/components/Placeholder";
+import { AFFILIATES_ENABLED } from "@/config/features";
 
 /* Páginas carregadas sob demanda (code-splitting por rota). */
 const Login = lazy(() =>
@@ -168,7 +169,8 @@ function RoleRedirect() {
     return <Navigate to="/aguardando-aprovacao" replace />;
   if (seller.status === "suspended")
     return <Navigate to="/conta-suspensa" replace />;
-  if (seller.role === "afiliado") return <Navigate to="/afiliado" replace />;
+  if (AFFILIATES_ENABLED && seller.role === "afiliado")
+    return <Navigate to="/afiliado" replace />;
   return <Navigate to="/painel" replace />; // garagista ou vendedor
 }
 
@@ -209,7 +211,9 @@ export default function App() {
           <Route path="leads" element={<SellerLeads />} />
           <Route path="veiculos" element={<SellerVehicles />} />
           <Route path="vendedores" element={<SellerEquipe />} />
-          <Route path="afiliados" element={<SellerAfiliados />} />
+          {AFFILIATES_ENABLED && (
+            <Route path="afiliados" element={<SellerAfiliados />} />
+          )}
           <Route path="vendas" element={<SellerSales />} />
           <Route
             path="financeiro"
@@ -224,18 +228,20 @@ export default function App() {
         </Route>
 
         {/* ── Afiliado ──────────────────────────── */}
-        <Route
-          path="/afiliado"
-          element={
-            <RoleRoute roles={["afiliado"]}>
-              <AffiliateLayout />
-            </RoleRoute>
-          }
-        >
-          <Route index element={<AfiliadoCarros />} />
-          <Route path="desempenho" element={<AfiliadoDesempenho />} />
-          <Route path="perfil" element={<AfiliadoPerfil />} />
-        </Route>
+        {AFFILIATES_ENABLED && (
+          <Route
+            path="/afiliado"
+            element={
+              <RoleRoute roles={["afiliado"]}>
+                <AffiliateLayout />
+              </RoleRoute>
+            }
+          >
+            <Route index element={<AfiliadoCarros />} />
+            <Route path="desempenho" element={<AfiliadoDesempenho />} />
+            <Route path="perfil" element={<AfiliadoPerfil />} />
+          </Route>
+        )}
 
         {/* ── Admin ─────────────────────────────── */}
         <Route
@@ -254,7 +260,9 @@ export default function App() {
           <Route path="planos" element={<AdminPlans />} />
           <Route path="veiculos" element={<AdminVehicles />} />
           <Route path="movimentacoes" element={<AdminMovimentacoes />} />
-          <Route path="afiliados" element={<AdminAfiliados />} />
+          {AFFILIATES_ENABLED && (
+            <Route path="afiliados" element={<AdminAfiliados />} />
+          )}
           <Route path="mini-lojas" element={<AdminStores />} />
           <Route path="aparencia" element={<AdminAparencia />} />
         </Route>

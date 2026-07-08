@@ -8,6 +8,7 @@ import { BuyerAuthModal } from "@/features/auth/components/BuyerAuthModal";
 import { useLogClickEvent } from "@/features/tracking/queries";
 import { bodyLabels, fuelLabels, transmissionLabels } from "../vehicleLabels";
 import { formatCurrency, formatNumber } from "@/lib/format";
+import { AFFILIATES_ENABLED } from "@/config/features";
 import { whatsappLink } from "@/lib/whatsapp";
 import { maskPhone } from "@/lib/masks";
 import { Icon } from "../components/icons";
@@ -353,6 +354,7 @@ export function VehicleDetails() {
   // até um eventual login) e loga a visita uma vez por carga, quando o carro
   // já estiver carregado.
   useEffect(() => {
+    if (!AFFILIATES_ENABLED) return;
     const ref = searchParams.get("ref");
     if (ref) {
       try {
