@@ -1,15 +1,11 @@
 import { useEffect, useState } from "react";
 import { Field, Input, Select } from "@/components/ui-light";
 
+// Como a venda foi realizada (canal). Rótulo exibido: "Venda realizada".
 export const SALE_REASONS = [
-  "Vendido na Revvio",
-  "Vendido particular",
-  "Comprei outro veículo",
-  "Não uso mais",
-  "Mudança de cidade/país",
-  "Preciso do dinheiro",
-  "Troca por outro veículo",
-  "Repasse/lojista",
+  "Através da Plataforma Revvio",
+  "Cliente veio presencialmente na loja",
+  "Por indicação",
   "Outro",
 ] as const;
 

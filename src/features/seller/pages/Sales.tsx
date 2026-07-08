@@ -46,7 +46,7 @@ const schema = z.object({
   sale_price: z.coerce.number().gt(0, "Informe o valor"),
   payment_method: z.enum(["pix", "financiamento", "a_vista"]),
   sale_date: z.string().min(1, "Informe a data"),
-  sale_reason: z.string().min(1, "Informe o motivo da venda"),
+  sale_reason: z.string().min(1, "Informe como a venda foi realizada"),
 });
 type FormValues = z.infer<typeof schema>;
 
@@ -299,7 +299,7 @@ function RegisterSaleForm({ onClose }: { onClose: () => void }) {
         name="sale_reason"
         render={({ field }) => (
           <ReasonField
-            label="Motivo da venda"
+            label="Venda realizada"
             options={SALE_REASONS}
             error={errors.sale_reason?.message}
             onResolved={field.onChange}
@@ -368,7 +368,7 @@ export function Sales() {
                 <th className="px-5 py-3 font-medium">Veículo</th>
                 <th className="px-5 py-3 font-medium">Comprador</th>
                 <th className="px-5 py-3 font-medium">Pagamento</th>
-                <th className="px-5 py-3 font-medium">Motivo</th>
+                <th className="px-5 py-3 font-medium">Venda realizada</th>
                 <th className="px-5 py-3 font-medium">Data</th>
                 <th className="px-5 py-3 text-right font-medium">Valor</th>
                 {manager && <th className="px-5 py-3 text-right font-medium">Ações</th>}

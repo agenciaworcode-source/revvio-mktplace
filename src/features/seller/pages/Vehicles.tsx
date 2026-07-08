@@ -83,7 +83,7 @@ const schema = z.object({
 });
 type FormValues = z.infer<typeof schema>;
 
-function toDefaults(v?: VehicleWithOwner): FormValues {
+function toDefaults(v?: VehicleWithOwner, fallbackVendedorId?: string): FormValues {
   return {
     make: v?.make ?? "",
     model: v?.model ?? "",
@@ -99,7 +99,7 @@ function toDefaults(v?: VehicleWithOwner): FormValues {
     featured: v?.featured ?? false,
     options: v?.options ?? [],
     status: (v?.status === "removed" ? "available" : v?.status) ?? "available",
-    vendedor_id: v?.vendedor_id ?? "",
+    vendedor_id: v?.vendedor_id ?? fallbackVendedorId ?? "",
     origem: v?.origem ?? "",
     primeiro_dono: v?.primeiro_dono == null ? null : v.primeiro_dono ? "sim" : "nao",
     documentacao: v?.documentacao ?? "",
@@ -227,7 +227,7 @@ export function VehicleForm({
   /** Loja do veículo (modo admin). Quando ausente, usa a loja do usuário logado. */
   lojaId?: string;
 }) {
-  const { lojaId: authLojaId, seller } = useAuth();
+  const { lojaId: authLojaId, seller, personId, isVendedor } = useAuth();
   const lojaId = lojaIdProp ?? authLojaId ?? undefined;
   const save = useSaveVehicle(lojaId);
   // Garagista (dono) + vendedores da loja — funciona tanto p/ o próprio
@@ -240,6 +240,10 @@ export function VehicleForm({
         ? `${p.name}${seller?.id === p.id ? " (você)" : " (garagista)"}`
         : p.name,
   }));
+  // Quem cadastrou o veículo (melhoria #2) — só há valor ao editar.
+  const createdByName = vehicle?.created_by
+    ? people.find((p) => p.id === vehicle.created_by)?.name ?? "—"
+    : null;
   const [images, setImages] = useState<string[]>(vehicle?.images ?? []);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -252,7 +256,8 @@ export function VehicleForm({
     formState: { errors, dirtyFields },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: toDefaults(vehicle),
+    // Ao cadastrar como vendedor, já atribui o veículo a si mesmo por padrão.
+    defaultValues: toDefaults(vehicle, isVendedor ? personId ?? undefined : undefined),
   });
   const [manual, setManual] = useState<boolean>(!!vehicle);
 
@@ -421,6 +426,19 @@ export function VehicleForm({
             ))}
           </Select>
         </Field>
+        {createdByName && (
+          <Field
+            label="Cadastrado por"
+            hint="Quem registrou este veículo na plataforma."
+          >
+            <Input
+              readOnly
+              tabIndex={-1}
+              value={createdByName}
+              className="cursor-not-allowed bg-slate-50 text-slate-500"
+            />
+          </Field>
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -644,9 +662,7 @@ export function Vehicles() {
       <PageHeader
         title="Meus Veículos"
         subtitle="Cadastre e gerencie o seu estoque."
-        action={
-          manager ? <Button onClick={() => setCreating(true)}>+ Novo veículo</Button> : undefined
-        }
+        action={<Button onClick={() => setCreating(true)}>+ Novo veículo</Button>}
       />
 
       {isLoading ? (
@@ -656,14 +672,8 @@ export function Vehicles() {
       ) : vehicles.length === 0 ? (
         <EmptyState
           title="Nenhum veículo cadastrado"
-          description={
-            manager
-              ? "Adicione seu primeiro veículo para começar a vender."
-              : "A loja ainda não tem veículos cadastrados."
-          }
-          action={
-            manager ? <Button onClick={() => setCreating(true)}>+ Novo veículo</Button> : undefined
-          }
+          description="Adicione seu primeiro veículo para começar a vender."
+          action={<Button onClick={() => setCreating(true)}>+ Novo veículo</Button>}
         />
       ) : (
         <div className="flex flex-col gap-4">
@@ -808,22 +818,24 @@ export function Vehicles() {
                         👁 {formatNumber(v.clicks)} {v.clicks === 1 ? "clique" : "cliques"}
                       </span>
                     </div>
-                    <div className="mt-1 flex gap-2">
-                      <Button
-                        variant="outline"
-                        className="flex-1 py-2"
-                        onClick={() => setEditing(v)}
-                      >
-                        Editar
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        className="px-3 py-2 text-red-400 hover:bg-red-950/40"
-                        onClick={() => setDeleting(v)}
-                      >
-                        Excluir
-                      </Button>
-                    </div>
+                    {manager && (
+                      <div className="mt-1 flex gap-2">
+                        <Button
+                          variant="outline"
+                          className="flex-1 py-2"
+                          onClick={() => setEditing(v)}
+                        >
+                          Editar
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          className="px-3 py-2 text-red-400 hover:bg-red-950/40"
+                          onClick={() => setDeleting(v)}
+                        >
+                          Excluir
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </Card>
               ))}
@@ -839,7 +851,7 @@ export function Vehicles() {
                     <th className="px-5 py-3 text-center font-medium">Cliques</th>
                     <th className="px-5 py-3 text-right font-medium">Preço</th>
                     <th className="px-5 py-3 text-right font-medium">FIPE</th>
-                    <th className="px-5 py-3 text-right font-medium">Ações</th>
+                    {manager && <th className="px-5 py-3 text-right font-medium">Ações</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -886,20 +898,22 @@ export function Vehicles() {
                           "—"
                         )}
                       </td>
-                      <td className="px-5 py-3">
-                        <div className="flex justify-end gap-2">
-                          <Button variant="outline" className="px-3 py-1.5" onClick={() => setEditing(v)}>
-                            Editar
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            className="px-3 py-1.5 text-red-400 hover:bg-red-950/40"
-                            onClick={() => setDeleting(v)}
-                          >
-                            Excluir
-                          </Button>
-                        </div>
-                      </td>
+                      {manager && (
+                        <td className="px-5 py-3">
+                          <div className="flex justify-end gap-2">
+                            <Button variant="outline" className="px-3 py-1.5" onClick={() => setEditing(v)}>
+                              Editar
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              className="px-3 py-1.5 text-red-400 hover:bg-red-950/40"
+                              onClick={() => setDeleting(v)}
+                            >
+                              Excluir
+                            </Button>
+                          </div>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>

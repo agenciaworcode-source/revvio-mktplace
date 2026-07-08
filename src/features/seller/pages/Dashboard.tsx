@@ -39,6 +39,11 @@ export function Dashboard() {
       ?.filter((c) => c.status === "pending")
       .reduce((acc, c) => acc + Number(c.amount), 0) ?? 0;
 
+  // Comissões a receber (vendedor): pendentes + atrasadas, por vencimento.
+  const receivable = (commissions.data ?? [])
+    .filter((c) => c.status === "pending" || c.status === "overdue")
+    .sort((a, b) => (a.due_date ?? "").localeCompare(b.due_date ?? ""));
+
   const recent = sales.data?.slice(0, 5) ?? [];
 
   return (
@@ -76,6 +81,46 @@ export function Dashboard() {
             sales={sales.data ?? []}
             vehicles={vehicles.data ?? []}
           />
+
+          {isVendedor && (
+            <>
+              <div className="mb-3 mt-10 flex items-end justify-between gap-3">
+                <h2 className="text-lg font-bold text-slate-900">Comissões a receber</h2>
+                <span className="text-sm font-semibold text-slate-500">
+                  {formatCurrency(pendingCommission)} no total
+                </span>
+              </div>
+              {receivable.length === 0 ? (
+                <EmptyState
+                  title="Nenhuma comissão a receber"
+                  description="Ao registrar uma venda, sua comissão aparece aqui com a data de vencimento."
+                />
+              ) : (
+                <Card className="p-0">
+                  <ul className="divide-y divide-slate-100">
+                    {receivable.map((c) => (
+                      <li
+                        key={c.id}
+                        className="flex items-center justify-between gap-4 px-5 py-4"
+                      >
+                        <div className="min-w-0">
+                          <p className="font-semibold text-slate-900">
+                            {formatCurrency(c.amount)}
+                          </p>
+                          <p className="text-xs text-slate-500">
+                            Vencimento: {c.due_date ? formatDate(c.due_date) : "a definir"}
+                          </p>
+                        </div>
+                        <Badge tone={c.status === "overdue" ? "red" : "amber"}>
+                          {c.status === "overdue" ? "Atrasada" : "A receber"}
+                        </Badge>
+                      </li>
+                    ))}
+                  </ul>
+                </Card>
+              )}
+            </>
+          )}
 
           <h2 className="mb-3 mt-10 text-lg font-bold text-slate-900">Vendas recentes</h2>
           {recent.length === 0 ? (

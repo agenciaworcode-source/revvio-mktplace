@@ -22,6 +22,8 @@ export type Vehicle = Tables["rv_vehicles"]["Row"] & {
   removal_reason: string | null;
   removed_at: string | null;
   removed_by: string | null;
+  /** Quem cadastrou o veículo — garagista ou vendedor (ainda não nos tipos gerados). */
+  created_by: string | null;
 };
 export type VehicleOwner = Tables["rv_vehicle_owners"]["Row"];
 export type Sale = Tables["rv_sales"]["Row"] & {
