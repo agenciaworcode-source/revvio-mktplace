@@ -33,6 +33,7 @@ export function BuyerAuthModal({
   const [tab, setTab] = useState<Tab>("entrar");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
 
   // campos
   const [name, setName] = useState("");
@@ -51,6 +52,7 @@ export function BuyerAuthModal({
     setCity(initial?.city ?? "");
     setPassword("");
     setError(null);
+    setInfo(null);
     setTab(hasInitial ? "criar" : defaultTab);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
@@ -60,8 +62,30 @@ export function BuyerAuthModal({
     onAuthed();
   }
 
+  async function handleForgot() {
+    setError(null);
+    setInfo(null);
+    if (!email.trim()) {
+      setError("Informe seu e-mail acima para recuperar a senha.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${window.location.origin}/definir-senha`,
+      });
+      if (error) throw error;
+      setInfo("Enviamos um link de recuperação para o seu e-mail.");
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function handleEntrar() {
     setError(null);
+    setInfo(null);
     setLoading(true);
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -80,6 +104,7 @@ export function BuyerAuthModal({
 
   async function handleCriar() {
     setError(null);
+    setInfo(null);
     if (
       !name.trim() ||
       !email.trim() ||
@@ -135,6 +160,11 @@ export function BuyerAuthModal({
           <Alert variant="error">{error}</Alert>
         </div>
       )}
+      {info && (
+        <div className="mb-3">
+          <Alert variant="success">{info}</Alert>
+        </div>
+      )}
 
       <div className="flex flex-col gap-3">
         {tab === "criar" && (
@@ -161,6 +191,16 @@ export function BuyerAuthModal({
         <Field label="Senha">
           <Input value={password} type="password" onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
         </Field>
+        {tab === "entrar" && (
+          <button
+            type="button"
+            onClick={handleForgot}
+            disabled={loading}
+            className="self-end text-sm font-semibold text-brand hover:underline disabled:opacity-50"
+          >
+            Esqueci minha senha
+          </button>
+        )}
       </div>
 
       <div className="mt-5 flex justify-end gap-2">

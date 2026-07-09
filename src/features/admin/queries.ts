@@ -544,7 +544,8 @@ export function useDeletePricingPlan() {
 /* ── Agregados reais p/ Visão Geral / Financeiro ────────── */
 export type AdminOverview = {
   loading: boolean;
-  sellers: Seller[]; // apenas role = seller
+  sellers: Seller[]; // apenas role = garagista
+  stores: Seller[]; // vitrines públicas: garagista + a loja do próprio admin
   plans: PricingPlan[];
   plansByKey: Map<string, PricingPlan>;
   vehicleCounts: Map<string, number>;
@@ -565,6 +566,9 @@ export function useAdminOverview(): AdminOverview {
 
   const allSellers = sellersQ.data ?? [];
   const sellers = allSellers.filter((s) => s.role === "garagista");
+  // O admin também tem mini-loja pública; entra na gestão de lojas (mas não na
+  // lista de assinantes/garagistas nem nos cálculos de MRR).
+  const stores = allSellers.filter((s) => s.role === "garagista" || s.role === "admin");
   const activeSellers = sellers.filter((s) => s.status === "active");
   const plans = plansQ.data ?? [];
   const vehicles = vehiclesQ.data ?? [];
@@ -611,6 +615,7 @@ export function useAdminOverview(): AdminOverview {
   return {
     loading: sellersQ.isLoading || plansQ.isLoading || vehiclesQ.isLoading,
     sellers,
+    stores,
     plans,
     plansByKey,
     vehicleCounts,

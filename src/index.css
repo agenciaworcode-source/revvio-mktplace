@@ -3,7 +3,10 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  /* A UI é predominantemente clara (login, painel, admin). Forçar o esquema
+     claro evita que controles nativos (date pickers, selects) renderizem texto
+     branco sobre fundo claro — os inputs apareciam "em branco". */
+  color-scheme: light;
 }
 
 body {

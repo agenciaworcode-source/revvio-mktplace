@@ -76,7 +76,7 @@ function DeleteStoreModal({ store, onClose }: { store: Seller; onClose: () => vo
 
 export function Stores() {
   const o = useAdminOverview();
-  const stores = o.sellers.filter((s) => s.status !== "pending");
+  const stores = o.stores.filter((s) => s.status !== "pending");
   const [target, setTarget] = useState<Seller | null>(null);
 
   return (
@@ -131,23 +131,32 @@ export function Stores() {
                   <StatusPill status={s.status} />
                 </div>
                 <div className="my-1 mb-3.5 text-[12.5px] text-slate-400">
-                  /loja/{s.slug} · {o.vehicleCounts.get(s.id) ?? 0} veículos
+                  {s.slug ? `/loja/${s.slug}` : "sem endereço público"} ·{" "}
+                  {o.vehicleCounts.get(s.id) ?? 0} veículos
                 </div>
-                <a
-                  href={`/loja/${s.slug}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex w-full items-center justify-center gap-1.5 rounded-[9px] border border-[#e6e8ec] bg-white py-2.5 text-[13px] font-bold text-slate-950 hover:bg-slate-50"
-                >
-                  <Icon name="eye" size={15} /> Visitar mini-loja
-                </a>
-                <button
-                  type="button"
-                  onClick={() => setTarget(s)}
-                  className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-[9px] border border-red-200 bg-white py-2.5 text-[13px] font-bold text-red-600 hover:bg-red-50"
-                >
-                  <Icon name="logout" size={15} /> Excluir
-                </button>
+                {s.slug ? (
+                  <a
+                    href={`/loja/${s.slug}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex w-full items-center justify-center gap-1.5 rounded-[9px] border border-[#e6e8ec] bg-white py-2.5 text-[13px] font-bold text-slate-950 hover:bg-slate-50"
+                  >
+                    <Icon name="eye" size={15} /> Visitar mini-loja
+                  </a>
+                ) : (
+                  <div className="flex w-full items-center justify-center gap-1.5 rounded-[9px] border border-dashed border-[#e6e8ec] bg-slate-50 py-2.5 text-[13px] font-semibold text-slate-400">
+                    Sem endereço público
+                  </div>
+                )}
+                {s.role !== "admin" && (
+                  <button
+                    type="button"
+                    onClick={() => setTarget(s)}
+                    className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-[9px] border border-red-200 bg-white py-2.5 text-[13px] font-bold text-red-600 hover:bg-red-50"
+                  >
+                    <Icon name="logout" size={15} /> Excluir
+                  </button>
+                )}
               </div>
             </div>
           ))}
