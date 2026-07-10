@@ -133,9 +133,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       personId: seller?.id ?? null,
       lojaId: seller ? seller.parent_id ?? seller.id : null,
       signOut: async () => {
-        await supabase.auth.signOut();
-        setSeller(null);
-        setBuyer(null);
+        // scope 'local' não depende do endpoint remoto de revogação, que
+        // falhava de forma intermitente (timeout/5xx) e lançava exceção antes
+        // de limpar a sessão — deixando o usuário logado ("hora sai, hora não").
+        try {
+          const { error } = await supabase.auth.signOut({ scope: "local" });
+          if (error) throw error;
+        } catch (e) {
+          console.error("Erro ao sair; limpando sessão local mesmo assim:", e);
+          // Garante o logout local mesmo se a chamada de rede falhar.
+          try {
+            for (const k of Object.keys(window.localStorage)) {
+              if (k.startsWith("sb-") && k.endsWith("-auth-token")) {
+                window.localStorage.removeItem(k);
+              }
+            }
+          } catch {
+            /* ignore */
+          }
+        } finally {
+          setSession(null);
+          setSeller(null);
+          setBuyer(null);
+        }
       },
       refreshSeller: () => loadSeller(session?.user),
     }),
