@@ -5,7 +5,10 @@ import { sendEmail } from "../_shared/resend.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const WEBHOOK_TOKEN = Deno.env.get("ASAAS_WEBHOOK_TOKEN"); // opcional, recomendado
+// Obrigatório: a function é pública (verify_jwt = false), então o token é a única
+// barreira contra um POST forjado criando conta grátis ou cobrança falsa.
+const WEBHOOK_TOKEN = Deno.env.get("ASAAS_WEBHOOK_TOKEN");
+if (!WEBHOOK_TOKEN) throw new Error("ASAAS_WEBHOOK_TOKEN não configurada.");
 const APP_URL = Deno.env.get("APP_URL") ?? "https://loja.revvio.com.br";
 
 const brl = (v: number) =>
@@ -156,7 +159,7 @@ async function createAccountFromPending(
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  if (WEBHOOK_TOKEN && req.headers.get("asaas-access-token") !== WEBHOOK_TOKEN) {
+  if (req.headers.get("asaas-access-token") !== WEBHOOK_TOKEN) {
     return json({ error: "Token inválido." }, 401);
   }
 

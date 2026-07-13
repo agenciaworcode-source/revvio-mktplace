@@ -1,11 +1,18 @@
 // Cliente mínimo da API do ASAAS (https://docs.asaas.com).
 // A chave vem do secret ASAAS_API_KEY; ASAAS_ENV define sandbox|production.
 
-const ENV = Deno.env.get("ASAAS_ENV") ?? "sandbox";
-const BASE =
-  ENV === "production"
-    ? "https://api.asaas.com/v3"
-    : "https://sandbox.asaas.com/api/v3";
+// Sem default: um ASAAS_ENV ausente ou com typo cairia no sandbox em silêncio,
+// e as cobranças reais nunca existiriam. Falha alto, na subida da function.
+const BASE_BY_ENV: Record<string, string> = {
+  production: "https://api.asaas.com/v3",
+  sandbox: "https://sandbox.asaas.com/api/v3",
+};
+const ENV = Deno.env.get("ASAAS_ENV") ?? "";
+const BASE = BASE_BY_ENV[ENV];
+if (!BASE)
+  throw new Error(
+    `ASAAS_ENV inválida: "${ENV}". Use "sandbox" ou "production".`
+  );
 
 function apiKey(): string {
   const key = Deno.env.get("ASAAS_API_KEY");
