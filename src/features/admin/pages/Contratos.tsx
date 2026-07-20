@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Button,
@@ -64,9 +65,23 @@ export function Contratos() {
   const navigate = useNavigate();
   const [filters, setFilters] = useState<ContractFilters>({});
   const [deleting, setDeleting] = useState<Contract | null>(null);
+  const [printing, setPrinting] = useState<Contract | null>(null);
   const contractsQ = useAdminContracts(filters);
   const deleteMut = useDeleteContract();
   const rows = contractsQ.data ?? [];
+
+  /* Imprime direto da lista: monta a folha no <body> (mesmo portal do
+     editor), espera o paint e chama print. Sai do modo ao terminar. */
+  useEffect(() => {
+    if (!printing) return;
+    const done = () => setPrinting(null);
+    window.addEventListener("afterprint", done);
+    const frame = requestAnimationFrame(() => window.print());
+    return () => {
+      window.removeEventListener("afterprint", done);
+      cancelAnimationFrame(frame);
+    };
+  }, [printing]);
 
   async function confirmDelete() {
     if (!deleting) return;
@@ -213,6 +228,14 @@ export function Contratos() {
                     <div className="flex justify-end gap-1">
                       <button
                         type="button"
+                        title="Imprimir / PDF"
+                        onClick={() => setPrinting(c)}
+                        className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                      >
+                        <Icon name="download" size={16} />
+                      </button>
+                      <button
+                        type="button"
                         title="Abrir / editar"
                         onClick={() => navigate(`/dashboard/contratos/${c.id}`)}
                         className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
@@ -235,6 +258,17 @@ export function Contratos() {
           </table>
         </Card>
       )}
+
+      {printing &&
+        createPortal(
+          <div
+            id="contract-print-sheet"
+            className="hidden whitespace-pre-wrap font-serif text-[13pt] leading-[1.7] text-black print:block"
+          >
+            {printing.full_text_content}
+          </div>,
+          document.body
+        )}
 
       <Modal
         open={!!deleting}
