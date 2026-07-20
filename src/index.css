@@ -33,8 +33,10 @@ textarea:-webkit-autofill:focus {
 }
 
 /* ── Impressão de contratos (módulo admin) ───────────────────
-   Ao imprimir, só a folha do contrato aparece: sidebar do painel,
-   botões, formulário e cabeçalhos ficam ocultos. */
+   A folha do contrato é um portal React montado direto no <body>
+   (fora do layout do painel, que tem scroll/sticky e cortaria o
+   conteúdo). Ao imprimir, o app inteiro (#root) some e só a folha
+   fica no fluxo normal — funciona com quantas páginas precisar. */
 @media print {
   @page {
     size: A4;
@@ -43,21 +45,7 @@ textarea:-webkit-autofill:focus {
   body:has(#contract-print-sheet) {
     background: #fff !important;
   }
-  body:has(#contract-print-sheet) * {
-    visibility: hidden;
-  }
-  #contract-print-sheet,
-  #contract-print-sheet * {
-    visibility: visible;
-  }
-  #contract-print-sheet {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    border: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
+  body:has(#contract-print-sheet) > #root {
+    display: none !important;
   }
 }

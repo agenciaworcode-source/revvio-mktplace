@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Alert,
@@ -13,6 +14,15 @@ import {
 } from "@/components/ui-light";
 import { Icon } from "@/features/public/components/icons";
 import { maskCpfCnpj } from "@/lib/masks";
+import { formatCurrency } from "@/lib/format";
+import { useLeads } from "@/features/leads/queries";
+import type { LeadWithVehicle } from "@/features/leads/types";
+import type { Seller } from "@/lib/database.types";
+import {
+  useAdminSellers,
+  useAdminVehicles,
+  type AdminVehicle,
+} from "../queries";
 import {
   useContract,
   useCreateContract,
@@ -40,6 +50,11 @@ function moneyToInput(n: number): string {
     : "";
 }
 
+/** "Cidade/UF" a partir do cadastro da loja (endereço completo se editar depois). */
+function sellerAddress(s: Seller): string {
+  return [s.city, s.state].filter(Boolean).join("/");
+}
+
 export function ContratoEditor() {
   const { id } = useParams<{ id: string }>();
   const isNew = !id;
@@ -50,6 +65,11 @@ export function ContratoEditor() {
   const updateMut = useUpdateContract();
   const uploadMut = useUploadContractPhoto();
 
+  // catálogo do sistema para autopreenchimento
+  const vehiclesQ = useAdminVehicles();
+  const sellersQ = useAdminSellers();
+  const leadsQ = useLeads();
+
   const [type, setType] = useState<ContractType>("intermediacao");
   const [fields, setFields] = useState<ContractFields>(EMPTY_FIELDS);
   const [template, setTemplate] = useState(CONTRACT_TEMPLATES.intermediacao);
@@ -58,6 +78,11 @@ export function ContratoEditor() {
   const [error, setError] = useState<string | null>(null);
   const [savedMsg, setSavedMsg] = useState(false);
   const [cameraOpen, setCameraOpen] = useState(false);
+
+  // seleções dos combos de autopreenchimento (só UI; o contrato guarda os textos)
+  const [pickVehicle, setPickVehicle] = useState("");
+  const [pickSeller, setPickSeller] = useState("");
+  const [pickLead, setPickLead] = useState("");
 
   // hidrata o estado uma única vez quando o contrato carrega (modo edição)
   const hydrated = useRef(false);
@@ -98,17 +123,64 @@ export function ContratoEditor() {
     [template, fields, issuedAt]
   );
 
-  function set<K extends keyof ContractFields>(key: K, value: string) {
+  /** Mescla campos recalculando a comissão de 4% enquanto não editada à mão. */
+  function applyFields(patch: Partial<ContractFields>) {
     setFields((f) => {
-      const next = { ...f, [key]: value };
-      // comissão acompanha 4% do valor da venda até ser editada à mão
-      if (key === "sale_value" && !commissionTouched && type === "intermediacao") {
+      const next = { ...f, ...patch };
+      if (
+        patch.sale_value !== undefined &&
+        !commissionTouched &&
+        type === "intermediacao"
+      ) {
         next.commission_value = moneyToInput(
-          Math.round(parseMoney(value) * COMMISSION_RATE * 100) / 100
+          Math.round(parseMoney(patch.sale_value) * COMMISSION_RATE * 100) / 100
         );
       }
       return next;
     });
+  }
+
+  function set<K extends keyof ContractFields>(key: K, value: string) {
+    applyFields({ [key]: value } as Partial<ContractFields>);
+  }
+
+  /* ── Autopreenchimento a partir do sistema ──────────────── */
+
+  function fillFromSeller(s: Seller) {
+    applyFields({
+      vendedor_name: s.name,
+      vendedor_cpf_cnpj: s.cpf_cnpj ? maskCpfCnpj(s.cpf_cnpj) : "",
+      vendedor_address: sellerAddress(s),
+    });
+  }
+
+  function fillFromVehicle(v: AdminVehicle) {
+    applyFields({
+      vehicle_brand_model: `${v.make} ${v.model}`.trim(),
+      vehicle_year_model: v.year ? String(v.year) : "",
+      sale_value: moneyToInput(Number(v.price)),
+    });
+    // a loja dona do veículo entra como vendedora
+    const owner = sellersQ.data?.find((s) => s.id === v.seller_id);
+    if (owner) {
+      fillFromSeller(owner);
+      setPickSeller(owner.id);
+    }
+  }
+
+  function fillFromLead(l: LeadWithVehicle) {
+    applyFields({
+      comprador_name: l.name,
+      comprador_address: l.city ?? "",
+    });
+    // lead atrelado a um carro puxa também veículo + loja vendedora
+    if (l.vehicle_id) {
+      const v = vehiclesQ.data?.find((veh) => veh.id === l.vehicle_id);
+      if (v) {
+        fillFromVehicle(v);
+        setPickVehicle(String(v.id));
+      }
+    }
   }
 
   function changeType(next: ContractType) {
@@ -189,43 +261,111 @@ export function ContratoEditor() {
   }
 
   const saving = createMut.isPending || updateMut.isPending;
+  const vehicles = vehiclesQ.data ?? [];
+  const sellers = (sellersQ.data ?? []).filter((s) => s.role !== "admin");
+  const leads = leadsQ.data ?? [];
 
   return (
     <div>
-      <div className="print:hidden">
-        <PageHeader
-          title={isNew ? "Novo contrato" : "Editar contrato"}
-          subtitle="Preencha os dados — o documento é montado em tempo real ao lado"
-          action={
-            <div className="flex flex-wrap gap-2">
-              <Button variant="ghost" onClick={() => navigate("/dashboard/contratos")}>
-                Voltar
-              </Button>
-              <Button variant="outline" onClick={() => window.print()}>
-                <Icon name="download" size={16} /> Imprimir / PDF
-              </Button>
-              <Button loading={saving} onClick={save}>
-                <Icon name="check" size={16} /> Salvar e gerar contrato
-              </Button>
-            </div>
-          }
-        />
-
-        {error && (
-          <div className="mb-4">
-            <Alert variant="error">{error}</Alert>
+      <PageHeader
+        title={isNew ? "Novo contrato" : "Editar contrato"}
+        subtitle="Preencha os dados — o documento é montado em tempo real ao lado"
+        action={
+          <div className="flex flex-wrap gap-2">
+            <Button variant="ghost" onClick={() => navigate("/dashboard/contratos")}>
+              Voltar
+            </Button>
+            <Button variant="outline" onClick={() => window.print()}>
+              <Icon name="download" size={16} /> Imprimir / PDF
+            </Button>
+            <Button loading={saving} onClick={save}>
+              <Icon name="check" size={16} /> Salvar e gerar contrato
+            </Button>
           </div>
-        )}
-        {savedMsg && (
-          <div className="mb-4">
-            <Alert variant="success">Contrato salvo com sucesso.</Alert>
-          </div>
-        )}
-      </div>
+        }
+      />
 
-      <div className="grid gap-6 print:block xl:grid-cols-2">
+      {error && (
+        <div className="mb-4">
+          <Alert variant="error">{error}</Alert>
+        </div>
+      )}
+      {savedMsg && (
+        <div className="mb-4">
+          <Alert variant="success">Contrato salvo com sucesso.</Alert>
+        </div>
+      )}
+
+      <div className="grid gap-6 xl:grid-cols-2">
         {/* ── Coluna do formulário ─────────────────────────── */}
-        <div className="flex flex-col gap-6 print:hidden">
+        <div className="flex flex-col gap-6">
+          <Card className="flex flex-col gap-4">
+            <p className="text-sm font-bold text-slate-800">
+              Preencher com dados do sistema
+            </p>
+            <p className="-mt-2 text-xs text-slate-400">
+              Selecione um veículo, lead ou loja já cadastrados para preencher o
+              contrato — depois ajuste apenas o que mudou na negociação.
+            </p>
+            <div className="grid gap-4 sm:grid-cols-3">
+              <Field label="Veículo">
+                <Select
+                  value={pickVehicle}
+                  onChange={(e) => {
+                    setPickVehicle(e.target.value);
+                    const v = vehicles.find((x) => String(x.id) === e.target.value);
+                    if (v) fillFromVehicle(v);
+                  }}
+                >
+                  <option value="">Selecionar…</option>
+                  {vehicles.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {v.make} {v.model}
+                      {v.year ? ` (${v.year})` : ""} — {formatCurrency(v.price)}
+                      {v.seller?.name ? ` · ${v.seller.name}` : ""}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+              <Field label="Lead (comprador)">
+                <Select
+                  value={pickLead}
+                  onChange={(e) => {
+                    setPickLead(e.target.value);
+                    const l = leads.find((x) => x.id === e.target.value);
+                    if (l) fillFromLead(l);
+                  }}
+                >
+                  <option value="">Selecionar…</option>
+                  {leads.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.name}
+                      {l.vehicle ? ` — ${l.vehicle.make} ${l.vehicle.model}` : ""}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+              <Field label="Loja / vendedor">
+                <Select
+                  value={pickSeller}
+                  onChange={(e) => {
+                    setPickSeller(e.target.value);
+                    const s = sellers.find((x) => x.id === e.target.value);
+                    if (s) fillFromSeller(s);
+                  }}
+                >
+                  <option value="">Selecionar…</option>
+                  {sellers.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                      {s.city ? ` · ${s.city}` : ""}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+            </div>
+          </Card>
+
           <Card className="flex flex-col gap-4">
             <Field label="Tipo de documento">
               <Select
@@ -428,21 +568,30 @@ export function ContratoEditor() {
           )}
         </div>
 
-        {/* ── Prévia / folha de impressão ──────────────────── */}
+        {/* ── Prévia (tela) ────────────────────────────────── */}
         <div>
-          <div className="print:hidden mb-2 text-xs font-bold uppercase tracking-wide text-slate-400 xl:sticky xl:top-0">
+          <div className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400">
             Prévia do documento
           </div>
-          <div
-            id="contract-print-sheet"
-            className="rounded-2xl border border-hair bg-white p-10 shadow-[0_1px_2px_rgba(16,24,40,.04)]"
-          >
+          <div className="rounded-2xl border border-hair bg-white p-10 shadow-[0_1px_2px_rgba(16,24,40,.04)]">
             <div className="whitespace-pre-wrap font-serif text-[13.5px] leading-[1.7] text-slate-900">
               {preview}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Folha de impressão: portal direto no <body>, fora do layout do painel
+          (que tem scroll/sticky e cortava a folha, saindo tudo em branco). */}
+      {createPortal(
+        <div
+          id="contract-print-sheet"
+          className="hidden whitespace-pre-wrap font-serif text-[13pt] leading-[1.7] text-black print:block"
+        >
+          {preview}
+        </div>,
+        document.body
+      )}
 
       <CameraCapture
         open={cameraOpen}
