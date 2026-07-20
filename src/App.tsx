@@ -137,6 +137,14 @@ const AdminStores = lazy(() =>
 const AdminAparencia = lazy(() =>
   import("@/features/admin/pages/Aparencia").then((m) => ({ default: m.Aparencia }))
 );
+const AdminContratos = lazy(() =>
+  import("@/features/admin/pages/Contratos").then((m) => ({ default: m.Contratos }))
+);
+const AdminContratoEditor = lazy(() =>
+  import("@/features/admin/pages/ContratoEditor").then((m) => ({
+    default: m.ContratoEditor,
+  }))
+);
 const AffiliateLayout = lazy(() =>
   import("@/features/affiliate/AffiliateLayout").then((m) => ({ default: m.AffiliateLayout }))
 );
@@ -264,6 +272,9 @@ export default function App() {
             <Route path="afiliados" element={<AdminAfiliados />} />
           )}
           <Route path="mini-lojas" element={<AdminStores />} />
+          <Route path="contratos" element={<AdminContratos />} />
+          <Route path="contratos/novo" element={<AdminContratoEditor />} />
+          <Route path="contratos/:id" element={<AdminContratoEditor />} />
           <Route path="aparencia" element={<AdminAparencia />} />
         </Route>
 

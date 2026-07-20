@@ -31,3 +31,33 @@ textarea:-webkit-autofill:focus {
   caret-color: #0f172a;
   transition: background-color 9999s ease-in-out 0s;
 }
+
+/* ── Impressão de contratos (módulo admin) ───────────────────
+   Ao imprimir, só a folha do contrato aparece: sidebar do painel,
+   botões, formulário e cabeçalhos ficam ocultos. */
+@media print {
+  @page {
+    size: A4;
+    margin: 20mm 18mm;
+  }
+  body:has(#contract-print-sheet) {
+    background: #fff !important;
+  }
+  body:has(#contract-print-sheet) * {
+    visibility: hidden;
+  }
+  #contract-print-sheet,
+  #contract-print-sheet * {
+    visibility: visible;
+  }
+  #contract-print-sheet {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+}

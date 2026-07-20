@@ -13,6 +13,7 @@ const ADMIN_NAV: PanelNavItem[] = [
     ? [{ to: "/dashboard/afiliados", label: "Afiliados", icon: "users" } as PanelNavItem]
     : []),
   { to: "/dashboard/mini-lojas", label: "Mini-Lojas", icon: "store" },
+  { to: "/dashboard/contratos", label: "Contratos", icon: "edit" },
   { to: "/dashboard/aparencia", label: "Aparência", icon: "camera" },
 ];
 
