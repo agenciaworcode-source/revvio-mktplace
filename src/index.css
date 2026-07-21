@@ -48,4 +48,14 @@ textarea:-webkit-autofill:focus {
   body:has(#contract-print-sheet) > #root {
     display: none !important;
   }
+  /* Timbre: garante que a marca e o verde da wordmark saiam na impressão
+     mesmo com "gráficos de fundo" desligado no diálogo do navegador. */
+  #contract-print-sheet,
+  #contract-print-sheet * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  #contract-print-sheet img {
+    display: inline-block;
+  }
 }

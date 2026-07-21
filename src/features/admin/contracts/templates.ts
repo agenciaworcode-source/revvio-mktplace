@@ -45,7 +45,6 @@ export interface ContractFields {
   vehicle_year_model: string;
   vehicle_plate: string;
   vehicle_renavam: string;
-  vehicle_chassi: string;
   sale_value: string; // valores ficam como string no form; parse no submit
   commission_value: string;
 }
@@ -61,7 +60,6 @@ export const EMPTY_FIELDS: ContractFields = {
   vehicle_year_model: "",
   vehicle_plate: "",
   vehicle_renavam: "",
-  vehicle_chassi: "",
   sale_value: "",
   commission_value: "",
 };
@@ -99,7 +97,6 @@ export function interpolate(
     vehicle_year_model: text(fields.vehicle_year_model),
     vehicle_plate: text(fields.vehicle_plate),
     vehicle_renavam: text(fields.vehicle_renavam),
-    vehicle_chassi: text(fields.vehicle_chassi),
     sale_value: money(fields.sale_value),
     commission_value: money(fields.commission_value),
     data_atual: issuedAt.toLocaleDateString("pt-BR", {
@@ -201,7 +198,7 @@ VENDEDOR: [vendedor_name], CPF: [vendedor_cpf_cnpj], residente e domiciliado em 
 
 COMPRADOR: [comprador_name], CPF: [comprador_cpf_cnpj], residente e domiciliado em [comprador_address].
 
-OBJETO: Venda do veículo marca/modelo [vehicle_brand_model], placa [vehicle_plate], ano [vehicle_year_model], chassi [vehicle_chassi], RENAVAM [vehicle_renavam].
+OBJETO: Venda do veículo marca/modelo [vehicle_brand_model], placa [vehicle_plate], ano [vehicle_year_model], RENAVAM [vehicle_renavam].
 
 CLÁUSULA 1 - O vendedor declara ser legítimo proprietário do veículo e que este encontra-se livre de ônus, multas e débitos, salvo os expressamente informados neste contrato.
 
@@ -221,35 +218,20 @@ Assinatura do Vendedor: [vendedor_name]
 ____________________________________
 Assinatura do Comprador: [comprador_name]`;
 
-/* ── Modelo C · Procuração ──────────────────────────────── */
+/* ── Modelo C · Procuração ──────────────────────────────────
+   Texto propositalmente enxuto (parágrafos corridos em vez de
+   incisos em lista): a procuração deve fechar em 1 folha A4. */
 const TEMPLATE_PROCURACAO = `PROCURAÇÃO PARA FINS DE TRÂMITE VEICULAR
 
-OUTORGANTE:
-[vendedor_name], inscrito(a) no CPF/CNPJ sob o nº [vendedor_cpf_cnpj], residente e domiciliado(a) em [vendedor_address].
+OUTORGANTE: [vendedor_name], inscrito(a) no CPF/CNPJ sob o nº [vendedor_cpf_cnpj], residente e domiciliado(a) em [vendedor_address].
 
-OUTORGADO:
-[comprador_name], inscrito(a) no CPF/CNPJ sob o nº [comprador_cpf_cnpj], residente e domiciliado(a) em [comprador_address].
+OUTORGADO: [comprador_name], inscrito(a) no CPF/CNPJ sob o nº [comprador_cpf_cnpj], residente e domiciliado(a) em [comprador_address].
 
-VEÍCULO OBJETO DOS PODERES:
-Marca/Modelo: [vehicle_brand_model]
-Ano/Modelo: [vehicle_year_model]
-Placa: [vehicle_plate]
-RENAVAM: [vehicle_renavam]
-Chassi: [vehicle_chassi]
+VEÍCULO: [vehicle_brand_model], ano/modelo [vehicle_year_model], placa [vehicle_plate], RENAVAM [vehicle_renavam].
 
-PODERES:
-Pelo presente instrumento particular de procuração, o OUTORGANTE nomeia e constitui o OUTORGADO como seu bastante procurador, a quem confere poderes específicos para, com relação exclusivamente ao veículo acima identificado:
+PODERES: Pelo presente instrumento particular, o OUTORGANTE nomeia e constitui o OUTORGADO seu bastante procurador, conferindo-lhe poderes específicos, exclusivamente quanto ao veículo acima identificado, para: representá-lo perante o DETRAN, CIRETRAN e demais órgãos executivos de trânsito; requerer, assinar e retirar documentos do veículo, incluindo CRV, CRLV e segundas vias; promover a transferência de propriedade, assinando o documento único de transferência (ATPV-e) e reconhecendo firmas quando exigido; quitar débitos, multas, taxas, IPVA, licenciamento e demais encargos; solicitar baixa de restrições, emissão de certidões e vistorias; e substabelecer, no todo ou em parte, quando indispensável ao cumprimento do mandato.
 
-I - representá-lo perante o DETRAN, CIRETRAN e demais órgãos executivos de trânsito, estaduais ou municipais;
-II - requerer, assinar e retirar documentos relativos ao veículo, incluindo CRV, CRLV e segundas vias;
-III - promover a transferência de propriedade do veículo, assinando o documento único de transferência (ATPV-e) e reconhecendo firmas quando exigido;
-IV - efetuar a quitação de débitos, multas, taxas, IPVA, licenciamento e demais encargos incidentes sobre o veículo;
-V - solicitar baixas de restrições, emissão de certidões e vistorias;
-VI - substabelecer, no todo ou em parte, os poderes ora conferidos, quando indispensável ao cumprimento do presente mandato.
-
-A presente procuração é outorgada em caráter específico para os fins acima descritos, sendo vedada sua utilização para qualquer outra finalidade.
-
-Validade: a presente procuração terá validade de 90 (noventa) dias a contar da data de sua assinatura, salvo revogação expressa anterior.
+Os poderes são outorgados em caráter específico para os fins acima, vedada a utilização para qualquer outra finalidade. Validade de 90 (noventa) dias a contar da assinatura, salvo revogação expressa anterior.
 
 Local e data: ${INTERMEDIADORA.cidade}, [data_atual]
 

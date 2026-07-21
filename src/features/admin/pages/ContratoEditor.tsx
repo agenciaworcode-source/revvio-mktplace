@@ -42,6 +42,7 @@ import {
   type ContractType,
 } from "../contracts/templates";
 import { CameraCapture } from "../contracts/CameraCapture";
+import { ContractSheet, isSinglePage } from "../contracts/ContractSheet";
 
 /** 4160.5 → "4.160,50" (string editável no input de valor) */
 function moneyToInput(n: number): string {
@@ -102,7 +103,6 @@ export function ContratoEditor() {
       vehicle_year_model: c.vehicle_year_model,
       vehicle_plate: c.vehicle_plate,
       vehicle_renavam: c.vehicle_renavam,
-      vehicle_chassi: c.vehicle_chassi ?? "",
       sale_value: moneyToInput(Number(c.sale_value)),
       commission_value: moneyToInput(Number(c.commission_value)),
     });
@@ -122,6 +122,7 @@ export function ContratoEditor() {
     () => interpolate(template, fields, issuedAt),
     [template, fields, issuedAt]
   );
+  const singlePage = isSinglePage(type);
 
   /** Mescla campos recalculando a comissão de 4% enquanto não editada à mão. */
   function applyFields(patch: Partial<ContractFields>) {
@@ -228,7 +229,8 @@ export function ContratoEditor() {
       vehicle_year_model: fields.vehicle_year_model.trim(),
       vehicle_plate: fields.vehicle_plate.trim().toUpperCase(),
       vehicle_renavam: fields.vehicle_renavam.trim(),
-      vehicle_chassi: fields.vehicle_chassi.trim() || null,
+      // chassi saiu do formulário; a coluna é mantida (histórico) mas não é mais preenchida
+      vehicle_chassi: null,
       sale_value: parseMoney(fields.sale_value),
       commission_value: parseMoney(fields.commission_value),
       template_content: template,
@@ -462,12 +464,6 @@ export function ContratoEditor() {
                   onChange={(e) => set("vehicle_renavam", e.target.value)}
                 />
               </Field>
-              <Field label="Chassi (opcional)">
-                <Input
-                  value={fields.vehicle_chassi}
-                  onChange={(e) => set("vehicle_chassi", e.target.value.toUpperCase())}
-                />
-              </Field>
             </div>
 
             <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
@@ -573,10 +569,8 @@ export function ContratoEditor() {
           <div className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400">
             Prévia do documento
           </div>
-          <div className="rounded-2xl border border-hair bg-white p-10 shadow-[0_1px_2px_rgba(16,24,40,.04)]">
-            <div className="whitespace-pre-wrap font-serif text-[13.5px] leading-[1.7] text-slate-900">
-              {preview}
-            </div>
+          <div className="rounded-2xl border border-hair bg-white p-10 text-slate-900 shadow-[0_1px_2px_rgba(16,24,40,.04)]">
+            <ContractSheet text={preview} mode="screen" compact={singlePage} />
           </div>
         </div>
       </div>
@@ -584,11 +578,8 @@ export function ContratoEditor() {
       {/* Folha de impressão: portal direto no <body>, fora do layout do painel
           (que tem scroll/sticky e cortava a folha, saindo tudo em branco). */}
       {createPortal(
-        <div
-          id="contract-print-sheet"
-          className="hidden whitespace-pre-wrap font-serif text-[13pt] leading-[1.7] text-black print:block"
-        >
-          {preview}
+        <div id="contract-print-sheet" className="hidden print:block">
+          <ContractSheet text={preview} mode="print" compact={singlePage} />
         </div>,
         document.body
       )}

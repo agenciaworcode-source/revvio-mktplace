@@ -22,6 +22,7 @@ import {
   type ContractFilters,
 } from "../contracts/queries";
 import { CONTRACT_TYPE_LABEL, CONTRACT_TYPE_OPTIONS } from "../contracts/templates";
+import { ContractSheet, isSinglePage } from "../contracts/ContractSheet";
 
 /** Exporta as linhas filtradas no formato do relatório contábil.
  *  Separador `;` + BOM: abre direto no Excel pt-BR sem desconfigurar. */
@@ -261,11 +262,12 @@ export function Contratos() {
 
       {printing &&
         createPortal(
-          <div
-            id="contract-print-sheet"
-            className="hidden whitespace-pre-wrap font-serif text-[13pt] leading-[1.7] text-black print:block"
-          >
-            {printing.full_text_content}
+          <div id="contract-print-sheet" className="hidden print:block">
+            <ContractSheet
+              text={printing.full_text_content}
+              mode="print"
+              compact={isSinglePage(printing.contract_type)}
+            />
           </div>,
           document.body
         )}
