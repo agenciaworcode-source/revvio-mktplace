@@ -10,7 +10,17 @@ import "./index.css";
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: { staleTime: 30_000, retry: 1 },
+    queries: {
+      // Voltar para a aba disparava um refetch de tudo a cada troca de janela.
+      // 1 min de frescor cobre o vai-e-vem normal do usuário; as mutations já
+      // invalidam as chaves afetadas, então os dados não ficam velhos.
+      staleTime: 60_000,
+      // Mantém o cache das telas visitadas por 10 min: voltar para a listagem
+      // renderiza na hora (com revalidação em segundo plano) em vez de spinner.
+      gcTime: 10 * 60_000,
+      refetchOnReconnect: true,
+      retry: 1,
+    },
   },
 });
 

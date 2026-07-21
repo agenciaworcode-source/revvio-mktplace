@@ -3,6 +3,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -80,12 +81,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [buyer, setBuyer] = useState<Buyer | null>(null);
   const [loading, setLoading] = useState(true);
 
+  /** Dono do perfil já carregado — evita recarregar a mesma sessão. */
+  const profileUserId = useRef<string | null>(null);
+  /** getSession() já resolveu; a partir daí os eventos assumem o controle. */
+  const bootstrapped = useRef(false);
+
   async function loadSeller(user: User | undefined | null) {
     if (!user) {
+      profileUserId.current = null;
       setSeller(null);
       setBuyer(null);
       return;
     }
+    profileUserId.current = user.id;
     const s = await ensureSeller(user);
     setSeller(s);
     setBuyer(s ? null : await fetchBuyer(user.id));
@@ -95,22 +103,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     supabase.auth.getSession().then(async ({ data }) => {
       setSession(data.session);
       await loadSeller(data.session?.user);
+      bootstrapped.current = true;
       setLoading(false);
     });
 
-    const { data: sub } = supabase.auth.onAuthStateChange(async (event, s) => {
+    const { data: sub } = supabase.auth.onAuthStateChange(async (_event, s) => {
       setSession(s);
-      // No sign-in/sign-out o seller carrega de forma assíncrona; mantemos
-      // 'loading' ligado durante o fetch para os guards não redirecionarem
-      // antes do perfil resolver (senão o garagista cai em /cadastro → /vender).
-      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "INITIAL_SESSION") {
-        setLoading(true);
-        await loadSeller(s?.user);
-        setLoading(false);
-      } else {
-        // TOKEN_REFRESHED / USER_UPDATED: atualiza sem piscar 'loading'.
-        await loadSeller(s?.user);
-      }
+      // A carga inicial é do getSession() acima; ignorar o INITIAL_SESSION aqui
+      // evita a dupla resolução (e o 'loading' piscando duas vezes no boot).
+      if (!bootstrapped.current) return;
+
+      // Ao voltar de outra aba (ou ao renovar o token) o supabase reemite
+      // SIGNED_IN / TOKEN_REFRESHED para a MESMA sessão. Antes recarregávamos o
+      // perfil e religávamos 'loading', o que desmonta a árvore de rotas nos
+      // guards — era isso que fechava o modal de veículo e apagava tudo que já
+      // tinha sido digitado. Mesma sessão ⇒ nada a fazer.
+      if ((s?.user?.id ?? null) === profileUserId.current) return;
+
+      // Troca real de usuário (login/logout): o seller carrega de forma
+      // assíncrona e mantemos 'loading' ligado durante o fetch para os guards
+      // não redirecionarem antes do perfil resolver (senão o garagista cai em
+      // /cadastro → /vender).
+      setLoading(true);
+      await loadSeller(s?.user);
+      setLoading(false);
     });
 
     return () => sub.subscription.unsubscribe();

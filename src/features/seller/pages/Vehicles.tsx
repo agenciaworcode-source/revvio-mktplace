@@ -37,6 +37,7 @@ import {
 import { FipeSelector } from "../components/FipeSelector";
 import { maskPhone } from "@/lib/masks";
 import { ReasonField, REMOVAL_REASONS } from "@/components/ReasonField";
+import { useFormDraft } from "@/lib/formDraft";
 import type { FipeResult } from "@/lib/fipe";
 
 const statusMeta: Record<VehicleStatus, { label: string; tone: "green" | "amber" | "neutral" }> = {
@@ -82,6 +83,13 @@ const schema = z.object({
   description: z.string().optional(),
 });
 type FormValues = z.infer<typeof schema>;
+
+/** O que é guardado no rascunho: campos + imagens já enviadas + modo FIPE/manual. */
+interface VehicleDraft {
+  values: FormValues;
+  images: string[];
+  manual: boolean;
+}
 
 function toDefaults(v?: VehicleWithOwner, fallbackVendedorId?: string): FormValues {
   return {
@@ -253,13 +261,69 @@ export function VehicleForm({
     control,
     handleSubmit,
     setValue,
-    formState: { errors, dirtyFields },
+    getValues,
+    reset,
+    watch,
+    formState: { errors, dirtyFields, isDirty },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     // Ao cadastrar como vendedor, já atribui o veículo a si mesmo por padrão.
     defaultValues: toDefaults(vehicle, isVendedor ? personId ?? undefined : undefined),
   });
   const [manual, setManual] = useState<boolean>(!!vehicle);
+
+  /* ── Rascunho automático ────────────────────────────────────
+     O formulário é longo; perder o preenchimento por um reload
+     ou um fechamento acidental era o pior atrito do cadastro.
+     Chave por veículo (ou "novo" da loja) para não misturar. */
+  const draftKey = lojaId ? `vehicle:${lojaId}:${vehicle?.id ?? "novo"}` : null;
+  const draft = useFormDraft<VehicleDraft>({
+    key: draftKey,
+    onRestore: (d) => {
+      reset(d.values, { keepDefaultValues: true });
+      setImages(d.images);
+      setManual(d.manual);
+    },
+  });
+
+  // Estado que vive fora do react-hook-form entra no rascunho por ref, para o
+  // callback do watch() enxergar sempre o valor corrente sem virar dependência.
+  const imagesRef = useRef(images);
+  imagesRef.current = images;
+  const manualRef = useRef(manual);
+  manualRef.current = manual;
+
+  // watch(callback) assina as mudanças SEM re-renderizar o formulário — usar
+  // watch() como valor faria o form inteiro renderizar a cada tecla digitada.
+  const draftSave = draft.save;
+  useEffect(() => {
+    const sub = watch((values) =>
+      draftSave({
+        values: values as FormValues,
+        images: imagesRef.current,
+        manual: manualRef.current,
+      })
+    );
+    return () => sub.unsubscribe();
+  }, [watch, draftSave]);
+
+  // Imagens e o modo FIPE/manual mudam fora do watch — empurram o rascunho.
+  // A comparação é com o estado da abertura (e não com `length`), senão editar
+  // um veículo que já tem fotos gravaria um rascunho sem ninguém ter mexido.
+  const opened = useRef({ images, manual });
+  useEffect(() => {
+    const touched =
+      isDirty || images !== opened.current.images || manual !== opened.current.manual;
+    if (!touched) return;
+    draftSave({ values: getValues(), images, manual });
+  }, [images, manual, isDirty, draftSave, getValues]);
+
+  function discardDraft() {
+    draft.clear();
+    reset(toDefaults(vehicle, isVendedor ? personId ?? undefined : undefined));
+    setImages(vehicle?.images ?? []);
+    setManual(!!vehicle);
+  }
 
   function applyFipe(r: FipeResult) {
     setValue("make", r.make, { shouldValidate: true });
@@ -322,6 +386,7 @@ export function VehicleForm({
     };
     try {
       await save.mutateAsync(payload);
+      draft.clear(); // gravou no banco: o rascunho não serve mais
       onClose();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro ao salvar o veículo.");
@@ -331,6 +396,21 @@ export function VehicleForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
       {error && <Alert variant="error">{error}</Alert>}
+
+      {draft.restored && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <span>
+            Recuperamos o preenchimento que você tinha deixado neste formulário.
+          </span>
+          <button
+            type="button"
+            onClick={discardDraft}
+            className="font-semibold underline underline-offset-2 hover:text-amber-950"
+          >
+            Descartar e começar do zero
+          </button>
+        </div>
+      )}
 
       {manual ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -590,8 +670,26 @@ export function VehicleForm({
         </div>
       )}
 
-      <div className="mt-2 flex justify-end gap-3">
-        <Button type="button" variant="ghost" onClick={onClose}>
+      <div className="mt-2 flex items-center justify-end gap-3">
+        {(isDirty || images.length > 0) && (
+          <span className="mr-auto text-xs text-slate-400">
+            Rascunho salvo automaticamente neste navegador.
+          </span>
+        )}
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => {
+            // "Cancelar" é descarte explícito — só o X / fechar a aba preserva.
+            if (
+              (isDirty || images.length > 0) &&
+              !window.confirm("Descartar o preenchimento deste formulário?")
+            )
+              return;
+            draft.clear();
+            onClose();
+          }}
+        >
           Cancelar
         </Button>
         <Button type="submit" loading={save.isPending} disabled={uploading}>
