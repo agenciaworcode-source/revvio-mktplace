@@ -19,7 +19,7 @@ export function LeadCard({
   // Em contextos arrastáveis (funil), impede que o clique no botão inicie o drag.
   const stop = (e: PointerEvent) => e.stopPropagation();
   return (
-    <div className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5">
+    <div className="flex flex-col rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
       {/* Topo: flag de status à esquerda, ações à direita */}
       <div className="mb-3 flex items-center justify-between gap-2">
         <span
@@ -36,7 +36,7 @@ export function LeadCard({
                 onClick={() => onEdit(lead)}
                 title="Editar lead"
                 aria-label="Editar lead"
-                className="grid h-7 w-7 place-items-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                className="grid h-9 w-9 place-items-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700"
               >
                 <Icon name="edit" size={15} />
               </button>
@@ -48,7 +48,7 @@ export function LeadCard({
                 onClick={() => onDelete(lead)}
                 title="Excluir lead"
                 aria-label="Excluir lead"
-                className="grid h-7 w-7 place-items-center rounded-lg text-red-500 hover:bg-red-50 hover:text-red-600"
+                className="grid h-9 w-9 place-items-center rounded-lg text-red-500 hover:bg-red-50 hover:text-red-600"
               >
                 <Icon name="trash" size={15} />
               </button>

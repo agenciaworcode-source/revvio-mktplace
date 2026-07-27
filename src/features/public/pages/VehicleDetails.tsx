@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { PublicShell } from "../PublicShell";
 import { useLogAffiliateVisit, usePublicVehicle, type PublicVehicle } from "../queries";
@@ -10,6 +10,7 @@ import { bodyLabels, fuelLabels, transmissionLabels } from "../vehicleLabels";
 import { formatCurrency, formatNumber } from "@/lib/format";
 import { AFFILIATES_ENABLED } from "@/config/features";
 import { whatsappLink } from "@/lib/whatsapp";
+import { openExternal } from "@/lib/openExternal";
 import { maskPhone } from "@/lib/masks";
 import { Icon } from "../components/icons";
 import { ImageLightbox } from "../components/ImageLightbox";
@@ -139,6 +140,9 @@ function LeadForm({ v }: { v: PublicVehicle }) {
   const [authOpen, setAuthOpen] = useState(false);
   const [pendingSend, setPendingSend] = useState(false);
   const logClick = useLogClickEvent();
+  // id do comprador devolvido pelo cadastro: o contexto ainda pode não tê-lo
+  // carregado quando o envio dispara, e o lead ficaria sem buyer_id.
+  const authedBuyerId = useRef<string | null>(null);
 
   // pré-preenche a partir do perfil do comprador logado
   useEffect(() => {
@@ -155,7 +159,7 @@ function LeadForm({ v }: { v: PublicVehicle }) {
   useEffect(() => {
     if (pendingSend && user) {
       setPendingSend(false);
-      doSubmit();
+      doSubmit(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingSend, user]);
@@ -182,11 +186,13 @@ function LeadForm({ v }: { v: PublicVehicle }) {
       setAuthOpen(true);
       return;
     }
-    doSubmit();
+    doSubmit(true);
   }
 
   // Conclui o envio (já validado e logado): registra clique/lead e abre o WhatsApp.
-  function doSubmit() {
+  // `fromUserGesture` distingue o clique direto do retorno do cadastro — ver
+  // openExternal(): fora do gesto, `window.open` cai no bloqueador de pop-ups.
+  function doSubmit(fromUserGesture: boolean) {
     // Conta o clique no anúncio (botão "Quero ver o carro") — best-effort.
     track(v.id);
     if (seller?.id) logClick("vehicle_interest", seller.id, v.id);
@@ -201,7 +207,7 @@ function LeadForm({ v }: { v: PublicVehicle }) {
         city: cidade.trim() || null,
         message: mensagem.trim() || null,
         financing: financiamento,
-        buyer_id: buyer?.id ?? null,
+        buyer_id: buyer?.id ?? authedBuyerId.current,
       });
     }
     const linhas = [
@@ -213,7 +219,7 @@ function LeadForm({ v }: { v: PublicVehicle }) {
       financiamento && "Gostaria de simular financiamento online.",
     ].filter(Boolean);
     const wa = whatsappLink(sellerWhats, linhas.join("\n"));
-    if (wa) window.open(wa, "_blank", "noopener");
+    if (wa) openExternal(wa, fromUserGesture);
   }
 
   const semWhats = !sellerWhats;
@@ -334,7 +340,8 @@ function LeadForm({ v }: { v: PublicVehicle }) {
         open={authOpen}
         onClose={() => setAuthOpen(false)}
         initial={{ name: nome, email, phone: celular, city: cidade }}
-        onAuthed={() => {
+        onAuthed={(buyerId) => {
+          authedBuyerId.current = buyerId ?? null;
           setAuthOpen(false);
           // dispara o envio quando o `user` já estiver atualizado no contexto
           setPendingSend(true);

@@ -62,7 +62,7 @@ export function ImageCropModal({
       <div className="flex flex-col gap-4">
         {error && <Alert variant="error">{error}</Alert>}
 
-        <div className="relative h-[320px] w-full overflow-hidden rounded-xl bg-slate-900">
+        <div className="relative h-[240px] w-full overflow-hidden rounded-xl bg-slate-900 sm:h-[320px]">
           <Cropper
             image={imageUrl}
             crop={crop}

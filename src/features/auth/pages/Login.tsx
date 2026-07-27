@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -26,8 +26,11 @@ function friendlyError(message: string): string {
 
 export function Login() {
   const navigate = useNavigate();
+  // Mensagem trazida por quem redirecionou para cá (ex.: cadastro que exigiu
+  // confirmação de e-mail antes de liberar o login).
+  const { state } = useLocation() as { state?: { info?: string } | null };
   const [authError, setAuthError] = useState<string | null>(null);
-  const [info, setInfo] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(state?.info ?? null);
   const [showPw, setShowPw] = useState(false);
   const {
     register,

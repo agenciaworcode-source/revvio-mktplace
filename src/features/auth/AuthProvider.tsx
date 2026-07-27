@@ -173,7 +173,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setBuyer(null);
         }
       },
-      refreshSeller: () => loadSeller(session?.user),
+      // Lê a sessão do cliente, não do state: logo após um signUp/signIn o
+      // `session` deste closure ainda é o anterior (null no cadastro), e o
+      // perfil recém-criado nunca era carregado. Como loadSeller() atualiza
+      // profileUserId, o SIGNED_IN que chega em seguida não recarrega de novo.
+      refreshSeller: async () => {
+        const { data } = await supabase.auth.getSession();
+        setSession(data.session);
+        await loadSeller(data.session?.user);
+      },
     }),
     [session, seller, buyer, loading]
   );

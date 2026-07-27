@@ -10,7 +10,12 @@ function timeAgo(ts: number): string {
   return `${Math.floor(s / 86400)} d`;
 }
 
-export function NotificationsBell() {
+export function NotificationsBell({
+  /** Lado em que o painel abre. No topo mobile o sino fica à direita. */
+  align = "left",
+}: {
+  align?: "left" | "right";
+} = {}) {
   const { items, unread, markAllRead } = useRealtimeNotifications();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -48,7 +53,11 @@ export function NotificationsBell() {
       </button>
 
       {open && (
-        <div className="absolute left-0 top-[42px] z-50 w-[300px] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+        <div
+          className={`absolute top-[42px] z-50 w-[min(300px,calc(100vw-2rem))] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl ${
+            align === "right" ? "right-0" : "left-0"
+          }`}
+        >
           <div className="border-b border-slate-100 px-4 py-2.5 text-xs font-bold uppercase tracking-wide text-slate-500">
             Notificações
           </div>

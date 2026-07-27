@@ -124,7 +124,7 @@ export function SubscribersTable({
 
   return (
     <SectionCard className="overflow-hidden">
-      <div className="flex items-center justify-between border-b border-[#f1f3f5] px-6 py-5">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#f1f3f5] px-4 py-4 sm:px-6 sm:py-5">
         <div>
           <div className="text-base font-bold text-slate-950">Assinantes · Garagistas</div>
           <div className="mt-0.5 text-[13px] text-slate-400">
@@ -147,7 +147,7 @@ export function SubscribersTable({
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-sm">
+          <table className="w-full min-w-[860px] border-collapse text-sm">
             <thead>
               <tr>
                 {ths.map((h, i) => (

@@ -776,8 +776,8 @@ export function Vehicles() {
       ) : (
         <div className="flex flex-col gap-4">
           {/* Barra de filtros + alternância de visualização */}
-          <Card className="flex flex-wrap items-end gap-3 p-4">
-            <label className="flex flex-col gap-1">
+          <Card className="flex flex-wrap items-end gap-3 p-3 sm:p-4">
+            <label className="flex min-w-[150px] flex-1 flex-col gap-1 sm:flex-none">
               <span className="text-[11px] font-bold uppercase tracking-[.5px] text-slate-400">
                 Status
               </span>
@@ -793,7 +793,7 @@ export function Vehicles() {
               </Select>
             </label>
 
-            <label className="flex flex-col gap-1">
+            <label className="flex min-w-[150px] flex-1 flex-col gap-1 sm:flex-none">
               <span className="text-[11px] font-bold uppercase tracking-[.5px] text-slate-400">
                 Marca
               </span>
@@ -811,7 +811,7 @@ export function Vehicles() {
               </Select>
             </label>
 
-            <label className="flex flex-col gap-1">
+            <label className="flex min-w-[150px] flex-1 flex-col gap-1 sm:flex-none">
               <span className="text-[11px] font-bold uppercase tracking-[.5px] text-slate-400">
                 Preço (R$)
               </span>
@@ -822,7 +822,7 @@ export function Vehicles() {
                   placeholder="Mín."
                   value={priceMin}
                   onChange={(e) => setPriceMin(e.target.value)}
-                  className="w-28 py-2 text-[13px]"
+                  className="min-w-0 flex-1 py-2 text-[13px] sm:!w-28 sm:flex-none"
                 />
                 <span className="text-slate-300">–</span>
                 <Input
@@ -831,12 +831,12 @@ export function Vehicles() {
                   placeholder="Máx."
                   value={priceMax}
                   onChange={(e) => setPriceMax(e.target.value)}
-                  className="w-28 py-2 text-[13px]"
+                  className="min-w-0 flex-1 py-2 text-[13px] sm:!w-28 sm:flex-none"
                 />
               </div>
             </label>
 
-            <div className="ml-auto flex items-end gap-3">
+            <div className="flex w-full items-end justify-between gap-3 sm:ml-auto sm:w-auto sm:justify-end">
               {hasFilter && (
                 <button
                   onClick={clearFilters}
@@ -940,7 +940,7 @@ export function Vehicles() {
             </div>
           ) : (
             <Card className="overflow-x-auto p-0">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[820px] text-sm">
                 <thead className="border-b border-slate-200 text-left text-xs uppercase text-slate-500">
                   <tr>
                     <th className="px-5 py-3 font-medium">Veículo</th>

@@ -38,38 +38,45 @@ export function LeadFilters({
 }) {
   const set = (patch: Partial<LeadFiltersValue>) => onChange({ ...value, ...patch });
   return (
-    <div className="mb-5 flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-3">
-      <Input
-        placeholder="Buscar por nome, cidade ou telefone…"
-        value={value.term}
-        onChange={(e) => set({ term: e.target.value })}
-        className="!w-auto min-w-0 flex-1"
-      />
-      <Input
-        type="date"
-        value={value.from}
-        onChange={(e) => set({ from: e.target.value })}
-        className="!w-36 shrink-0"
-      />
-      <span className="shrink-0 text-slate-400">–</span>
-      <Input
-        type="date"
-        value={value.to}
-        onChange={(e) => set({ to: e.target.value })}
-        className="!w-36 shrink-0"
-      />
-      <Select
-        value={value.city}
-        onChange={(e) => set({ city: e.target.value })}
-        className="!w-44 shrink-0"
-      >
-        <option value="all">Todas as cidades</option>
-        {cities.map((c) => (
-          <option key={c} value={c}>
-            {c}
-          </option>
-        ))}
-      </Select>
+    <div className="mb-5 rounded-xl border border-slate-200 bg-white p-3">
+      {/* Empilha no mobile: a linha única de 4 controles não cabia em 360px. */}
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <Input
+          placeholder="Buscar por nome, cidade ou telefone…"
+          value={value.term}
+          onChange={(e) => set({ term: e.target.value })}
+          className="min-w-0 sm:!w-auto sm:flex-1"
+        />
+        <div className="flex items-center gap-2">
+          <Input
+            type="date"
+            aria-label="Data inicial"
+            value={value.from}
+            onChange={(e) => set({ from: e.target.value })}
+            className="min-w-0 flex-1 sm:!w-36 sm:flex-none sm:shrink-0"
+          />
+          <span className="shrink-0 text-slate-400">–</span>
+          <Input
+            type="date"
+            aria-label="Data final"
+            value={value.to}
+            onChange={(e) => set({ to: e.target.value })}
+            className="min-w-0 flex-1 sm:!w-36 sm:flex-none sm:shrink-0"
+          />
+        </div>
+        <Select
+          value={value.city}
+          onChange={(e) => set({ city: e.target.value })}
+          className="sm:!w-44 sm:shrink-0"
+        >
+          <option value="all">Todas as cidades</option>
+          {cities.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </Select>
+      </div>
     </div>
   );
 }

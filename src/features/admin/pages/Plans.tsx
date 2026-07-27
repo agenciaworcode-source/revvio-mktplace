@@ -162,7 +162,7 @@ function PlanFormModal({
       <div className="flex flex-col gap-4">
         {error && <Alert variant="error">{error}</Alert>}
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Chave (key)" hint={isEdit ? "Não recomendado alterar" : "ex: profissional"}>
             <Input
               value={state.key}
@@ -179,7 +179,7 @@ function PlanFormModal({
           <Input value={state.tagline} onChange={(e) => set("tagline", e.target.value)} />
         </Field>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Preço mensal (R$)">
             <Input
               inputMode="numeric"
@@ -198,7 +198,7 @@ function PlanFormModal({
           </Field>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Field label="Limite de veículos" hint="vazio = ilimitado">
             <Input
               type="number"
@@ -222,7 +222,7 @@ function PlanFormModal({
           </Field>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Cor de destaque">
             <div className="flex items-center gap-2">
               <input

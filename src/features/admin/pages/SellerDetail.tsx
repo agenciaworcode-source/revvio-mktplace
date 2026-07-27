@@ -79,7 +79,8 @@ function ChargesCard({ sellerId }: { sellerId: string }) {
           Nenhuma cobrança gerada ainda.
         </p>
       ) : (
-        <table className="mt-3 w-full text-sm">
+        <div className="mt-3 overflow-x-auto">
+        <table className="w-full min-w-[640px] text-sm">
           <thead className="border-y border-slate-200 text-left text-xs uppercase text-slate-500">
             <tr>
               <th className="px-6 py-2 font-medium">Descrição</th>
@@ -119,6 +120,7 @@ function ChargesCard({ sellerId }: { sellerId: string }) {
             })}
           </tbody>
         </table>
+        </div>
       )}
     </Card>
   );
@@ -164,7 +166,8 @@ function CommissionsCard({ sellerId }: { sellerId: string }) {
           Nenhuma comissão gerada ainda (aparecem quando o vendedor registra vendas).
         </p>
       ) : (
-        <table className="mt-3 w-full text-sm">
+        <div className="mt-3 overflow-x-auto">
+        <table className="w-full min-w-[640px] text-sm">
           <thead className="border-y border-slate-200 text-left text-xs uppercase text-slate-500">
             <tr>
               <th className="px-6 py-2 font-medium">Venda</th>
@@ -212,6 +215,7 @@ function CommissionsCard({ sellerId }: { sellerId: string }) {
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </Card>
   );

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/features/auth/AuthProvider";
-import { signUpBuyer } from "@/features/auth/buyer";
+import { BuyerEmailInUseError, signUpBuyer } from "@/features/auth/buyer";
 import { maskPhone } from "@/lib/masks";
 import { Alert, Button, Field, Input, Modal } from "@/components/ui-light";
 
@@ -23,7 +23,8 @@ export function BuyerAuthModal({
 }: {
   open: boolean;
   onClose: () => void;
-  onAuthed: () => void;
+  /** Chamado com a sessão já ativa. `buyerId` vem preenchido no cadastro. */
+  onAuthed: (buyerId?: string | null) => void;
   /** Dados já preenchidos em outro form (ex.: "Quero ver o carro") — abre direto em "Criar conta". */
   initial?: BuyerAuthInitial;
   /** Aba inicial quando não há dados pré-preenchidos (ex.: canais da loja → "criar"). */
@@ -57,9 +58,9 @@ export function BuyerAuthModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  async function finish() {
+  async function finish(buyerId?: string | null) {
     await refreshSeller(); // recarrega buyer no contexto
-    onAuthed();
+    onAuthed(buyerId);
   }
 
   async function handleForgot() {
@@ -117,14 +118,25 @@ export function BuyerAuthModal({
     }
     setLoading(true);
     try {
-      await signUpBuyer({ name, email, phone, city, password });
-      await finish();
+      const result = await signUpBuyer({ name, email, phone, city, password });
+      if (result.status === "needs-email-confirmation") {
+        setTab("entrar");
+        setInfo(
+          `Conta criada! Confirme o e-mail enviado para ${email.trim()} e entre para continuar.`
+        );
+        return;
+      }
+      // Cadastro já entra logado — o comprador segue direto, sem tela de login.
+      await finish(result.buyer.id);
     } catch (e) {
-      setError(
-        /already registered/i.test((e as Error).message)
-          ? "Este e-mail já tem conta. Use a aba Entrar."
-          : (e as Error).message
-      );
+      if (e instanceof BuyerEmailInUseError) {
+        // Já tem conta: leva para o login com o e-mail preservado.
+        setTab("entrar");
+        setPassword("");
+        setError("Este e-mail já tem conta. Informe sua senha para entrar.");
+        return;
+      }
+      setError((e as Error).message);
     } finally {
       setLoading(false);
     }
@@ -133,10 +145,15 @@ export function BuyerAuthModal({
   if (!open) return null;
 
   return (
-    <Modal open onClose={onClose} title="Entre para continuar" closeOnBackdrop={false}>
+    <Modal
+      open
+      onClose={onClose}
+      title={tab === "criar" ? "Falta só criar sua conta" : "Entre para continuar"}
+      closeOnBackdrop={false}
+    >
       <p className="mb-4 text-sm text-slate-600">
         {tab === "criar" && (initial?.name || initial?.email)
-          ? "Confirme seus dados e defina uma senha para criar sua conta e continuar."
+          ? "Confirme seus dados e defina uma senha. Ao criar a conta você já segue direto para o WhatsApp."
           : "Crie sua conta ou entre para continuar."}
       </p>
 
@@ -213,7 +230,7 @@ export function BuyerAuthModal({
           </Button>
         ) : (
           <Button loading={loading} onClick={handleCriar}>
-            Criar conta
+            Criar conta e continuar
           </Button>
         )}
       </div>

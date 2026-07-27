@@ -14,6 +14,14 @@ function cx(...parts: Array<string | false | null | undefined>) {
   return parts.filter(Boolean).join(" ");
 }
 
+/* O Tailwind emite `.p-6` depois de `.p-0`/`.p-4`, então um `className="p-0"`
+   passado por quem chama perdia para o padrão do componente. Só aplicamos o
+   padding padrão quando o chamador não definiu o seu. */
+const PADDING_RE = /(?:^|\s)(?:[a-z0-9-]+:)*-?p[trblxyse]?-/;
+function hasPadding(className?: string): boolean {
+  return !!className && PADDING_RE.test(className);
+}
+
 /* ── Button ─────────────────────────────────────────────── */
 type ButtonVariant = "primary" | "ghost" | "danger" | "outline";
 
@@ -124,7 +132,8 @@ export function Card({
   return (
     <div
       className={cx(
-        "rounded-2xl border border-hair bg-white p-6 shadow-[0_1px_2px_rgba(16,24,40,.04)]",
+        "rounded-2xl border border-hair bg-white shadow-[0_1px_2px_rgba(16,24,40,.04)]",
+        !hasPadding(className) && "p-4 sm:p-6",
         className
       )}
     >
@@ -198,9 +207,9 @@ export function StatCard({
   hint?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-hair bg-white px-[22px] py-5 shadow-[0_1px_2px_rgba(16,24,40,.04)]">
-      <p className="text-[13px] font-semibold text-slate-500">{label}</p>
-      <p className="mt-2 text-[26px] font-extrabold tracking-[-.5px] text-slate-950">
+    <div className="rounded-2xl border border-hair bg-white px-4 py-4 shadow-[0_1px_2px_rgba(16,24,40,.04)] sm:px-[22px] sm:py-5">
+      <p className="text-[12px] font-semibold text-slate-500 sm:text-[13px]">{label}</p>
+      <p className="mt-2 break-words text-[21px] font-extrabold tracking-[-.5px] text-slate-950 sm:text-[26px]">
         {value}
       </p>
       {hint && <p className="mt-1 text-xs text-slate-400">{hint}</p>}
@@ -219,12 +228,14 @@ export function PageHeader({
   action?: ReactNode;
 }) {
   return (
-    <div className="mb-7 flex flex-wrap items-start justify-between gap-4">
-      <div>
-        <h1 className="text-[28px] font-extrabold tracking-[-1px] text-slate-950">
+    <div className="mb-6 flex flex-wrap items-start justify-between gap-3 sm:mb-7 sm:gap-4">
+      <div className="min-w-0">
+        <h1 className="text-[22px] font-extrabold tracking-[-.6px] text-slate-950 sm:text-[28px] sm:tracking-[-1px]">
           {title}
         </h1>
-        {subtitle && <p className="mt-1.5 text-[14.5px] text-slate-400">{subtitle}</p>}
+        {subtitle && (
+          <p className="mt-1.5 text-[13.5px] text-slate-400 sm:text-[14.5px]">{subtitle}</p>
+        )}
       </div>
       {action}
     </div>
@@ -272,7 +283,7 @@ export function Modal({
   if (!open) return null;
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 sm:p-8"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto overscroll-contain bg-black/40 p-3 sm:p-8"
       onClick={closeOnBackdrop ? onClose : undefined}
     >
       <div
@@ -282,18 +293,18 @@ export function Modal({
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-hair px-6 py-4">
-          <h2 className="text-lg font-bold text-slate-950">{title}</h2>
+        <div className="flex items-center justify-between gap-3 border-b border-hair px-4 py-3.5 sm:px-6 sm:py-4">
+          <h2 className="text-base font-bold text-slate-950 sm:text-lg">{title}</h2>
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-700"
+            className="-mr-1 grid h-9 w-9 shrink-0 place-items-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700"
             aria-label="Fechar"
           >
             ✕
           </button>
         </div>
-        <div className="p-6">{children}</div>
+        <div className="p-4 sm:p-6">{children}</div>
       </div>
     </div>
   );

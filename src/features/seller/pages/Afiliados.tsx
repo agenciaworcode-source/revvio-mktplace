@@ -314,7 +314,7 @@ export function Afiliados() {
           <EmptyState title="Sem dados" description="Nenhum afiliado com atividade no período." />
         ) : (
           <Card className="overflow-x-auto p-0">
-            <table className="w-full text-left text-sm">
+            <table className="w-full min-w-[760px] text-left text-sm">
               <thead className="border-b border-hair text-xs uppercase text-slate-500">
                 <tr>
                   <th className="px-4 py-3 font-medium">Afiliado</th>
@@ -366,7 +366,7 @@ export function Afiliados() {
         />
       ) : (
         <Card className="overflow-x-auto p-0">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[620px] text-sm">
             <thead className="border-b border-slate-200 text-left text-xs uppercase text-slate-500">
               <tr>
                 <th className="px-5 py-3 font-medium">Afiliado</th>

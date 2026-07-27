@@ -8,7 +8,7 @@ import {
 } from "@/features/tracking/queries";
 
 const cardCls =
-  "rounded-2xl border border-hair bg-white shadow-[0_1px_2px_rgba(16,24,40,.04)] p-6";
+  "rounded-2xl border border-hair bg-white shadow-[0_1px_2px_rgba(16,24,40,.04)] p-4 sm:p-6";
 
 const CHANNEL_LABEL: Record<string, string> = {
   store_whatsapp: "WhatsApp da mini-loja",
@@ -19,7 +19,8 @@ function BuyersTable({ buyers, unit }: { buyers: ClickBuyer[]; unit: string }) {
   if (buyers.length === 0)
     return <p className="px-1 py-2 text-[13px] text-slate-400">Sem registros.</p>;
   return (
-    <table className="w-full text-[13px]">
+    <div className="-mx-3 overflow-x-auto px-3">
+    <table className="w-full min-w-[560px] text-[13px]">
       <thead className="text-left text-[11px] uppercase tracking-[.5px] text-slate-400">
         <tr>
           <th className="py-1">Nome</th>
@@ -41,6 +42,7 @@ function BuyersTable({ buyers, unit }: { buyers: ClickBuyer[]; unit: string }) {
         ))}
       </tbody>
     </table>
+    </div>
   );
 }
 

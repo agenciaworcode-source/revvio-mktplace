@@ -38,7 +38,7 @@ function SalesOpsSection() {
         </div>
       ) : (
         <>
-          <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
             <KpiCard
               label="Volume intermediado"
               value={brlShort(ops.gmv)}
@@ -69,7 +69,7 @@ function SalesOpsSection() {
           </div>
 
           <SectionCard className="overflow-hidden">
-            <div className="border-b border-[#f1f3f5] px-6 py-5">
+            <div className="border-b border-[#f1f3f5] px-4 py-4 sm:px-6 sm:py-5">
               <div className="text-base font-bold text-slate-950">
                 Breakdown por garagista
               </div>
@@ -83,7 +83,7 @@ function SalesOpsSection() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full border-collapse text-sm">
+                <table className="w-full min-w-[760px] border-collapse text-sm">
                   <thead>
                     <tr>
                       {["Garagista", "Vendas", "Volume", "A receber", "Pagas"].map(
@@ -152,7 +152,7 @@ export function Financial() {
         </div>
       ) : (
         <>
-          <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-5">
+          <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-5">
             <KpiCard label="MRR" value={brlShort(o.mrr)} sub="recorrente" icon="wallet" />
             <KpiCard
               label="Receita acumulada"

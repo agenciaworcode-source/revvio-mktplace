@@ -70,7 +70,7 @@ function AsaasInvoices({ lojaId }: { lojaId?: string }) {
         />
       ) : (
         <Card className="overflow-x-auto p-0">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[680px] text-sm">
             <thead className="border-b border-slate-200 text-left text-xs uppercase text-slate-500">
               <tr>
                 <th className="px-5 py-3 font-medium">Descrição</th>
@@ -172,7 +172,7 @@ function LojaView({ lojaId }: { lojaId?: string }) {
             />
           ) : (
             <Card className="overflow-x-auto p-0">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[680px] text-sm">
                 <thead className="border-b border-slate-200 text-left text-xs uppercase text-slate-500">
                   <tr>
                     <th className="px-5 py-3 font-medium">Vendedor</th>
@@ -250,7 +250,7 @@ function VendedorView({ personId, rate }: { personId?: string; rate: number }) {
             />
           ) : (
             <Card className="overflow-x-auto p-0">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[680px] text-sm">
                 <thead className="border-b border-slate-200 text-left text-xs uppercase text-slate-500">
                   <tr>
                     <th className="px-5 py-3 font-medium">Status</th>

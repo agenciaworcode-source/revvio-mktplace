@@ -1,7 +1,8 @@
 import { useMemo, type ReactNode } from "react";
 import {
   DndContext,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   useDraggable,
   useDroppable,
   useSensor,
@@ -28,7 +29,7 @@ function Column({
   return (
     <div
       ref={setNodeRef}
-      className={`flex w-72 shrink-0 flex-col rounded-xl bg-slate-50 p-3 ${
+      className={`flex w-[82vw] max-w-[288px] shrink-0 snap-start flex-col rounded-xl bg-slate-50 p-3 sm:w-72 ${
         isOver ? "ring-2 ring-brand" : ""
       }`}
     >
@@ -64,7 +65,7 @@ function DraggableCard({
       style={style}
       {...listeners}
       {...attributes}
-      className="cursor-grab touch-none active:cursor-grabbing"
+      className="cursor-grab touch-manipulation active:cursor-grabbing"
     >
       <LeadCard lead={lead} onEdit={onEdit} onDelete={onDelete} />
     </div>
@@ -83,7 +84,12 @@ export function LeadKanban({
   onDelete?: (lead: LeadWithVehicle) => void;
 }) {
   const updateStage = useUpdateLeadStage();
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
+  // No touch o arraste começa por toque longo: com PointerSensor + `touch-none`
+  // o dedo sobre um card não rolava a página nem o carrossel de colunas.
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 220, tolerance: 8 } })
+  );
 
   const byStage = useMemo(() => {
     const map: Record<LeadStage, LeadWithVehicle[]> = {
@@ -108,7 +114,7 @@ export function LeadKanban({
 
   return (
     <DndContext sensors={sensors} onDragEnd={onDragEnd}>
-      <div className="flex gap-4 overflow-x-auto pb-4">
+      <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 sm:mx-0 sm:snap-none sm:px-0">
         {LEAD_STAGES.map((s) => (
           <Column key={s.key} stage={s.key} label={s.label} count={byStage[s.key].length}>
             {byStage[s.key].map((l) => (

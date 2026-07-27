@@ -54,7 +54,7 @@ export function SalesReasonTable({
   }
   return (
     <Card className="overflow-x-auto p-0">
-      <table className="w-full text-sm">
+      <table className="w-full min-w-[780px] text-sm">
         <thead className="border-b border-slate-200 text-left text-xs uppercase text-slate-500">
           <tr>
             <th className="px-5 py-3 font-medium">Data</th>
@@ -104,7 +104,7 @@ export function RemovalsReasonTable({
   }
   return (
     <Card className="overflow-x-auto p-0">
-      <table className="w-full text-sm">
+      <table className="w-full min-w-[780px] text-sm">
         <thead className="border-b border-slate-200 text-left text-xs uppercase text-slate-500">
           <tr>
             <th className="px-5 py-3 font-medium">Removido em</th>

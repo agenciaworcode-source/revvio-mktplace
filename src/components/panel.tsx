@@ -26,12 +26,14 @@ export function PanelHeader({
   actions?: ReactNode;
 }) {
   return (
-    <div className="mb-7 flex flex-wrap items-start justify-between gap-4">
-      <div>
-        <h1 className="text-[28px] font-extrabold tracking-[-1px] text-slate-950">
+    <div className="mb-6 flex flex-wrap items-start justify-between gap-3 sm:mb-7 sm:gap-4">
+      <div className="min-w-0">
+        <h1 className="text-[22px] font-extrabold tracking-[-.6px] text-slate-950 sm:text-[28px] sm:tracking-[-1px]">
           {title}
         </h1>
-        {subtitle && <p className="mt-1.5 text-[14.5px] text-slate-400">{subtitle}</p>}
+        {subtitle && (
+          <p className="mt-1.5 text-[13.5px] text-slate-400 sm:text-[14.5px]">{subtitle}</p>
+        )}
       </div>
       {actions && <div className="flex flex-wrap gap-2.5">{actions}</div>}
     </div>
@@ -72,20 +74,22 @@ export function KpiCard({
   trend?: number | null;
 }) {
   return (
-    <div className="rounded-2xl border border-hair bg-white px-[22px] py-5 shadow-[0_1px_2px_rgba(16,24,40,.04)]">
-      <div className="mb-3.5 flex items-start justify-between">
-        <span className="text-[13px] font-semibold text-slate-500">{label}</span>
+    <div className="rounded-2xl border border-hair bg-white px-4 py-4 shadow-[0_1px_2px_rgba(16,24,40,.04)] sm:px-[22px] sm:py-5">
+      <div className="mb-3 flex items-start justify-between gap-2 sm:mb-3.5">
+        <span className="min-w-0 text-[12px] font-semibold text-slate-500 sm:text-[13px]">
+          {label}
+        </span>
         <span
-          className="grid h-[34px] w-[34px] place-items-center rounded-[9px]"
+          className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-[9px] sm:h-[34px] sm:w-[34px]"
           style={{ background: `${accent}17`, color: accent }}
         >
           <Icon name={icon} size={18} />
         </span>
       </div>
-      <div className="text-[30px] font-extrabold leading-none tracking-[-1px] text-slate-950">
+      <div className="break-words text-[22px] font-extrabold leading-none tracking-[-.6px] text-slate-950 sm:text-[30px] sm:tracking-[-1px]">
         {value}
       </div>
-      <div className="mt-2.5 flex items-center gap-1.5">
+      <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
         {trend != null && (
           <span
             className="inline-flex items-center gap-1 text-[12.5px] font-bold"
@@ -116,7 +120,7 @@ export function StatusPill({ status }: { status: SellerStatus }) {
   const s = STATUS_MAP[status] ?? STATUS_MAP.active;
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold"
+      className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-bold"
       style={{ background: s.bg, color: s.c }}
     >
       <span className="h-1.5 w-1.5 rounded-full" style={{ background: s.dot }} />
@@ -163,9 +167,9 @@ export function BarsChart({
   const max = Math.max(1, ...series.map((d) => d.value));
   const hasData = series.some((d) => d.value > 0);
   return (
-    <SectionCard className="p-6">
-      <div className="flex items-start justify-between">
-        <div>
+    <SectionCard className="p-4 sm:p-6">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="min-w-0">
           <div className="text-base font-bold text-slate-950">{title}</div>
           {subtitle && <div className="mt-0.5 text-[13px] text-slate-400">{subtitle}</div>}
         </div>
@@ -216,7 +220,7 @@ export function PlanSplit({
   rows: { name: string; count: number; price: number; color: string }[];
 }) {
   return (
-    <SectionCard className="p-6">
+    <SectionCard className="p-4 sm:p-6">
       <div className="text-base font-bold text-slate-950">Distribuição por plano</div>
       <div className="mb-5 mt-0.5 text-[13px] text-slate-400">
         {total} {total === 1 ? "assinante ativo" : "assinantes ativos"}

@@ -33,7 +33,8 @@ function AffiliateSalesDrill({ affiliateId, from, to, name }: { affiliateId: str
       ) : sales.length === 0 ? (
         <p className="text-sm text-slate-400">Nenhuma venda no período.</p>
       ) : (
-        <table className="w-full text-left text-sm">
+        <div className="-mx-4 overflow-x-auto px-4">
+        <table className="w-full min-w-[480px] text-left text-sm">
           <thead className="border-b border-hair text-xs uppercase text-slate-500">
             <tr><th className="px-3 py-2 font-medium">Data</th><th className="px-3 py-2 font-medium">Comprador</th><th className="px-3 py-2 font-medium">Veículo</th><th className="px-3 py-2 font-medium">Valor</th></tr>
           </thead>
@@ -48,6 +49,7 @@ function AffiliateSalesDrill({ affiliateId, from, to, name }: { affiliateId: str
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </Card>
   );
@@ -166,7 +168,7 @@ export function Afiliados() {
         title="Afiliados"
         subtitle="Visão global dos afiliados de todos os garagistas"
       />
-      <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-4">
+      <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Select
           value={garagistaId}
           onChange={(e) => {
@@ -301,7 +303,7 @@ export function Afiliados() {
           ) : (
             <>
               <Card className="overflow-x-auto p-0">
-                <table className="w-full text-left text-sm">
+                <table className="w-full min-w-[1080px] text-left text-sm">
                   <thead className="border-b border-hair text-xs uppercase text-slate-500">
                     <tr>
                       <th className="px-4 py-3 font-medium">Afiliado</th>

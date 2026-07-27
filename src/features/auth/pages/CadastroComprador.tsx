@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { signUpBuyer } from "@/features/auth/buyer";
+import { BuyerEmailInUseError, signUpBuyer } from "@/features/auth/buyer";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { maskPhone } from "@/lib/masks";
 import { AuthSplitLayout, authFieldWrap, authFieldInput } from "../AuthSplitLayout";
@@ -32,12 +32,19 @@ export function CadastroComprador() {
     }
     setLoading(true);
     try {
-      await signUpBuyer({ name, email, phone, city, password });
+      const result = await signUpBuyer({ name, email, phone, city, password });
+      if (result.status === "needs-email-confirmation") {
+        navigate("/login", {
+          replace: true,
+          state: { info: "Conta criada! Confirme o e-mail e faça login." },
+        });
+        return;
+      }
       await refreshSeller();
       navigate("/", { replace: true });
     } catch (err) {
       setError(
-        /already registered/i.test((err as Error).message)
+        err instanceof BuyerEmailInUseError
           ? "Este e-mail já tem conta. Faça login."
           : (err as Error).message
       );

@@ -5,6 +5,7 @@ import { MarketplaceCard } from "../components/MarketplaceCard";
 import { Icon } from "../components/icons";
 import { useStorefront } from "../queries";
 import { whatsappLink } from "@/lib/whatsapp";
+import { openExternal } from "@/lib/openExternal";
 import { Spinner } from "@/components/ui";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { BuyerAuthModal } from "@/features/auth/components/BuyerAuthModal";
@@ -67,9 +68,11 @@ export function Storefront() {
   const location = [seller.city, seller.state].filter(Boolean).join(", ");
   const featured = vehicles.slice(0, 3);
 
-  function openChannel(kind: ClickKind, url: string) {
+  // `fromUserGesture` distingue o clique direto do retorno do cadastro — fora
+  // do gesto, `window.open` cai no bloqueador de pop-ups (ver openExternal).
+  function openChannel(kind: ClickKind, url: string, fromUserGesture: boolean) {
     logClick(kind, seller.id);
-    window.open(url, "_blank", "noopener");
+    openExternal(url, fromUserGesture);
   }
   function handleChannel(e: React.MouseEvent, kind: ClickKind, url: string) {
     e.preventDefault();
@@ -77,7 +80,7 @@ export function Storefront() {
       setPending({ kind, url });
       return;
     }
-    openChannel(kind, url);
+    openChannel(kind, url, true);
   }
 
   return (
@@ -288,7 +291,7 @@ export function Storefront() {
         onAuthed={() => {
           const p = pending;
           setPending(null);
-          if (p) openChannel(p.kind, p.url);
+          if (p) openChannel(p.kind, p.url, false);
         }}
       />
     </div>

@@ -50,7 +50,7 @@ export function Aparencia() {
         </div>
       )}
 
-      <SectionCard>
+      <SectionCard className="p-4 sm:p-6">
         <h2 className="text-[15px] font-bold text-slate-900">Banner da home</h2>
         <p className="mt-1 text-[13.5px] text-slate-400">
           Recomendado: imagem ampla (ex.: 1280×420). Substitui o banner anterior.
@@ -70,7 +70,7 @@ export function Aparencia() {
           )}
         </div>
 
-        <div className="mt-5 flex items-center gap-3">
+        <div className="mt-5 flex flex-wrap items-center gap-3">
           <input
             ref={inputRef}
             type="file"

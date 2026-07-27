@@ -111,7 +111,7 @@ export function Contratos() {
         }
       />
 
-      <Card className="mb-4 flex flex-wrap items-end gap-4">
+      <Card className="mb-4 grid grid-cols-1 items-end gap-3 p-4 sm:grid-cols-2 sm:gap-4 sm:p-6 lg:grid-cols-[1.6fr_1.2fr_1fr_1fr_auto]">
         <Field label="Cliente (nome ou CPF/CNPJ)">
           <Input
             placeholder="Buscar vendedor ou comprador…"
@@ -119,7 +119,6 @@ export function Contratos() {
             onChange={(e) =>
               setFilters({ ...filters, search: e.target.value || undefined })
             }
-            className="min-w-[240px]"
           />
         </Field>
         <Field label="Tipo de documento">
@@ -158,7 +157,11 @@ export function Contratos() {
             }
           />
         </Field>
-        <Button variant="outline" onClick={() => setFilters({})}>
+        <Button
+          variant="outline"
+          onClick={() => setFilters({})}
+          className="sm:col-span-2 lg:col-span-1"
+        >
           Limpar
         </Button>
       </Card>
@@ -179,7 +182,7 @@ export function Contratos() {
         />
       ) : (
         <Card className="overflow-x-auto p-0">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[980px] text-sm">
             <thead>
               <tr className="border-b border-hair text-left text-xs font-bold uppercase tracking-wide text-slate-400">
                 <th className="px-5 py-3.5">Emissão</th>

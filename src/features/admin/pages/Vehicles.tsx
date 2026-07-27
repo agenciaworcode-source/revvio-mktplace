@@ -54,9 +54,9 @@ function statusMeta(status: string) {
 }
 
 const selectCls =
-  "rounded-lg border border-slate-200 bg-white px-3 py-2 text-[13px] text-slate-700 outline-none focus:border-brand";
+  "w-full max-w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-[13px] text-slate-700 outline-none focus:border-brand sm:w-auto sm:min-w-[160px]";
 const inputCls =
-  "w-28 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[13px] text-slate-700 outline-none focus:border-brand";
+  "w-full min-w-0 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[13px] text-slate-700 outline-none focus:border-brand sm:w-28";
 
 export function Vehicles() {
   const { data, isLoading } = useAdminVehicles();
@@ -143,7 +143,7 @@ export function Vehicles() {
         </div>
       ) : (
         <SectionCard className="overflow-hidden">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#f1f3f5] px-6 py-5">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#f1f3f5] px-4 py-4 sm:px-6 sm:py-5">
             <div className="text-base font-bold text-slate-950">
               Inventário consolidado ·{" "}
               {hasFilter
@@ -161,8 +161,8 @@ export function Vehicles() {
           </div>
 
           {vehicles.length > 0 && (
-            <div className="flex flex-wrap items-end gap-3 border-b border-[#f1f3f5] bg-[#fbfbfc] px-6 py-4">
-              <label className="flex flex-col gap-1">
+            <div className="flex flex-wrap items-end gap-3 border-b border-[#f1f3f5] bg-[#fbfbfc] px-4 py-4 sm:px-6">
+              <label className="flex min-w-[150px] flex-1 flex-col gap-1 sm:flex-none">
                 <span className="text-[11px] font-bold uppercase tracking-[.5px] text-slate-400">
                   Status
                 </span>
@@ -174,7 +174,7 @@ export function Vehicles() {
                 </select>
               </label>
 
-              <label className="flex flex-col gap-1">
+              <label className="flex min-w-[150px] flex-1 flex-col gap-1 sm:flex-none">
                 <span className="text-[11px] font-bold uppercase tracking-[.5px] text-slate-400">
                   Marca
                 </span>
@@ -188,7 +188,7 @@ export function Vehicles() {
                 </select>
               </label>
 
-              <label className="flex flex-col gap-1">
+              <label className="flex min-w-[150px] flex-1 flex-col gap-1 sm:flex-none">
                 <span className="text-[11px] font-bold uppercase tracking-[.5px] text-slate-400">
                   Garagista
                 </span>
@@ -202,7 +202,7 @@ export function Vehicles() {
                 </select>
               </label>
 
-              <label className="flex flex-col gap-1">
+              <label className="flex min-w-[150px] flex-1 flex-col gap-1 sm:flex-none">
                 <span className="text-[11px] font-bold uppercase tracking-[.5px] text-slate-400">
                   Preço (R$)
                 </span>
@@ -239,7 +239,7 @@ export function Vehicles() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-sm">
+              <table className="w-full min-w-[1020px] border-collapse text-sm">
                 <thead>
                   <tr>
                     {["Veículo", "Garagem", "Status", "Ano", "Preço", "FIPE", "Cliques", "Ações"].map(

@@ -126,8 +126,10 @@ export function Stores() {
                 )}
               </div>
               <div className="px-[18px] pb-[18px] pt-[30px]">
-                <div className="flex items-center justify-between">
-                  <div className="text-[15px] font-bold text-slate-950">{s.name}</div>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="min-w-0 truncate text-[15px] font-bold text-slate-950">
+                    {s.name}
+                  </div>
                   <StatusPill status={s.status} />
                 </div>
                 <div className="my-1 mb-3.5 text-[12.5px] text-slate-400">

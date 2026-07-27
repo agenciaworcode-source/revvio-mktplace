@@ -34,7 +34,7 @@ function FiltersBar({
   onChange: (next: ReasonFilters) => void;
 }) {
   return (
-    <Card className="flex flex-wrap items-end gap-4">
+    <Card className="grid grid-cols-1 items-end gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-[1.4fr_1.4fr_1fr_1fr_auto]">
       <Field label="Garagista">
         <Select
           value={value.sellerId ?? ""}
@@ -75,7 +75,7 @@ function FiltersBar({
           onChange={(e) => onChange({ ...value, to: e.target.value || undefined })}
         />
       </Field>
-      <Button variant="outline" onClick={() => onChange({})}>
+      <Button variant="outline" onClick={() => onChange({})} className="sm:col-span-2 lg:col-span-1">
         Limpar
       </Button>
     </Card>

@@ -11,6 +11,13 @@ function cx(...parts: Array<string | false | null | undefined>) {
   return parts.filter(Boolean).join(" ");
 }
 
+/* Ver nota em ui-light.tsx: `.p-6` do Tailwind vence `.p-0` por ordem de
+   emissão no CSS, então o padrão só entra se o chamador não passar padding. */
+const PADDING_RE = /(?:^|\s)(?:[a-z0-9-]+:)*-?p[trblxyse]?-/;
+function hasPadding(className?: string): boolean {
+  return !!className && PADDING_RE.test(className);
+}
+
 /* ── Button ─────────────────────────────────────────────── */
 type ButtonVariant = "primary" | "ghost" | "danger" | "outline";
 
@@ -121,7 +128,8 @@ export function Card({
   return (
     <div
       className={cx(
-        "rounded-2xl border border-slate-800 bg-slate-900/60 p-6 shadow-xl",
+        "rounded-2xl border border-slate-800 bg-slate-900/60 shadow-xl",
+        !hasPadding(className) && "p-4 sm:p-6",
         className
       )}
     >
@@ -265,25 +273,25 @@ export function Modal({
   if (!open) return null;
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-4 sm:p-8"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto overscroll-contain bg-black/60 p-3 sm:p-8"
       onClick={closeOnBackdrop ? onClose : undefined}
     >
       <div
         className="my-auto w-full max-w-2xl rounded-2xl border border-slate-800 bg-slate-900 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-slate-800 px-6 py-4">
-          <h2 className="text-lg font-bold text-white">{title}</h2>
+        <div className="flex items-center justify-between gap-3 border-b border-slate-800 px-4 py-3.5 sm:px-6 sm:py-4">
+          <h2 className="text-base font-bold text-white sm:text-lg">{title}</h2>
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-white"
+            className="-mr-1 grid h-9 w-9 shrink-0 place-items-center rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white"
             aria-label="Fechar"
           >
             ✕
           </button>
         </div>
-        <div className="p-6">{children}</div>
+        <div className="p-4 sm:p-6">{children}</div>
       </div>
     </div>
   );
