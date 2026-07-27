@@ -11,6 +11,7 @@ import { formatCurrency, formatNumber } from "@/lib/format";
 import { AFFILIATES_ENABLED } from "@/config/features";
 import { whatsappLink } from "@/lib/whatsapp";
 import { openExternal } from "@/lib/openExternal";
+import { vehicleRef } from "@/lib/vehicleRef";
 import { maskPhone } from "@/lib/masks";
 import { Icon } from "../components/icons";
 import { ImageLightbox } from "../components/ImageLightbox";
@@ -212,6 +213,9 @@ function LeadForm({ v }: { v: PublicVehicle }) {
     }
     const linhas = [
       `Olá! Tenho interesse no ${carro} (${formatCurrency(v.price)}) anunciado na REVVIO.`,
+      // Amarra a conversa ao anúncio: o WhatsApp é o único ponto do fluxo onde
+      // essa ligação se perdia (o lead no painel já guarda o vehicle_id).
+      `Ref.: ${vehicleRef(v.id)}`,
       nome && `Nome: ${nome}`,
       celular && `Celular: ${celular}`,
       email && `E-mail: ${email}`,
