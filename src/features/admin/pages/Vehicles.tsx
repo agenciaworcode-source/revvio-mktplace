@@ -11,6 +11,7 @@ import { AdminActions } from "../components";
 import { VehicleForm } from "@/features/seller/pages/Vehicles";
 import { PanelHeader, SectionCard } from "@/components/panel";
 import { formatCurrency, formatNumber } from "@/lib/format";
+import { matchesVehicleRef, vehicleRef } from "@/lib/vehicleRef";
 import { Spinner } from "@/components/ui";
 import { Alert, Button, Modal, Spinner as LightSpinner } from "@/components/ui-light";
 import { ReasonField, REMOVAL_REASONS } from "@/components/ReasonField";
@@ -62,6 +63,7 @@ export function Vehicles() {
   const { data, isLoading } = useAdminVehicles();
   const vehicles = useMemo(() => data ?? [], [data]);
 
+  const [term, setTerm] = useState("");
   const [status, setStatus] = useState("all");
   const [make, setMake] = useState("all");
   const [seller, setSeller] = useState("all");
@@ -98,7 +100,13 @@ export function Vehicles() {
   const filtered = useMemo(() => {
     const min = priceMin ? Number(priceMin) : null;
     const max = priceMax ? Number(priceMax) : null;
+    const q = term.trim().toLowerCase();
     return vehicles.filter((v) => {
+      // Aceita o código colado do WhatsApp (RV-xxx) e também marca/modelo.
+      if (q) {
+        const texto = `${v.make} ${v.model}`.toLowerCase();
+        if (!matchesVehicleRef(q, v.id) && !texto.includes(q)) return false;
+      }
       if (status !== "all" && v.status !== status) return false;
       if (make !== "all" && v.make !== make) return false;
       if (seller !== "all" && (v.seller?.name ?? "") !== seller) return false;
@@ -106,12 +114,13 @@ export function Vehicles() {
       if (max !== null && v.price > max) return false;
       return true;
     });
-  }, [vehicles, status, make, seller, priceMin, priceMax]);
+  }, [vehicles, term, status, make, seller, priceMin, priceMax]);
 
   const hasFilter =
-    status !== "all" || make !== "all" || seller !== "all" || !!priceMin || !!priceMax;
+    !!term || status !== "all" || make !== "all" || seller !== "all" || !!priceMin || !!priceMax;
 
   const clearFilters = () => {
+    setTerm("");
     setStatus("all");
     setMake("all");
     setSeller("all");
@@ -162,6 +171,18 @@ export function Vehicles() {
 
           {vehicles.length > 0 && (
             <div className="flex flex-wrap items-end gap-3 border-b border-[#f1f3f5] bg-[#fbfbfc] px-4 py-4 sm:px-6">
+              <label className="flex min-w-[190px] flex-1 flex-col gap-1">
+                <span className="text-[11px] font-bold uppercase tracking-[.5px] text-slate-400">
+                  Buscar
+                </span>
+                <input
+                  placeholder="Código (RV-12), marca ou modelo"
+                  value={term}
+                  onChange={(e) => setTerm(e.target.value)}
+                  className={selectCls}
+                />
+              </label>
+
               <label className="flex min-w-[150px] flex-1 flex-col gap-1 sm:flex-none">
                 <span className="text-[11px] font-bold uppercase tracking-[.5px] text-slate-400">
                   Status
@@ -273,7 +294,11 @@ export function Vehicles() {
                             <div className="text-[13.5px] font-bold uppercase text-slate-950">
                               {v.make}
                             </div>
-                            <div className="text-[12.5px] text-slate-400">{v.model}</div>
+                            <div className="text-[12.5px] text-slate-400">
+                              <span className="font-semibold">{vehicleRef(v.id)}</span>
+                              {" · "}
+                              {v.model}
+                            </div>
                           </div>
                         </div>
                       </td>

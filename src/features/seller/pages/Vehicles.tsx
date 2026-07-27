@@ -13,6 +13,7 @@ import {
 } from "../queries";
 import { uploadMedia } from "@/lib/storage";
 import { formatCurrency, formatNumber } from "@/lib/format";
+import { matchesVehicleRef, vehicleRef } from "@/lib/vehicleRef";
 import {
   bodyLabels,
   fuelLabels,
@@ -711,6 +712,7 @@ export function Vehicles() {
   const [removalReason, setRemovalReason] = useState("");
 
   const [view, setView] = useState<"cards" | "list">("cards");
+  const [term, setTerm] = useState("");
   const [status, setStatus] = useState("all");
   const [make, setMake] = useState("all");
   const [priceMin, setPriceMin] = useState("");
@@ -725,17 +727,26 @@ export function Vehicles() {
   const filtered = useMemo(() => {
     const min = priceMin ? Number(priceMin) : null;
     const max = priceMax ? Number(priceMax) : null;
+    const q = term.trim().toLowerCase();
     return vehicles.filter((v) => {
+      // O código do anúncio (RV-xxx) chega colado do WhatsApp; a mesma caixa
+      // também busca por marca/modelo para não virar um campo de uso único.
+      if (q) {
+        const texto = `${v.make} ${v.model}`.toLowerCase();
+        if (!matchesVehicleRef(q, v.id) && !texto.includes(q)) return false;
+      }
       if (status !== "all" && v.status !== status) return false;
       if (make !== "all" && v.make !== make) return false;
       if (min !== null && v.price < min) return false;
       if (max !== null && v.price > max) return false;
       return true;
     });
-  }, [vehicles, status, make, priceMin, priceMax]);
+  }, [vehicles, term, status, make, priceMin, priceMax]);
 
-  const hasFilter = status !== "all" || make !== "all" || !!priceMin || !!priceMax;
+  const hasFilter =
+    !!term || status !== "all" || make !== "all" || !!priceMin || !!priceMax;
   const clearFilters = () => {
+    setTerm("");
     setStatus("all");
     setMake("all");
     setPriceMin("");
@@ -777,6 +788,18 @@ export function Vehicles() {
         <div className="flex flex-col gap-4">
           {/* Barra de filtros + alternância de visualização */}
           <Card className="flex flex-wrap items-end gap-3 p-3 sm:p-4">
+            <label className="flex min-w-[190px] flex-1 flex-col gap-1">
+              <span className="text-[11px] font-bold uppercase tracking-[.5px] text-slate-400">
+                Buscar
+              </span>
+              <Input
+                placeholder="Código (RV-12), marca ou modelo"
+                value={term}
+                onChange={(e) => setTerm(e.target.value)}
+                className="py-2 text-[13px]"
+              />
+            </label>
+
             <label className="flex min-w-[150px] flex-1 flex-col gap-1 sm:flex-none">
               <span className="text-[11px] font-bold uppercase tracking-[.5px] text-slate-400">
                 Status
@@ -899,6 +922,10 @@ export function Vehicles() {
                           {v.make} {v.model}
                         </p>
                         <p className="text-xs text-slate-500">
+                          <span className="font-semibold text-slate-400">
+                            {vehicleRef(v.id)}
+                          </span>
+                          {" · "}
                           {v.year ?? "—"}
                           {v.mileage != null && ` · ${formatNumber(v.mileage)} km`}
                         </p>
@@ -971,6 +998,10 @@ export function Vehicles() {
                               {v.make} {v.model}
                             </p>
                             <p className="text-xs text-slate-500">
+                              <span className="font-semibold text-slate-400">
+                                {vehicleRef(v.id)}
+                              </span>
+                              {" · "}
                               {v.year ?? "—"}
                               {v.mileage != null && ` · ${formatNumber(v.mileage)} km`}
                             </p>
