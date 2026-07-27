@@ -175,7 +175,8 @@ function LeadForm({ v }: { v: PublicVehicle }) {
     if (celular.replace(/\D/g, "").length < 10) e.celular = "Telefone inválido.";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) e.email = "E-mail inválido.";
     if (!cidade.trim()) e.cidade = "Informe sua cidade.";
-    if (!mensagem.trim()) e.mensagem = "Escreva uma mensagem.";
+    // Mensagem é opcional: o comprador continua a conversa no próprio WhatsApp,
+    // e exigir texto aqui só adicionava atrito antes do contato.
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -279,12 +280,10 @@ function LeadForm({ v }: { v: PublicVehicle }) {
         <div>
           <Textarea
             rows={3}
-            placeholder="Digite a sua mensagem *"
+            placeholder="Mensagem (opcional)"
             value={mensagem}
             onChange={(e) => setMensagem(e.target.value)}
-            className={errors.mensagem ? "!border-red-400 focus:!border-red-400 focus:!ring-red-400" : ""}
           />
-          {errors.mensagem && <p className="mt-1 text-[12px] text-red-500">{errors.mensagem}</p>}
         </div>
       </div>
 
