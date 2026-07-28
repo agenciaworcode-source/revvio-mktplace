@@ -9,27 +9,34 @@
  * Regra: nenhum hex de marca ou de superfície escrito direto em componente.
  */
 
-/** Cores que mudam junto com a marca. */
+/**
+ * Cores que mudam junto com a marca.
+ *
+ * `DEFAULT` e `panel.top` vêm direto dos arquivos de identidade; os demais
+ * tons foram derivados por mistura com branco/preto até bater a mesma
+ * luminosidade que o tom equivalente tinha na paleta anterior — assim a
+ * hierarquia visual do sistema se manteve ao trocar o matiz.
+ */
 export const brand = {
-  DEFAULT: "#10b981",
-  dark: "#059669",
-  light: "#d1fae5",
+  DEFAULT: "#36ae84",
+  dark: "#257659",
+  light: "#dbf0e9",
   /** Barra inativa do gráfico de MRR (verde bem lavado). */
-  tint: "#e6f6ef",
+  tint: "#e6f5f0",
   /** Parada intermediária dos gradientes de destaque. */
-  mid: "#0f9b73",
+  mid: "#288262",
   /** Parada final do gradiente do CTA da landing. */
-  deep: "#0b7a5a",
+  deep: "#1f654d",
 } as const;
 
 /** Superfícies escuras: sidebar dos painéis, faixas de topo e banners. */
 export const panel = {
   /** Topo do gradiente da sidebar. */
-  top: "#0c1322",
+  top: "#062a2a",
   /** Base do gradiente da sidebar. */
-  bottom: "#070b14",
+  bottom: "#031818",
   /** Realce azulado do banner das mini-lojas. */
-  accent: "#1b2a44",
+  accent: "#1f4040",
 } as const;
 
 /**
@@ -38,7 +45,7 @@ export const panel = {
  */
 export const neutral = {
   /** Preto da marca, usado em faixas escuras e no rodapé. */
-  ink: "#08090c",
+  ink: "#021111",
   /** Fundo geral do app, atrás dos cards. */
   cloud: "#f4f5f7",
   /** Fundo sutil de inputs, cabeçalho de tabela e faixas de filtro. */
@@ -57,6 +64,32 @@ export const neutral = {
   shade: "#101828",
   /** Texto de placeholder. */
   muted: "#b0b7c0",
+} as const;
+
+
+/**
+ * Rampa verde 50–950, sobrepondo o `emerald` do Tailwind.
+ *
+ * O código usa `emerald-*` em ~46 pontos como verde da marca (botão de
+ * WhatsApp do lead, Badge "green", Alert "success", valores positivos) — e não
+ * por acaso: o `emerald-500` do Tailwind É o verde antigo, #10b981. Sem
+ * sobrepor, esses pontos continuariam no verde velho ao lado do novo.
+ *
+ * Cada degrau foi derivado da marca nova mantendo a luminosidade do degrau
+ * equivalente do Tailwind, então a rampa preserva os contrastes originais.
+ */
+export const green = {
+  50: "#f0f9f6",
+  100: "#dbf0e9",
+  200: "#b7e2d3",
+  300: "#87ceb5",
+  400: "#4fb893",
+  500: "#309974",
+  600: "#257659",
+  700: "#1d5e48",
+  800: "#184d3a",
+  900: "#144131",
+  950: "#0b221a",
 } as const;
 
 /**

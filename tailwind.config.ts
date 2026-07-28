@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 // Fonte única da identidade visual: ver src/theme/palette.ts
-import { brand, neutral, panel, shadows, status } from "./src/theme/palette";
+import { brand, green, neutral, panel, shadows, status } from "./src/theme/palette";
 
 export default {
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
@@ -15,6 +15,8 @@ export default {
         panel,
         status,
         ...neutral,
+        // `emerald` é o verde da marca em ~46 usos legados — ver palette.ts
+        emerald: green,
         slate: {
           950: "#0f172a",
         },
