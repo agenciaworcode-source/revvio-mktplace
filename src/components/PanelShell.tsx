@@ -94,7 +94,7 @@ export function PanelShell({
         style={{ background: SIDEBAR_BG }}
       >
         <div className="flex items-center justify-between gap-2 px-1.5 pb-1.5">
-          <BrandLogo height={24} theme="light" />
+          <BrandLogo height={20} theme="light" />
           <div className="flex items-center gap-1.5">
             {isDesktop && <NotificationsBell />}
             <button
@@ -170,7 +170,7 @@ export function PanelShell({
           >
             <Icon name="menu" size={22} />
           </button>
-          <BrandLogo height={22} theme="light" />
+          <BrandLogo height={26} theme="light" variant="mark" />
           <span className="ml-auto truncate rounded-md bg-brand/[0.14] px-2 py-[3px] text-[10px] font-extrabold uppercase tracking-[1.2px] text-brand">
             {badge}
           </span>

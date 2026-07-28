@@ -80,7 +80,7 @@ export function PublicFooter() {
       {/* container 1 — 4 colunas (altura 420px) */}
       <div className="mx-auto grid min-h-[420px] max-w-[1280px] content-center gap-10 px-5 py-12 sm:px-7 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div>
-          <BrandLogo height={26} theme="dark" />
+          <BrandLogo height={40} theme="dark" variant="lockup" />
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate-500">
             Portal de compra e venda de veículos com procedência e contato direto com a loja.
           </p>

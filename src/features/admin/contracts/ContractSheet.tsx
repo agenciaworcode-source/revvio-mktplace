@@ -1,5 +1,5 @@
 // ============================================================
-// Folha do contrato: timbre REVVIO (identidade visual) + corpo
+// Folha do contrato: timbre Revvender (preto e branco) + corpo
 // do documento. Usada tanto na prévia em tela quanto na folha de
 // impressão — assim o que aparece no editor é exatamente o que
 // sai no papel/PDF.
@@ -16,7 +16,9 @@ export function isSinglePage(type: ContractType | undefined): boolean {
 function Letterhead({ mode, compact }: { mode: Mode; compact: boolean }) {
   const print = mode === "print";
   const markHeight = print ? (compact ? "9mm" : "11mm") : compact ? 30 : 36;
-  const wordSize = print ? (compact ? "15pt" : "18pt") : compact ? 21 : 25;
+  // Altura da imagem do wordmark. Era font-size do texto antigo; como imagem
+  // precisa ser menor, senão a caixa inteira das letras fica maior que a marca.
+  const wordHeight = print ? (compact ? "10pt" : "12pt") : compact ? 15 : 18;
 
   return (
     <header
@@ -27,20 +29,21 @@ function Letterhead({ mode, compact }: { mode: Mode; compact: boolean }) {
           : { paddingBottom: 16, marginBottom: compact ? 20 : 24 }
       }
     >
-      <div className="flex items-center gap-2">
+      {/* Timbre em preto e branco: o contrato costuma sair em impressora
+          monocromática, e a versão colorida vira cinza chapado no papel. */}
+      <div className="flex items-center gap-2.5">
         <img
-          src="/revvio-mark.png"
-          alt="REVVIO"
+          src="/brand/mark-bw.png"
+          alt=""
           style={{ height: markHeight }}
           className="w-auto"
         />
-        <span
-          className="font-display font-extrabold tracking-tight"
-          style={{ fontSize: wordSize, lineHeight: 1 }}
-        >
-          <span className="text-slate-900">REV</span>
-          <span className="text-brand">VIO</span>
-        </span>
+        <img
+          src="/brand/wordmark-bw.png"
+          alt="Revvender"
+          style={{ height: wordHeight }}
+          className="w-auto"
+        />
       </div>
       <p
         className="mt-1.5 font-sans text-slate-500"

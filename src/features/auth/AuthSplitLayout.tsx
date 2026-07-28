@@ -47,7 +47,7 @@ export function AuthSplitLayout({
         <div className="pointer-events-none absolute -left-16 bottom-10 h-72 w-72 rounded-full border border-white/5" />
 
         <Link to="/" className="inline-block">
-          <BrandLogo height={32} theme="light" />
+          <BrandLogo height={40} theme="light" variant="lockup" />
         </Link>
 
         <div className="relative">
@@ -80,7 +80,7 @@ export function AuthSplitLayout({
         <div className="w-full max-w-sm">
           {/* logo no mobile */}
           <Link to="/" className="mb-8 inline-block lg:hidden">
-            <BrandLogo height={26} theme="dark" />
+            <BrandLogo height={24} theme="dark" />
           </Link>
 
           <h1 className="text-2xl font-bold text-slate-900">{title}</h1>

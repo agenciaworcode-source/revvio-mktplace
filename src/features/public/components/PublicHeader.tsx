@@ -50,7 +50,7 @@ export function PublicHeader({
       <div className="border-b border-hair bg-white">
         <div className="mx-auto flex h-[68px] max-w-[1280px] items-center justify-between px-5 sm:px-7">
           <Link to="/" className="flex items-center">
-            <BrandLogo height={26} theme="dark" />
+            <BrandLogo height={22} theme="dark" />
           </Link>
           <nav className="hidden items-center gap-7 sm:flex">
             {NAV.map((n) => (

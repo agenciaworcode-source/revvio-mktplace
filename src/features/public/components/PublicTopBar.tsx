@@ -24,7 +24,7 @@ export function PublicTopBar({ current = "comprar" }: { current?: "comprar" | "v
       <div className="mx-auto flex h-[66px] max-w-[1280px] items-center justify-between px-5 sm:px-7">
         <div className="flex items-center gap-9">
           <Link to="/">
-            <BrandLogo height={26} theme="light" />
+            <BrandLogo height={22} theme="light" />
           </Link>
           <nav className="hidden gap-6 sm:flex">
             {navItems.map((item) => {
