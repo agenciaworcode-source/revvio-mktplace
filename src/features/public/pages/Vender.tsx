@@ -6,6 +6,7 @@ import { usePricingPlans, type PricingPlan } from "../queries";
 import { Spinner } from "@/components/ui";
 import { Seo } from "@/components/Seo";
 import { brand, neutral, status, withAlpha } from "@/theme/palette";
+import { CONTACT_EMAIL } from "@/config/site";
 
 /* slate-400 do Tailwind, usado inline onde não dá para aplicar classe. */
 const SLATE_400 = "#94a3b8";
@@ -213,7 +214,7 @@ export function Vender() {
   // CTA do plano leva direto ao cadastro (Enterprise → contato).
   const choose = (p: PricingPlan) => {
     if (p.key === "enterprise" || /falar com vendas/i.test(p.cta_label)) {
-      window.location.href = `mailto:contato@revvio.com.br?subject=${encodeURIComponent(
+      window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
         "Interesse no plano Enterprise — Revvio"
       )}`;
       return;
@@ -565,7 +566,7 @@ export function Vender() {
         <div className="mb-2.5 font-display text-xl font-extrabold tracking-tight text-white">
           REVV<span className="text-brand">IO</span>
         </div>
-        Av. Ipiranga, 207 — Centro, Marília — SP · (14) 98180-0854 · contato@revvio.com.br
+        Av. Ipiranga, 207 — Centro, Marília — SP · (14) 98180-0854 · {CONTACT_EMAIL}
         <div className="mt-1.5">REVVIO Marketplace · Gestão e venda de veículos · © 2026</div>
       </footer>
     </div>

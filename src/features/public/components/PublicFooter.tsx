@@ -9,6 +9,7 @@ import {
   PLATFORM_OWNER_SELLER_ID,
   type ClickKind,
 } from "@/features/tracking/queries";
+import { CONTACT_EMAIL } from "@/config/site";
 
 const COLS: { title: string; links: { label: string; to: string; ext?: boolean }[] }[] = [
   {
@@ -85,10 +86,10 @@ export function PublicFooter() {
             Portal de compra e venda de veículos com procedência e contato direto com a loja.
           </p>
           <a
-            href="mailto:contato@revvio.com.br"
+            href={`mailto:${CONTACT_EMAIL}`}
             className="mt-4 flex items-center gap-2 text-sm text-slate-500 hover:text-brand"
           >
-            <Icon name="mail" size={15} className="text-brand" /> contato@revvio.com.br
+            <Icon name="mail" size={15} className="text-brand" /> {CONTACT_EMAIL}
           </a>
           <a
             href="https://wa.me/5514981800854"

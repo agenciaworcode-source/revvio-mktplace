@@ -1,4 +1,5 @@
 import { LegalPage, LegalList, type LegalSection } from "../components/legal/LegalPage";
+import { CONTACT_EMAIL } from "@/config/site";
 
 const SECTIONS: LegalSection[] = [
   {
@@ -153,7 +154,7 @@ const SECTIONS: LegalSection[] = [
         <p>Para exercer os seus direitos ou esclarecer dúvidas sobre esta Política, fale conosco:</p>
         <LegalList
           items={[
-            <>E-mail: <strong>contato@revvio.com.br</strong></>,
+            <>E-mail: <strong>{CONTACT_EMAIL}</strong></>,
             <>Telefone / WhatsApp: <strong>(14) 98180-0854</strong></>,
             <>Endereço: <strong>Av. Ipiranga, 207 — Centro, Marília — SP, 17509-210</strong></>,
             "Atendimento: segunda a sexta, das 9h às 18h.",

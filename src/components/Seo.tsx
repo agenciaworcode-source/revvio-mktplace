@@ -1,7 +1,10 @@
 import { Helmet } from "react-helmet-async";
+import { normalizeSiteUrl } from "@/config/site";
 
-/** Origem canônica do site em produção. */
-export const SITE_URL = "https://loja.revvio.com.br";
+/** Origem canônica do site. Vem de VITE_SITE_URL; o padrão está em
+ *  src/config/site.ts, que é o mesmo lido pelo build para gerar as meta
+ *  tags do index.html, o robots.txt e o sitemap.xml. */
+export const SITE_URL = normalizeSiteUrl(import.meta.env.VITE_SITE_URL);
 const DEFAULT_IMAGE = `${SITE_URL}/og-image.jpg`;
 
 /**

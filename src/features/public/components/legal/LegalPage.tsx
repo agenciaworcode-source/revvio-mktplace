@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { PublicShell } from "../../PublicShell";
 import { Icon } from "../icons";
 import { Seo } from "@/components/Seo";
+import { CONTACT_EMAIL } from "@/config/site";
 
 export type LegalSection = {
   id: string;
@@ -87,8 +88,8 @@ export function LegalPage({
           <div className="mt-2 flex items-center gap-2 rounded-xl border border-hair bg-cloud px-4 py-3.5 text-[13.5px] text-slate-500">
             <Icon name="mail" size={16} className="text-brand" />
             Dúvidas? Fale com a gente em{" "}
-            <a href="mailto:contato@revvio.com.br" className="font-semibold text-brand">
-              contato@revvio.com.br
+            <a href={`mailto:${CONTACT_EMAIL}`} className="font-semibold text-brand">
+              {CONTACT_EMAIL}
             </a>
           </div>
         </div>

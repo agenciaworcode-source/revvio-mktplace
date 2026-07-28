@@ -13,3 +13,8 @@ backups/
 
 # build incremental do TypeScript (gerado)
 *.tsbuildinfo
+
+# artefatos do tsc -b (composite) — ver outDir em tsconfig.node.json
+*.config.js
+*.config.d.ts
+!postcss.config.js
