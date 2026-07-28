@@ -11,6 +11,7 @@ import { useAuth } from "@/features/auth/AuthProvider";
 import { BuyerAuthModal } from "@/features/auth/components/BuyerAuthModal";
 import { useLogClickEvent, type ClickKind } from "@/features/tracking/queries";
 import { Seo } from "@/components/Seo";
+import { neutral, status, withAlpha } from "@/theme/palette";
 
 function StoreStat({ value, label }: { value: string | number; label: string }) {
   return (
@@ -110,7 +111,7 @@ export function Storefront() {
 
       {/* Banner + perfil */}
       <div className="mx-auto mt-3.5 max-w-[1180px] px-7">
-        <div className="relative h-[230px] overflow-hidden rounded-[18px] bg-[#0c1322]">
+        <div className="relative h-[230px] overflow-hidden rounded-[18px] bg-panel-top">
           {seller.banner_url && (
             <img
               src={seller.banner_url}
@@ -121,7 +122,7 @@ export function Storefront() {
           <div
             className="absolute inset-0"
             style={{
-              background: "linear-gradient(180deg, rgba(8,9,12,.1), rgba(8,9,12,.82))",
+              background: `linear-gradient(180deg, ${withAlpha(neutral.ink, 0.1)}, ${withAlpha(neutral.ink, 0.82)})`,
             }}
           />
           {/* Nome da loja sobre o banner — fundo translúcido p/ destacar em
@@ -142,10 +143,10 @@ export function Storefront() {
             <img
               src={seller.avatar_url}
               alt=""
-              className="h-[108px] w-[108px] rounded-[22px] border-4 border-white object-cover shadow-[0_8px_24px_rgba(16,24,40,.18)]"
+              className="h-[108px] w-[108px] rounded-[22px] border-4 border-white object-cover shadow-[0_8px_24px_theme(colors.shade/0.18)]"
             />
           ) : (
-            <span className="grid h-[108px] w-[108px] place-items-center rounded-[22px] border-4 border-white bg-slate-100 text-4xl font-bold text-slate-400 shadow-[0_8px_24px_rgba(16,24,40,.18)]">
+            <span className="grid h-[108px] w-[108px] place-items-center rounded-[22px] border-4 border-white bg-slate-100 text-4xl font-bold text-slate-400 shadow-[0_8px_24px_theme(colors.shade/0.18)]">
               {seller.name.charAt(0).toUpperCase()}
             </span>
           )}
@@ -174,7 +175,7 @@ export function Storefront() {
                 target="_blank"
                 rel="noreferrer"
                 onClick={(e) => handleChannel(e, "store_whatsapp", wa)}
-                className="inline-flex items-center gap-2 rounded-[11px] bg-[#25D366] px-5 py-3 text-[14.5px] font-bold text-white shadow-[0_6px_16px_rgba(37,211,102,.32)]"
+                className="inline-flex items-center gap-2 rounded-[11px] bg-status-whatsapp px-5 py-3 text-[14.5px] font-bold text-white shadow-[0_6px_16px_theme(colors.status.whatsapp/0.32)]"
               >
                 <Icon name="whatsapp" size={18} /> WhatsApp
               </a>
@@ -185,7 +186,7 @@ export function Storefront() {
                 target="_blank"
                 rel="noreferrer"
                 onClick={(e) => handleChannel(e, "store_instagram", instaUrl)}
-                className="grid w-[46px] place-items-center rounded-[11px] border border-[#e3e5e9] bg-white text-slate-600 hover:bg-slate-50"
+                className="grid w-[46px] place-items-center rounded-[11px] border border-stroke bg-white text-slate-600 hover:bg-slate-50"
               >
                 <Icon name="instagram" size={19} />
               </a>
@@ -196,7 +197,7 @@ export function Storefront() {
 
       {/* Sobre + stats */}
       <div className="mx-auto mt-6 grid max-w-[1180px] grid-cols-1 items-start gap-6 px-7 lg:grid-cols-[1fr_340px]">
-        <div className="rounded-2xl border border-hair bg-white px-6 py-[22px] shadow-[0_1px_2px_rgba(16,24,40,.04)]">
+        <div className="rounded-2xl border border-hair bg-white px-6 py-[22px] shadow-card">
           <div className="mb-2.5 text-[13px] font-extrabold uppercase tracking-wide text-slate-400">
             Sobre a loja
           </div>
@@ -204,15 +205,15 @@ export function Storefront() {
             {seller.bio || "Esta loja ainda não adicionou uma descrição."}
           </p>
         </div>
-        <div className="rounded-2xl border border-hair bg-white px-6 py-[22px] shadow-[0_1px_2px_rgba(16,24,40,.04)]">
+        <div className="rounded-2xl border border-hair bg-white px-6 py-[22px] shadow-card">
           <div className="flex justify-around">
             <StoreStat value={vehicles.length} label="No estoque" />
-            <div className="w-px bg-[#f1f3f5]" />
+            <div className="w-px bg-line" />
             <StoreStat value={soldCount} label="Vendidos" />
-            <div className="w-px bg-[#f1f3f5]" />
+            <div className="w-px bg-line" />
             <StoreStat value="—" label="Nota" />
           </div>
-          <div className="mt-[18px] flex flex-col gap-2.5 border-t border-[#f1f3f5] pt-4 text-sm text-slate-600">
+          <div className="mt-[18px] flex flex-col gap-2.5 border-t border-line pt-4 text-sm text-slate-600">
             {seller.whatsapp && (
               <div className="flex items-center gap-2.5">
                 <Icon name="phone" size={16} className="text-brand" /> {seller.whatsapp}
@@ -236,7 +237,7 @@ export function Storefront() {
       {featured.length > 0 && (
         <div className="mx-auto mt-10 max-w-[1180px] px-7">
           <div className="mb-[18px] flex items-center gap-2.5">
-            <Icon name="star" size={20} style={{ color: "#f59e0b" }} />
+            <Icon name="star" size={20} style={{ color: status.amber }} />
             <h2 className="m-0 text-[21px] font-extrabold tracking-[-.6px] text-slate-950">
               Veículos em destaque
             </h2>

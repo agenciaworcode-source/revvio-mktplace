@@ -2,13 +2,14 @@ import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { Icon } from "@/features/public/components/icons";
 import { BrandLogo } from "@/features/public/components/BrandLogo";
+import { brand, neutral, withAlpha } from "@/theme/palette";
 
 /** Estilos de campo compartilhados (mesmo visual do Login). */
 export const authFieldWrap =
-  "flex items-center gap-2.5 rounded-xl border border-[#e3e5e9] bg-[#fbfbfc] px-3.5 " +
+  "flex items-center gap-2.5 rounded-xl border border-stroke bg-raised px-3.5 " +
   "focus-within:border-brand focus-within:ring-1 focus-within:ring-brand";
 export const authFieldInput =
-  "flex-1 border-none bg-transparent py-3 text-sm text-slate-900 outline-none placeholder:text-[#b0b7c0]";
+  "flex-1 border-none bg-transparent py-3 text-sm text-slate-900 outline-none placeholder:text-muted";
 
 const features = [
   { icon: "shield", label: "Procedência verificada" },
@@ -38,7 +39,7 @@ export function AuthSplitLayout({
         className="relative hidden flex-col justify-between overflow-hidden p-12 text-white lg:flex"
         style={{
           background:
-            "radial-gradient(ellipse 80% 80% at 25% 15%, rgba(16,185,129,.25), transparent 60%), #08090c",
+            `radial-gradient(ellipse 80% 80% at 25% 15%, ${withAlpha(brand.DEFAULT, 0.25)}, transparent 60%), ${neutral.ink}`,
         }}
       >
         {/* círculos decorativos */}

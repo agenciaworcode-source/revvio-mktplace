@@ -33,9 +33,9 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const buttonVariants: Record<ButtonVariant, string> = {
   primary:
-    "bg-brand text-white hover:bg-brand-dark disabled:opacity-50 font-bold shadow-[0_6px_16px_rgba(16,185,129,.24)]",
+    "bg-brand text-white hover:bg-brand-dark disabled:opacity-50 font-bold shadow-[0_6px_16px_theme(colors.brand.DEFAULT/0.24)]",
   outline:
-    "border border-[#e3e5e9] bg-white text-slate-700 hover:bg-slate-50 font-bold",
+    "border border-stroke bg-white text-slate-700 hover:bg-slate-50 font-bold",
   ghost: "text-slate-600 hover:bg-slate-100 font-semibold",
   danger: "bg-red-500 text-white hover:bg-red-600 font-bold",
 };
@@ -66,8 +66,8 @@ Button.displayName = "Button";
 
 /* ── Input / Textarea / Select ──────────────────────────── */
 const fieldBase =
-  "w-full rounded-lg border border-[#e3e5e9] bg-[#fbfbfc] px-3 py-2.5 text-sm " +
-  "text-slate-900 placeholder:text-[#b0b7c0] outline-none transition-colors " +
+  "w-full rounded-lg border border-stroke bg-raised px-3 py-2.5 text-sm " +
+  "text-slate-900 placeholder:text-muted outline-none transition-colors " +
   "focus:border-brand focus:ring-1 focus:ring-brand disabled:opacity-50";
 
 export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(
@@ -132,7 +132,7 @@ export function Card({
   return (
     <div
       className={cx(
-        "rounded-2xl border border-hair bg-white shadow-[0_1px_2px_rgba(16,24,40,.04)]",
+        "rounded-2xl border border-hair bg-white shadow-card",
         !hasPadding(className) && "p-4 sm:p-6",
         className
       )}
@@ -207,7 +207,7 @@ export function StatCard({
   hint?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-hair bg-white px-4 py-4 shadow-[0_1px_2px_rgba(16,24,40,.04)] sm:px-[22px] sm:py-5">
+    <div className="rounded-2xl border border-hair bg-white px-4 py-4 shadow-card sm:px-[22px] sm:py-5">
       <p className="text-[12px] font-semibold text-slate-500 sm:text-[13px]">{label}</p>
       <p className="mt-2 break-words text-[21px] font-extrabold tracking-[-.5px] text-slate-950 sm:text-[26px]">
         {value}

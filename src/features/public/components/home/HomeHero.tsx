@@ -28,7 +28,7 @@ export function HomeHero({ bannerUrl }: { bannerUrl?: string | null }) {
 
       {/* Busca Rápida — centralizada no fim do banner (metade sobre o banner, metade sobre a seção de baixo) */}
       <div className="absolute bottom-0 left-1/2 z-30 w-full max-w-[1100px] -translate-x-1/2 translate-y-1/2 px-5 sm:px-7">
-        <div className="rounded-2xl border border-hair bg-white p-6 shadow-[0_20px_50px_rgba(16,24,40,.10)]">
+        <div className="rounded-2xl border border-hair bg-white p-6 shadow-[0_20px_50px_theme(colors.shade/0.10)]">
           <h2 className="flex items-center gap-2 text-lg font-extrabold text-slate-900">
             <Icon name="search" size={20} className="text-brand" /> Busca Rápida
           </h2>

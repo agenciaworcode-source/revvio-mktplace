@@ -30,7 +30,7 @@ export function ContextSwitcher() {
           className={[
             "flex items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-[11px] font-bold transition-all",
             it.active
-              ? "bg-brand text-white shadow-[0_4px_12px_rgba(16,185,129,.3)]"
+              ? "bg-brand text-white shadow-[0_4px_12px_theme(colors.brand.DEFAULT/0.3)]"
               : "text-slate-400 hover:bg-white/5 hover:text-slate-200",
           ].join(" ")}
         >

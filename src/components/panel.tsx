@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Icon } from "@/features/public/components/icons";
 import type { SellerStatus } from "@/lib/database.types";
+import { brand, status as statusColor, withAlpha } from "@/theme/palette";
 
 /* ============================================================
    Kit de UI do Painel (tema claro) — usado pelo Admin e pelo
@@ -50,7 +51,7 @@ export function SectionCard({
 }) {
   return (
     <div
-      className={`rounded-2xl border border-hair bg-white shadow-[0_1px_2px_rgba(16,24,40,.04)] ${className}`}
+      className={`rounded-2xl border border-hair bg-white shadow-card ${className}`}
     >
       {children}
     </div>
@@ -63,7 +64,7 @@ export function KpiCard({
   value,
   sub,
   icon,
-  accent = "#10b981",
+  accent = brand.DEFAULT,
   trend,
 }: {
   label: string;
@@ -74,7 +75,7 @@ export function KpiCard({
   trend?: number | null;
 }) {
   return (
-    <div className="rounded-2xl border border-hair bg-white px-4 py-4 shadow-[0_1px_2px_rgba(16,24,40,.04)] sm:px-[22px] sm:py-5">
+    <div className="rounded-2xl border border-hair bg-white px-4 py-4 shadow-card sm:px-[22px] sm:py-5">
       <div className="mb-3 flex items-start justify-between gap-2 sm:mb-3.5">
         <span className="min-w-0 text-[12px] font-semibold text-slate-500 sm:text-[13px]">
           {label}
@@ -93,7 +94,7 @@ export function KpiCard({
         {trend != null && (
           <span
             className="inline-flex items-center gap-1 text-[12.5px] font-bold"
-            style={{ color: trend >= 0 ? "#059669" : "#dc2626" }}
+            style={{ color: trend >= 0 ? brand.dark : statusColor["red-dark"] }}
           >
             <Icon name={trend >= 0 ? "trendUp" : "trendDown"} size={14} />
             {trend >= 0 ? "+" : ""}
@@ -111,9 +112,24 @@ const STATUS_MAP: Record<
   SellerStatus,
   { t: string; bg: string; c: string; dot: string }
 > = {
-  active: { t: "Ativo", bg: "rgba(16,185,129,.12)", c: "#059669", dot: "#10b981" },
-  pending: { t: "Pendente", bg: "rgba(245,158,11,.14)", c: "#b45309", dot: "#f59e0b" },
-  suspended: { t: "Suspenso", bg: "rgba(239,68,68,.12)", c: "#dc2626", dot: "#ef4444" },
+  active: {
+    t: "Ativo",
+    bg: withAlpha(brand.DEFAULT, 0.12),
+    c: brand.dark,
+    dot: brand.DEFAULT,
+  },
+  pending: {
+    t: "Pendente",
+    bg: withAlpha(statusColor.amber, 0.14),
+    c: statusColor["amber-dark"],
+    dot: statusColor.amber,
+  },
+  suspended: {
+    t: "Suspenso",
+    bg: withAlpha(statusColor.red, 0.12),
+    c: statusColor["red-dark"],
+    dot: statusColor.red,
+  },
 };
 
 export function StatusPill({ status }: { status: SellerStatus }) {
@@ -130,11 +146,15 @@ export function StatusPill({ status }: { status: SellerStatus }) {
 }
 
 /* ── Badge de plano (por nome) ───────────────────────────── */
+/* Tom neutro dos planos sem cor própria (slate-500). Não é cor de marca:
+   serve justamente para NÃO competir com o verde do plano em destaque. */
+const PLAN_NEUTRAL = "#64748b";
+
 export function planColor(name?: string | null): string {
-  if (name === "Enterprise") return "#8b5cf6";
-  if (name === "Profissional") return "#10b981";
-  if (name === "Essencial") return "#64748b";
-  return "#64748b";
+  if (name === "Enterprise") return statusColor.violet;
+  if (name === "Profissional") return brand.DEFAULT;
+  if (name === "Essencial") return PLAN_NEUTRAL;
+  return PLAN_NEUTRAL;
 }
 
 export function PlanBadge({ name }: { name?: string | null }) {
@@ -193,8 +213,8 @@ export function BarsChart({
                   style={{
                     height: `${(d.value / max) * 140}px`,
                     background: last
-                      ? "linear-gradient(180deg,#10b981,#059669)"
-                      : "#e6f6ef",
+                      ? `linear-gradient(180deg,${brand.DEFAULT},${brand.dark})`
+                      : brand.tint,
                   }}
                 />
                 <span className="text-[11.5px] font-semibold text-slate-400">{d.label}</span>
@@ -234,7 +254,7 @@ export function PlanSplit({
                 <b className="text-slate-950">{p.count}</b> · {brlShort(p.price)}/mês
               </span>
             </div>
-            <div className="h-[9px] overflow-hidden rounded-full bg-[#f1f3f5]">
+            <div className="h-[9px] overflow-hidden rounded-full bg-line">
               <div
                 className="h-full rounded-full"
                 style={{
@@ -263,7 +283,7 @@ export function GhostButton({
   return (
     <button
       onClick={onClick}
-      className="inline-flex items-center gap-2 rounded-[10px] border border-[#e3e5e9] bg-white px-[18px] py-[11px] text-sm font-bold text-slate-700 hover:bg-slate-50"
+      className="inline-flex items-center gap-2 rounded-[10px] border border-stroke bg-white px-[18px] py-[11px] text-sm font-bold text-slate-700 hover:bg-slate-50"
       style={style}
     >
       {children}
@@ -281,7 +301,7 @@ export function PrimaryButton({
   return (
     <button
       onClick={onClick}
-      className="inline-flex items-center gap-2 rounded-[10px] bg-brand px-[18px] py-[11px] text-sm font-bold text-white shadow-[0_6px_16px_rgba(16,185,129,.28)] hover:bg-brand-dark"
+      className="inline-flex items-center gap-2 rounded-[10px] bg-brand px-[18px] py-[11px] text-sm font-bold text-white shadow-[0_6px_16px_theme(colors.brand.DEFAULT/0.28)] hover:bg-brand-dark"
     >
       {children}
     </button>

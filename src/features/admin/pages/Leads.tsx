@@ -60,7 +60,7 @@ function Thumb({ v }: { v: AdminVehicle }) {
 /* Card de anúncio com garagista + cliques (bloco dos mais clicados). */
 function TopCard({ v }: { v: AdminVehicle }) {
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-[#eef0f2] bg-white p-3">
+    <div className="flex items-center gap-3 rounded-xl border border-hair bg-white p-3">
       <Thumb v={v} />
       <div className="min-w-0 flex-1">
         <div className="truncate text-[13px] font-bold text-slate-950">
@@ -143,7 +143,7 @@ export function Leads() {
 
           {/* Listagem completa em tabela */}
           <SectionCard className="overflow-hidden">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#f1f3f5] px-4 py-4 sm:px-6 sm:py-5">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-4 sm:px-6 sm:py-5">
               <div className="text-base font-bold text-slate-950">
                 Todos os anúncios ·{" "}
                 {hasFilter
@@ -163,7 +163,7 @@ export function Leads() {
               )}
             </div>
 
-            <div className="flex flex-wrap items-end gap-3 border-b border-[#f1f3f5] bg-[#fbfbfc] px-4 py-4 sm:px-6">
+            <div className="flex flex-wrap items-end gap-3 border-b border-line bg-raised px-4 py-4 sm:px-6">
               <label className="flex min-w-[150px] flex-1 flex-col gap-1 sm:flex-none">
                 <span className="text-[11px] font-bold uppercase tracking-[.5px] text-slate-400">
                   Garagista
@@ -205,7 +205,7 @@ export function Leads() {
                       {["Anúncio", "Garagista", "Status", "Preço", "Cliques"].map((h, i) => (
                         <th
                           key={h}
-                          className="border-b border-[#f1f3f5] bg-[#fbfbfc] px-6 py-3 text-[11.5px] font-bold uppercase tracking-[.6px] text-slate-400"
+                          className="border-b border-line bg-raised px-6 py-3 text-[11.5px] font-bold uppercase tracking-[.6px] text-slate-400"
                           style={{ textAlign: i > 1 ? "center" : "left" }}
                         >
                           {h}
@@ -215,7 +215,7 @@ export function Leads() {
                   </thead>
                   <tbody>
                     {filtered.map((v) => (
-                      <tr key={v.id} className="hover:bg-[#fafbfc]">
+                      <tr key={v.id} className="hover:bg-row">
                         <td className="border-b border-cloud px-6 py-3">
                           <div className="flex items-center gap-3">
                             <Thumb v={v} />

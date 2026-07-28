@@ -569,7 +569,7 @@ export function ContratoEditor() {
           <div className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400">
             Prévia do documento
           </div>
-          <div className="rounded-2xl border border-hair bg-white p-10 text-slate-900 shadow-[0_1px_2px_rgba(16,24,40,.04)]">
+          <div className="rounded-2xl border border-hair bg-white p-10 text-slate-900 shadow-card">
             <ContractSheet text={preview} mode="screen" compact={singlePage} />
           </div>
         </div>

@@ -5,6 +5,10 @@ import { Icon } from "../components/icons";
 import { usePricingPlans, type PricingPlan } from "../queries";
 import { Spinner } from "@/components/ui";
 import { Seo } from "@/components/Seo";
+import { brand, neutral, status, withAlpha } from "@/theme/palette";
+
+/* slate-400 do Tailwind, usado inline onde não dá para aplicar classe. */
+const SLATE_400 = "#94a3b8";
 
 /* ============================================================
    REVVIO — Página "Vender" (captação de garagistas + planos)
@@ -53,15 +57,15 @@ function PlanCard({
     <div
       className="relative rounded-[18px] bg-white px-[26px] py-7 transition-shadow"
       style={{
-        border: p.popular ? "2px solid #10b981" : "1px solid #e7e9ee",
+        border: p.popular ? `2px solid ${brand.DEFAULT}` : `1px solid ${neutral.hair}`,
         boxShadow: p.popular
-          ? "0 20px 50px rgba(16,185,129,.16)"
-          : "0 2px 8px rgba(16,24,40,.05)",
+          ? `0 20px 50px ${withAlpha(brand.DEFAULT, 0.16)}`
+          : `0 2px 8px ${withAlpha(neutral.shade, 0.05)}`,
         transform: p.popular ? "translateY(-8px)" : "none",
       }}
     >
       {p.popular && (
-        <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand px-3.5 py-[5px] text-[11.5px] font-extrabold tracking-wide text-white shadow-[0_6px_16px_rgba(16,185,129,.4)]">
+        <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand px-3.5 py-[5px] text-[11.5px] font-extrabold tracking-wide text-white shadow-[0_6px_16px_theme(colors.brand.DEFAULT/0.4)]">
           MAIS ESCOLHIDO
         </span>
       )}
@@ -78,7 +82,7 @@ function PlanCard({
       </div>
       <div
         className="mt-1.5 min-h-[18px] text-[12.5px]"
-        style={{ color: annual ? "#059669" : "#9aa3af", fontWeight: annual ? 700 : 400 }}
+        style={{ color: annual ? brand.dark : SLATE_400, fontWeight: annual ? 700 : 400 }}
       >
         {annual
           ? `Cobrado anualmente · economize R$ ${(p.price_monthly - p.price_annual) * 12}/ano`
@@ -89,7 +93,7 @@ function PlanCard({
         className="mt-[18px] flex w-full items-center justify-center gap-2 rounded-[11px] py-[13px] text-[14.5px] font-bold"
         style={{
           border: p.popular ? "none" : `1.5px solid ${p.color}`,
-          background: p.popular ? "#10b981" : "#fff",
+          background: p.popular ? brand.DEFAULT : "#fff",
           color: p.popular ? "#fff" : p.color,
           boxShadow: p.popular ? `0 8px 20px ${p.color}40` : "none",
         }}
@@ -154,7 +158,7 @@ function CompareValueCell({
 function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border-b border-[#ecedf1]">
+    <div className="border-b border-hair">
       <button
         onClick={() => setOpen(!open)}
         className="flex w-full items-center justify-between gap-4 px-1 py-5 text-left"
@@ -162,7 +166,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
         <span className="text-base font-bold text-slate-950">{q}</span>
         <span
           className={`grid h-7 w-7 flex-shrink-0 place-items-center rounded-lg transition-all ${
-            open ? "bg-brand text-white" : "bg-[#f1f3f5] text-slate-500"
+            open ? "bg-brand text-white" : "bg-line text-slate-500"
           }`}
         >
           <Icon name={open ? "chevronUp" : "chevronDown"} size={16} stroke={2.4} />
@@ -231,7 +235,7 @@ export function Vender() {
         className="text-white"
         style={{
           background:
-            "radial-gradient(ellipse 60% 100% at 80% 0%, rgba(16,185,129,.22), transparent 55%), #08090c",
+            `radial-gradient(ellipse 60% 100% at 80% 0%, ${withAlpha(brand.DEFAULT, 0.22)}, transparent 55%), ${neutral.ink}`,
         }}
       >
         <div className="mx-auto grid max-w-[1180px] grid-cols-1 items-center gap-[50px] px-7 pb-[70px] pt-16 lg:grid-cols-[1.15fr_1fr]">
@@ -251,7 +255,7 @@ export function Vender() {
             <div className="mt-8 flex flex-wrap gap-3">
               <button
                 onClick={() => scrollTo("rv-pricing")}
-                className="rounded-xl bg-brand px-7 py-[15px] text-[15.5px] font-bold text-white shadow-[0_10px_28px_rgba(16,185,129,.35)] hover:bg-brand-dark"
+                className="rounded-xl bg-brand px-7 py-[15px] text-[15.5px] font-bold text-white shadow-[0_10px_28px_theme(colors.brand.DEFAULT/0.35)] hover:bg-brand-dark"
               >
                 Ver planos e preços
               </button>
@@ -279,7 +283,7 @@ export function Vender() {
           {/* Mockup mini-loja */}
           <div className="relative">
             <div className="overflow-hidden rounded-[20px] border border-white/10 shadow-[0_30px_60px_rgba(0,0,0,.5)]">
-              <div className="relative h-[110px] bg-[#0c1322]">
+              <div className="relative h-[110px] bg-panel-top">
                 <img
                   src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=640&h=220&q=70"
                   alt=""
@@ -317,7 +321,7 @@ export function Vender() {
               </div>
             </div>
             <div className="absolute -right-3.5 top-6 flex items-center gap-2.5 rounded-xl bg-white px-3.5 py-2.5 shadow-[0_12px_30px_rgba(0,0,0,.25)]">
-              <span className="grid h-[30px] w-[30px] place-items-center rounded-lg bg-[#25D366] text-white">
+              <span className="grid h-[30px] w-[30px] place-items-center rounded-lg bg-status-whatsapp text-white">
                 <Icon name="whatsapp" size={17} />
               </span>
               <div>
@@ -338,7 +342,7 @@ export function Vender() {
               key={s.t}
               className="relative rounded-2xl border border-hair bg-white p-6"
             >
-              <div className="absolute right-5 top-[18px] text-[38px] font-extrabold text-[#f1f3f5]">
+              <div className="absolute right-5 top-[18px] text-[38px] font-extrabold text-line">
                 {i + 1}
               </div>
               <div className="mb-4 grid h-[46px] w-[46px] place-items-center rounded-xl bg-brand/10 text-brand">
@@ -362,7 +366,7 @@ export function Vender() {
             {BENEFITS.map((b) => (
               <div
                 key={b.t}
-                className="rounded-2xl border border-hair bg-white p-[26px] shadow-[0_1px_2px_rgba(16,24,40,.04)]"
+                className="rounded-2xl border border-hair bg-white p-[26px] shadow-card"
               >
                 <div className="mb-4 grid h-[46px] w-[46px] place-items-center rounded-xl bg-brand/10 text-brand">
                   <Icon name={b.icon} size={22} />
@@ -391,7 +395,7 @@ export function Vender() {
 
         {/* Billing toggle */}
         <div className="mb-10 flex justify-center">
-          <div className="inline-flex items-center gap-1 rounded-full bg-[#f1f3f5] p-1">
+          <div className="inline-flex items-center gap-1 rounded-full bg-line p-1">
             {([
               ["mensal", false],
               ["anual", true],
@@ -402,8 +406,8 @@ export function Vender() {
                 className="inline-flex items-center gap-2 rounded-full px-5 py-[9px] text-sm font-bold capitalize"
                 style={{
                   background: annual === val ? "#fff" : "transparent",
-                  color: annual === val ? "#0f172a" : "#94a3b8",
-                  boxShadow: annual === val ? "0 2px 6px rgba(16,24,40,.1)" : "none",
+                  color: annual === val ? "#0f172a" : SLATE_400,
+                  boxShadow: annual === val ? `0 2px 6px ${withAlpha(neutral.shade, 0.1)}` : "none",
                 }}
               >
                 {l}
@@ -440,10 +444,10 @@ export function Vender() {
         <h3 className="mb-5 text-center text-[22px] font-extrabold tracking-[-.6px] text-slate-950">
           Compare os planos em detalhe
         </h3>
-        <div className="overflow-x-auto rounded-2xl border border-hair bg-white shadow-[0_1px_3px_rgba(16,24,40,.05)]">
+        <div className="overflow-x-auto rounded-2xl border border-hair bg-white shadow-[0_1px_3px_theme(colors.shade/0.05)]">
           <table className="w-full border-collapse text-sm">
             <thead>
-              <tr className="bg-[#fbfbfc]">
+              <tr className="bg-raised">
                 <th className="px-[22px] py-[18px] text-left text-[13px] font-bold text-slate-500">
                   Recursos
                 </th>
@@ -461,7 +465,7 @@ export function Vender() {
             </thead>
             <tbody>
               {buildCompareRows(plans, annual).map((row) => (
-                <tr key={row.label} className="hover:bg-[#fafbfc]">
+                <tr key={row.label} className="hover:bg-row">
                   <td className="border-t border-cloud px-[22px] py-[13px] align-top font-medium text-slate-700">
                     {row.label}
                   </td>
@@ -487,7 +491,7 @@ export function Vender() {
         <div className="mx-auto max-w-[860px] px-7 py-[70px] text-center">
           <div className="mb-[22px] flex justify-center gap-1">
             {[0, 1, 2, 3, 4].map((i) => (
-              <Icon key={i} name="star" size={22} style={{ color: "#f59e0b" }} />
+              <Icon key={i} name="star" size={22} style={{ color: status.amber }} />
             ))}
           </div>
           <p className="m-0 text-[clamp(20px,2.4vw,28px)] font-semibold leading-[1.5] tracking-[-.5px]">
@@ -528,7 +532,7 @@ export function Vender() {
           className="relative mx-auto max-w-[1000px] overflow-hidden rounded-3xl px-10 py-14 text-center text-white"
           style={{
             background:
-              "radial-gradient(ellipse 80% 140% at 50% 0%, rgba(255,255,255,.12), transparent 60%), linear-gradient(135deg,#10b981,#0b7a5a)",
+              `radial-gradient(ellipse 80% 140% at 50% 0%, rgba(255,255,255,.12), transparent 60%), linear-gradient(135deg,${brand.DEFAULT},${brand.deep})`,
           }}
         >
           <h2 className="m-0 text-[clamp(28px,3.4vw,40px)] font-extrabold tracking-[-1.4px]">

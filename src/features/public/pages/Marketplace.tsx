@@ -7,9 +7,10 @@ import { Icon } from "../components/icons";
 import { bodyLabels, fuelLabels, transmissionLabels } from "../vehicleLabels";
 import { Spinner } from "@/components/ui";
 import { Seo } from "@/components/Seo";
+import { brand as brandColor, neutral, withAlpha } from "@/theme/palette";
 
 const inputCls =
-  "w-full rounded-lg border border-[#e3e5e9] bg-[#fbfbfc] px-3 py-2.5 text-[13.5px] text-slate-900 outline-none placeholder:text-[#b0b7c0] focus:border-brand";
+  "w-full rounded-lg border border-stroke bg-raised px-3 py-2.5 text-[13.5px] text-slate-900 outline-none placeholder:text-muted focus:border-brand";
 
 /* Toggle (estilo protótipo) */
 function Toggle({
@@ -50,7 +51,7 @@ function FilterSection({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="border-t border-[#f1f3f5]">
+    <div className="border-t border-line">
       <button
         onClick={() => setOpen(!open)}
         className="flex w-full items-center justify-between py-3.5"
@@ -148,7 +149,7 @@ export function Marketplace() {
         className="text-white"
         style={{
           background:
-            "radial-gradient(ellipse 70% 120% at 75% 0%, rgba(16,185,129,.22), transparent 60%), #08090c",
+            `radial-gradient(ellipse 70% 120% at 75% 0%, ${withAlpha(brandColor.DEFAULT, 0.22)}, transparent 60%), ${neutral.ink}`,
         }}
       >
         <div className="mx-auto max-w-[1280px] px-5 py-11 sm:px-7">
@@ -187,7 +188,7 @@ export function Marketplace() {
             <Icon name="filter" size={16} className="text-brand" /> Filtros
           </div>
 
-          <div className="mb-2 rounded-xl bg-gradient-to-br from-brand to-[#0f9b73] p-4 text-white">
+          <div className="mb-2 rounded-xl bg-gradient-to-br from-brand to-brand-mid p-4 text-white">
             <div className="flex items-center justify-between">
               <span className="inline-flex items-center gap-2 text-sm font-bold">
                 <Icon name="badge" size={16} /> Abaixo da FIPE
@@ -325,7 +326,7 @@ export function Marketplace() {
 
           <button
             onClick={clearFilters}
-            className="mt-4 w-full rounded-lg border border-[#e3e5e9] bg-white py-2.5 text-[13px] font-bold uppercase tracking-wide text-slate-500 hover:bg-slate-50"
+            className="mt-4 w-full rounded-lg border border-stroke bg-white py-2.5 text-[13px] font-bold uppercase tracking-wide text-slate-500 hover:bg-slate-50"
           >
             Limpar filtros
           </button>

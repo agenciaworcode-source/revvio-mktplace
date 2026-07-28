@@ -8,7 +8,7 @@ import {
 } from "@/features/tracking/queries";
 
 const cardCls =
-  "rounded-2xl border border-hair bg-white shadow-[0_1px_2px_rgba(16,24,40,.04)] p-4 sm:p-6";
+  "rounded-2xl border border-hair bg-white shadow-card p-4 sm:p-6";
 
 const CHANNEL_LABEL: Record<string, string> = {
   store_whatsapp: "WhatsApp da mini-loja",
@@ -104,7 +104,7 @@ function ClicksByVehicleCard({
                     <div className="flex w-full items-center justify-between">{label}</div>
                   )}
                   {c.clicks > 0 && openVehicle === c.vehicle_id && (
-                    <div className="mt-2 rounded-lg bg-[#fbfbfc] p-3">
+                    <div className="mt-2 rounded-lg bg-raised p-3">
                       {buyers.isLoading ? (
                         <Spinner />
                       ) : (
@@ -145,7 +145,7 @@ function ChannelsCard({ sellerId }: { sellerId: string }) {
                 </span>
               </button>
               {open === c.kind && (
-                <div className="mt-2 rounded-lg bg-[#fbfbfc] p-3">
+                <div className="mt-2 rounded-lg bg-raised p-3">
                   <BuyersTable buyers={c.buyers} unit="Acessos" />
                 </div>
               )}

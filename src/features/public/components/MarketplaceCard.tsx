@@ -12,7 +12,7 @@ export function MarketplaceCard({ vehicle }: { vehicle: PublicVehicle }) {
   return (
     <Link
       to={`/veiculo/${vehicle.id}`}
-      className="rv-vcard group block overflow-hidden rounded-2xl border border-hair bg-white transition-all hover:-translate-y-1 hover:border-brand/40 hover:shadow-[0_14px_32px_rgba(16,24,40,.1)]"
+      className="rv-vcard group block overflow-hidden rounded-2xl border border-hair bg-white transition-all hover:-translate-y-1 hover:border-brand/40 hover:shadow-[0_14px_32px_theme(colors.shade/0.1)]"
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
         {vehicle.images?.[0] ? (

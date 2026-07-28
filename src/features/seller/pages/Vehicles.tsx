@@ -177,10 +177,10 @@ function OptionsSelect({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex min-h-[44px] w-full flex-wrap items-center gap-1.5 rounded-lg border border-[#e3e5e9] bg-[#fbfbfc] px-3 py-2 text-left text-sm focus:border-brand focus:ring-1 focus:ring-brand"
+        className="flex min-h-[44px] w-full flex-wrap items-center gap-1.5 rounded-lg border border-stroke bg-raised px-3 py-2 text-left text-sm focus:border-brand focus:ring-1 focus:ring-brand"
       >
         {value.length === 0 ? (
-          <span className="text-[#b0b7c0]">Selecione os opcionais…</span>
+          <span className="text-muted">Selecione os opcionais…</span>
         ) : (
           value.map((o) => (
             <span
@@ -205,7 +205,7 @@ function OptionsSelect({
       </button>
 
       {open && (
-        <div className="absolute z-30 mt-1 max-h-64 w-full overflow-auto rounded-lg border border-[#e3e5e9] bg-white p-1 shadow-xl">
+        <div className="absolute z-30 mt-1 max-h-64 w-full overflow-auto rounded-lg border border-stroke bg-white p-1 shadow-xl">
           {VEHICLE_OPTIONS.map((opt) => (
             <label
               key={opt}

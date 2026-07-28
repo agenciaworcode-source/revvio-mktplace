@@ -152,7 +152,7 @@ export function Vehicles() {
         </div>
       ) : (
         <SectionCard className="overflow-hidden">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#f1f3f5] px-4 py-4 sm:px-6 sm:py-5">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-4 sm:px-6 sm:py-5">
             <div className="text-base font-bold text-slate-950">
               Inventário consolidado ·{" "}
               {hasFilter
@@ -170,7 +170,7 @@ export function Vehicles() {
           </div>
 
           {vehicles.length > 0 && (
-            <div className="flex flex-wrap items-end gap-3 border-b border-[#f1f3f5] bg-[#fbfbfc] px-4 py-4 sm:px-6">
+            <div className="flex flex-wrap items-end gap-3 border-b border-line bg-raised px-4 py-4 sm:px-6">
               <label className="flex min-w-[190px] flex-1 flex-col gap-1">
                 <span className="text-[11px] font-bold uppercase tracking-[.5px] text-slate-400">
                   Buscar
@@ -267,7 +267,7 @@ export function Vehicles() {
                       (h, i) => (
                         <th
                           key={h}
-                          className="border-b border-[#f1f3f5] bg-[#fbfbfc] px-6 py-3 text-[11.5px] font-bold uppercase tracking-[.6px] text-slate-400"
+                          className="border-b border-line bg-raised px-6 py-3 text-[11.5px] font-bold uppercase tracking-[.6px] text-slate-400"
                           style={{ textAlign: i > 1 ? "center" : "left" }}
                         >
                           {h}
@@ -278,7 +278,7 @@ export function Vehicles() {
                 </thead>
                 <tbody>
                   {filtered.map((v) => (
-                    <tr key={v.id} className="hover:bg-[#fafbfc]">
+                    <tr key={v.id} className="hover:bg-row">
                       <td className="border-b border-cloud px-6 py-3">
                         <div className="flex items-center gap-3">
                           {v.images?.[0] ? (

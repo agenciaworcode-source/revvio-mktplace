@@ -124,7 +124,7 @@ export function SubscribersTable({
 
   return (
     <SectionCard className="overflow-hidden">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#f1f3f5] px-4 py-4 sm:px-6 sm:py-5">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-4 sm:px-6 sm:py-5">
         <div>
           <div className="text-base font-bold text-slate-950">Assinantes · Garagistas</div>
           <div className="mt-0.5 text-[13px] text-slate-400">
@@ -153,7 +153,7 @@ export function SubscribersTable({
                 {ths.map((h, i) => (
                   <th
                     key={h}
-                    className="border-b border-[#f1f3f5] bg-[#fbfbfc] px-6 py-3 text-[11.5px] font-bold uppercase tracking-[.6px] text-slate-400"
+                    className="border-b border-line bg-raised px-6 py-3 text-[11.5px] font-bold uppercase tracking-[.6px] text-slate-400"
                     style={{ textAlign: i > 1 && i < 5 ? "center" : "left" }}
                   >
                     {h}
@@ -168,7 +168,7 @@ export function SubscribersTable({
                   : undefined;
                 const loc = [s.city, s.state].filter(Boolean).join(", ");
                 return (
-                  <tr key={s.id} className="hover:bg-[#fafbfc]">
+                  <tr key={s.id} className="hover:bg-row">
                     <td className="border-b border-cloud px-6 py-3.5">
                       <Link
                         to={`/dashboard/sellers/${s.id}`}
@@ -199,7 +199,7 @@ export function SubscribersTable({
                         href={`/loja/${s.slug}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-[#e6e8ec] px-3 py-1.5 text-[13px] font-bold text-brand hover:bg-slate-50"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-stroke-soft px-3 py-1.5 text-[13px] font-bold text-brand hover:bg-slate-50"
                       >
                         <Icon name="eye" size={15} /> Ver loja
                       </a>

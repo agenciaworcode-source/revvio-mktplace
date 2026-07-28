@@ -9,6 +9,7 @@ import {
 } from "@/components/panel";
 import { formatNumber } from "@/lib/format";
 import { Spinner } from "@/components/ui";
+import { status } from "@/theme/palette";
 
 export function Dashboard() {
   const o = useAdminOverview();
@@ -34,21 +35,21 @@ export function Dashboard() {
               value={o.accumulated == null ? "—" : brlShort(o.accumulated)}
               sub="cobranças pagas"
               icon="dollar"
-              accent="#3b82f6"
+              accent={status.blue}
             />
             <KpiCard
               label="Assinantes ativos"
               value={o.activeSubs}
               sub="garagens"
               icon="users"
-              accent="#8b5cf6"
+              accent={status.violet}
             />
             <KpiCard
               label="Mini-lojas ativas"
               value={o.miniLojas}
               sub="vitrines públicas"
               icon="store"
-              accent="#f59e0b"
+              accent={status.amber}
             />
             <KpiCard
               label="Veículos"

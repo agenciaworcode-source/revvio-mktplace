@@ -6,6 +6,7 @@ import { Icon } from "@/features/public/components/icons";
 import { Spinner } from "@/components/ui";
 import { Alert, Button, Field, Input, Modal } from "@/components/ui-light";
 import type { Seller } from "@/lib/database.types";
+import { panel } from "@/theme/palette";
 
 function errorMessage(err: unknown): string {
   if (err && typeof err === "object") {
@@ -100,11 +101,11 @@ export function Stores() {
           {stores.map((s) => (
             <div
               key={s.id}
-              className="overflow-hidden rounded-2xl border border-hair bg-white shadow-[0_1px_2px_rgba(16,24,40,.04)]"
+              className="overflow-hidden rounded-2xl border border-hair bg-white shadow-card"
             >
               <div
                 className="relative h-[78px]"
-                style={{ background: "linear-gradient(120deg,#0c1322,#1b2a44)" }}
+                style={{ background: `linear-gradient(120deg,${panel.top},${panel.accent})` }}
               >
                 {s.banner_url && (
                   <img
@@ -141,12 +142,12 @@ export function Stores() {
                     href={`/loja/${s.slug}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex w-full items-center justify-center gap-1.5 rounded-[9px] border border-[#e6e8ec] bg-white py-2.5 text-[13px] font-bold text-slate-950 hover:bg-slate-50"
+                    className="flex w-full items-center justify-center gap-1.5 rounded-[9px] border border-stroke-soft bg-white py-2.5 text-[13px] font-bold text-slate-950 hover:bg-slate-50"
                   >
                     <Icon name="eye" size={15} /> Visitar mini-loja
                   </a>
                 ) : (
-                  <div className="flex w-full items-center justify-center gap-1.5 rounded-[9px] border border-dashed border-[#e6e8ec] bg-slate-50 py-2.5 text-[13px] font-semibold text-slate-400">
+                  <div className="flex w-full items-center justify-center gap-1.5 rounded-[9px] border border-dashed border-stroke-soft bg-slate-50 py-2.5 text-[13px] font-semibold text-slate-400">
                     Sem endereço público
                   </div>
                 )}

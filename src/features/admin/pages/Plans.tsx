@@ -25,6 +25,7 @@ import {
   Modal,
   Spinner,
 } from "@/components/ui-light";
+import { brand, neutral } from "@/theme/palette";
 
 /** Converte o que foi digitado em valor numérico (string) tratando como centavos. */
 function digitsToValue(input: string): string {
@@ -56,7 +57,7 @@ const EMPTY: FormState = {
   tagline: "",
   price_monthly: "",
   price_annual: "",
-  color: "#10b981",
+  color: brand.DEFAULT,
   popular: false,
   cta_label: "Escolher plano",
   highlights: "",
@@ -126,7 +127,7 @@ function PlanFormModal({
         tagline: state.tagline.trim() || null,
         price_monthly: pm,
         price_annual: pa,
-        color: state.color.trim() || "#10b981",
+        color: state.color.trim() || brand.DEFAULT,
         popular: state.popular,
         cta_label: state.cta_label.trim() || "Escolher plano",
         highlights: state.highlights
@@ -229,7 +230,7 @@ function PlanFormModal({
                 type="color"
                 value={state.color}
                 onChange={(e) => set("color", e.target.value)}
-                className="h-10 w-12 cursor-pointer rounded border border-[#e3e5e9]"
+                className="h-10 w-12 cursor-pointer rounded border border-stroke"
               />
               <Input value={state.color} onChange={(e) => set("color", e.target.value)} />
             </div>
@@ -402,9 +403,9 @@ export function Plans() {
             return (
               <div
                 key={p.id}
-                className="relative rounded-2xl border bg-white p-6 shadow-[0_1px_2px_rgba(16,24,40,.04)]"
+                className="relative rounded-2xl border bg-white p-6 shadow-card"
                 style={{
-                  borderColor: p.popular ? "#10b981" : "#ecedf1",
+                  borderColor: p.popular ? brand.DEFAULT : neutral.hair,
                   borderWidth: p.popular ? 1.5 : 1,
                   opacity: p.active ? 1 : 0.6,
                 }}
@@ -445,7 +446,7 @@ export function Plans() {
                 </div>
                 <button
                   onClick={() => setForm(toForm(p))}
-                  className="w-full rounded-[9px] border border-[#e6e8ec] bg-white py-2.5 text-[13.5px] font-bold text-slate-950 hover:bg-slate-50"
+                  className="w-full rounded-[9px] border border-stroke-soft bg-white py-2.5 text-[13.5px] font-bold text-slate-950 hover:bg-slate-50"
                 >
                   Editar plano
                 </button>

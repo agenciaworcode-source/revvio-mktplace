@@ -81,7 +81,7 @@ export function Aparencia() {
           <button
             onClick={() => inputRef.current?.click()}
             disabled={update.isPending}
-            className="inline-flex items-center gap-2 rounded-[10px] bg-brand px-[18px] py-[11px] text-sm font-bold text-white shadow-[0_6px_16px_rgba(16,185,129,.28)] hover:bg-brand-dark disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-[10px] bg-brand px-[18px] py-[11px] text-sm font-bold text-white shadow-[0_6px_16px_theme(colors.brand.DEFAULT/0.28)] hover:bg-brand-dark disabled:opacity-60"
           >
             {update.isPending ? (
               <>

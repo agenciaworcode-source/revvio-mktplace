@@ -35,7 +35,7 @@ function Grupo({
   marcas: Marca[];
 }) {
   return (
-    <div className="rounded-2xl border border-hair bg-white p-4 shadow-[0_1px_2px_rgba(16,24,40,.04)] sm:p-6">
+    <div className="rounded-2xl border border-hair bg-white p-4 shadow-card sm:p-6">
       <h3 className="mb-4 flex items-center gap-2.5 text-sm font-bold text-slate-900 sm:mb-5">
         <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand text-white">
           <Icon name={icone} size={18} />
@@ -48,7 +48,7 @@ function Grupo({
           <Link
             key={m.nome}
             to={`/comprar?q=${encodeURIComponent(m.busca ?? m.nome)}`}
-            className="group flex flex-col items-center gap-2.5 rounded-xl border border-hair bg-white px-3 py-4 transition-all hover:-translate-y-0.5 hover:border-brand hover:shadow-[0_10px_24px_rgba(16,24,40,.10)]"
+            className="group flex flex-col items-center gap-2.5 rounded-xl border border-hair bg-white px-3 py-4 transition-all hover:-translate-y-0.5 hover:border-brand hover:shadow-[0_10px_24px_theme(colors.shade/0.10)]"
           >
             {/* Faixa de altura fixa alinha marcas quadradas (Chevrolet) com
                 assinaturas largas e baixas (Kawasaki, Suzuki). */}

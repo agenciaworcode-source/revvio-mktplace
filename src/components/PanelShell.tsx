@@ -7,6 +7,7 @@ import { Icon } from "@/features/public/components/icons";
 import { NotificationsBell } from "@/features/notifications/NotificationsBell";
 import { ContextSwitcher } from "@/features/auth/ContextSwitcher";
 import { LG_QUERY, useMediaQuery } from "@/lib/useMediaQuery";
+import { panel } from "@/theme/palette";
 
 export type PanelNavItem = {
   to: string;
@@ -15,7 +16,7 @@ export type PanelNavItem = {
   end?: boolean;
 };
 
-const SIDEBAR_BG = "linear-gradient(180deg,#0c1322 0%,#070b14 100%)";
+const SIDEBAR_BG = `linear-gradient(180deg,${panel.top} 0%,${panel.bottom} 100%)`;
 
 /**
  * Casca compartilhada dos painéis (Admin e Garagista): sidebar escura
@@ -126,7 +127,7 @@ export function PanelShell({
                 [
                   "flex items-center gap-3 rounded-[11px] px-3.5 py-[11px] text-sm transition-all",
                   isActive
-                    ? "bg-brand font-bold text-white shadow-[0_6px_16px_rgba(16,185,129,.32)]"
+                    ? "bg-brand font-bold text-white shadow-[0_6px_16px_theme(colors.brand.DEFAULT/0.32)]"
                     : "font-semibold text-slate-400 hover:bg-white/5 hover:text-slate-200",
                 ].join(" ")
               }
@@ -157,7 +158,7 @@ export function PanelShell({
         {/* TOPBAR MOBILE — abre o drawer */}
         <header
           className="sticky top-0 z-30 flex h-14 items-center gap-3 px-4 lg:hidden"
-          style={{ background: "#0c1322" }}
+          style={{ background: panel.top }}
         >
           <button
             type="button"

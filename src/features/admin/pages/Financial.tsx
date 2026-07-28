@@ -11,6 +11,7 @@ import {
 } from "@/components/panel";
 import { formatCurrency, formatNumber } from "@/lib/format";
 import { Spinner } from "@/components/ui";
+import { status } from "@/theme/palette";
 
 /* ── Vendas intermediadas (operação do marketplace) ──────── */
 function SalesOpsSection() {
@@ -50,26 +51,26 @@ function SalesOpsSection() {
               value={formatNumber(ops.salesCount)}
               sub="registradas"
               icon="car"
-              accent="#3b82f6"
+              accent={status.blue}
             />
             <KpiCard
               label="Ticket médio"
               value={brlShort(ops.avgTicket)}
               sub="por venda"
               icon="wallet"
-              accent="#8b5cf6"
+              accent={status.violet}
             />
             <KpiCard
               label="Comissões dos garagistas"
               value={brlShort(ops.commissionPending + ops.commissionPaid)}
               sub={`${brlShort(ops.commissionPending)} a receber`}
               icon="trendUp"
-              accent="#f59e0b"
+              accent={status.amber}
             />
           </div>
 
           <SectionCard className="overflow-hidden">
-            <div className="border-b border-[#f1f3f5] px-4 py-4 sm:px-6 sm:py-5">
+            <div className="border-b border-line px-4 py-4 sm:px-6 sm:py-5">
               <div className="text-base font-bold text-slate-950">
                 Breakdown por garagista
               </div>
@@ -90,7 +91,7 @@ function SalesOpsSection() {
                         (h, i) => (
                           <th
                             key={h}
-                            className="border-b border-[#f1f3f5] bg-[#fbfbfc] px-6 py-3 text-[11.5px] font-bold uppercase tracking-[.6px] text-slate-400"
+                            className="border-b border-line bg-raised px-6 py-3 text-[11.5px] font-bold uppercase tracking-[.6px] text-slate-400"
                             style={{ textAlign: i === 0 ? "left" : "right" }}
                           >
                             {h}
@@ -101,7 +102,7 @@ function SalesOpsSection() {
                   </thead>
                   <tbody>
                     {ops.rows.map((r) => (
-                      <tr key={r.sellerId} className="hover:bg-[#fafbfc]">
+                      <tr key={r.sellerId} className="hover:bg-row">
                         <td className="border-b border-cloud px-6 py-3.5">
                           <Link
                             to={`/dashboard/sellers/${r.sellerId}`}
@@ -159,21 +160,21 @@ export function Financial() {
               value={o.accumulated == null ? "—" : brlShort(o.accumulated)}
               sub="cobranças pagas"
               icon="dollar"
-              accent="#3b82f6"
+              accent={status.blue}
             />
             <KpiCard
               label="Assinantes ativos"
               value={o.activeSubs}
               sub="garagens"
               icon="users"
-              accent="#8b5cf6"
+              accent={status.violet}
             />
             <KpiCard
               label="Mini-lojas ativas"
               value={o.miniLojas}
               sub="vitrines públicas"
               icon="store"
-              accent="#f59e0b"
+              accent={status.amber}
             />
             <KpiCard
               label="Veículos"
