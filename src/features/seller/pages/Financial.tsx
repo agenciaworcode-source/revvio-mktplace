@@ -1,4 +1,5 @@
 import { useAuth } from "@/features/auth/AuthProvider";
+import { useAcesso } from "@/features/auth/acesso";
 import {
   useCommissions,
   useLojaCommissions,
@@ -55,7 +56,7 @@ function AsaasInvoices({ lojaId }: { lojaId?: string }) {
 
   return (
     <section className="mt-10">
-      <h2 className="mb-1 text-lg font-bold text-slate-900">Minha assinatura (ASAAS)</h2>
+      <h2 className="mb-1 text-lg font-bold text-slate-900">Minha assinatura</h2>
       <p className="mb-3 text-sm text-slate-500">
         Faturas do seu plano na plataforma. Pague as que estiverem em aberto pelo link.
       </p>
@@ -142,8 +143,17 @@ const sumBy = (
   s: CommissionStatus
 ) => rows?.filter((c) => c.status === s).reduce((a, c) => a + Number(c.amount), 0) ?? 0;
 
-/* ── Visão do garagista: comissões da loja, por vendedor, com baixa ─ */
-function LojaView({ lojaId }: { lojaId?: string }) {
+/* ── Visão do garagista: comissões da loja, por vendedor, com baixa ─
+   `somenteLeitura`: vendedor com a permissão "Acessar o Financeiro da loja".
+   Ele enxerga os números, mas não dá baixa nem vê as faturas da assinatura
+   (a RLS também só deixa o manager atualizar rv_commissions). */
+function LojaView({
+  lojaId,
+  somenteLeitura = false,
+}: {
+  lojaId?: string;
+  somenteLeitura?: boolean;
+}) {
   const { data, isLoading } = useLojaCommissions(lojaId);
   const mark = useMarkCommission(lojaId);
 
@@ -151,7 +161,11 @@ function LojaView({ lojaId }: { lojaId?: string }) {
     <div>
       <PageHeader
         title="Financeiro"
-        subtitle="Comissões da equipe sobre as vendas da loja. Dê baixa quando acertar com o vendedor."
+        subtitle={
+          somenteLeitura
+            ? "Comissões da equipe sobre as vendas da loja."
+            : "Comissões da equipe sobre as vendas da loja. Dê baixa quando acertar com o vendedor."
+        }
       />
       {isLoading ? (
         <div className="flex justify-center py-16 text-slate-500">
@@ -179,7 +193,9 @@ function LojaView({ lojaId }: { lojaId?: string }) {
                     <th className="px-5 py-3 font-medium">Status</th>
                     <th className="px-5 py-3 font-medium">Vencimento</th>
                     <th className="px-5 py-3 text-right font-medium">Valor</th>
-                    <th className="px-5 py-3 text-right font-medium">Ação</th>
+                    {!somenteLeitura && (
+                      <th className="px-5 py-3 text-right font-medium">Ação</th>
+                    )}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -195,16 +211,18 @@ function LojaView({ lojaId }: { lojaId?: string }) {
                       <td className="px-5 py-3 text-right font-semibold text-slate-900">
                         {formatCurrency(c.amount)}
                       </td>
-                      <td className="px-5 py-3 text-right">
-                        <Button
-                          variant={c.status === "paid" ? "ghost" : "outline"}
-                          className="px-3 py-1 text-xs"
-                          loading={mark.isPending && mark.variables?.id === c.id}
-                          onClick={() => mark.mutate({ id: c.id, paid: c.status !== "paid" })}
-                        >
-                          {c.status === "paid" ? "Reverter" : "Marcar paga"}
-                        </Button>
-                      </td>
+                      {!somenteLeitura && (
+                        <td className="px-5 py-3 text-right">
+                          <Button
+                            variant={c.status === "paid" ? "ghost" : "outline"}
+                            className="px-3 py-1 text-xs"
+                            loading={mark.isPending && mark.variables?.id === c.id}
+                            onClick={() => mark.mutate({ id: c.id, paid: c.status !== "paid" })}
+                          >
+                            {c.status === "paid" ? "Reverter" : "Marcar paga"}
+                          </Button>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -212,7 +230,7 @@ function LojaView({ lojaId }: { lojaId?: string }) {
             </Card>
           )}
 
-          <AsaasInvoices lojaId={lojaId} />
+          {!somenteLeitura && <AsaasInvoices lojaId={lojaId} />}
         </>
       )}
     </div>
@@ -286,7 +304,10 @@ function VendedorView({ personId, rate }: { personId?: string; rate: number }) {
 
 export function Financial() {
   const { seller, lojaId, personId, isVendedor } = useAuth();
-  if (isVendedor)
+  const { data: acesso } = useAcesso(!!seller);
+  // Vendedor com a permissão "Acessar o Financeiro da loja" vê os números da
+  // equipe (sem dar baixa); sem ela, continua vendo só as próprias comissões.
+  if (isVendedor && !acesso?.perms.ver_financeiro)
     return <VendedorView personId={personId ?? undefined} rate={seller?.commission_rate ?? 0} />;
-  return <LojaView lojaId={lojaId ?? undefined} />;
+  return <LojaView lojaId={lojaId ?? undefined} somenteLeitura={isVendedor} />;
 }

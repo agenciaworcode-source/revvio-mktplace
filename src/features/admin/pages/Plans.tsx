@@ -49,7 +49,19 @@ type FormState = {
   sort_order: string;
   active: boolean;
   affiliates_enabled: boolean;
+  leads_enabled: boolean;
+  financeiro_enabled: boolean;
+  whatsapp_enabled: boolean;
+  equipe_enabled: boolean;
 };
+
+/** Abas do painel do garagista que este plano libera. */
+const MODULOS: { chave: keyof FormState; label: string; hint: string }[] = [
+  { chave: "leads_enabled", label: "Leads", hint: "Funil de leads da mini-loja" },
+  { chave: "financeiro_enabled", label: "Financeiro", hint: "Comissões da equipe" },
+  { chave: "equipe_enabled", label: "Vendedores", hint: "Convidar e gerir a equipe" },
+  { chave: "whatsapp_enabled", label: "Gerador WhatsApp", hint: "Texto de anúncio pronto" },
+];
 
 const EMPTY: FormState = {
   key: "",
@@ -66,6 +78,10 @@ const EMPTY: FormState = {
   sort_order: "0",
   active: true,
   affiliates_enabled: false,
+  leads_enabled: true,
+  financeiro_enabled: true,
+  whatsapp_enabled: true,
+  equipe_enabled: true,
 };
 
 function toForm(p: AdminPricingPlan): FormState {
@@ -85,6 +101,10 @@ function toForm(p: AdminPricingPlan): FormState {
     sort_order: String(p.sort_order),
     active: p.active,
     affiliates_enabled: p.affiliates_enabled ?? false,
+    leads_enabled: p.leads_enabled ?? true,
+    financeiro_enabled: p.financeiro_enabled ?? true,
+    whatsapp_enabled: p.whatsapp_enabled ?? true,
+    equipe_enabled: p.equipe_enabled ?? true,
   };
 }
 
@@ -139,6 +159,10 @@ function PlanFormModal({
         sort_order: Number(state.sort_order) || 0,
         active: state.active,
         affiliates_enabled: state.affiliates_enabled,
+        leads_enabled: state.leads_enabled,
+        financeiro_enabled: state.financeiro_enabled,
+        whatsapp_enabled: state.whatsapp_enabled,
+        equipe_enabled: state.equipe_enabled,
       },
       {
         onSuccess: onClose,
@@ -268,17 +292,56 @@ function PlanFormModal({
             />
             Plano ativo
           </label>
-          {AFFILIATES_ENABLED && (
-            <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
-              <input
-                type="checkbox"
-                className="h-4 w-4 accent-brand"
-                checked={state.affiliates_enabled}
-                onChange={(e) => set("affiliates_enabled", e.target.checked)}
-              />
-              Habilita afiliados neste plano
-            </label>
-          )}
+        </div>
+
+        {/* Módulos liberados para a loja que assina este plano. Desligar aqui
+            some com a aba no painel do garagista e dos vendedores dele. */}
+        <div className="rounded-xl border border-hair p-4">
+          <h3 className="text-[14px] font-bold text-slate-900">Módulos do painel</h3>
+          <p className="mt-0.5 text-[12.5px] text-slate-500">
+            Abas liberadas para a loja que assina este plano. O que o vendedor enxerga
+            dentro de cada módulo é o lojista quem define, em Configurações da Loja →
+            Permissões.
+          </p>
+          <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {MODULOS.map((m) => (
+              <label
+                key={m.chave}
+                className="flex cursor-pointer items-start gap-2.5 rounded-lg border border-hair px-3 py-2.5 hover:bg-slate-50"
+              >
+                <input
+                  type="checkbox"
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-brand"
+                  checked={state[m.chave] as boolean}
+                  onChange={(e) => set(m.chave, e.target.checked as never)}
+                />
+                <span>
+                  <span className="block text-[13.5px] font-semibold text-slate-800">
+                    {m.label}
+                  </span>
+                  <span className="block text-[12px] text-slate-500">{m.hint}</span>
+                </span>
+              </label>
+            ))}
+            {AFFILIATES_ENABLED && (
+              <label className="flex cursor-pointer items-start gap-2.5 rounded-lg border border-hair px-3 py-2.5 hover:bg-slate-50">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-brand"
+                  checked={state.affiliates_enabled}
+                  onChange={(e) => set("affiliates_enabled", e.target.checked)}
+                />
+                <span>
+                  <span className="block text-[13.5px] font-semibold text-slate-800">
+                    Afiliados
+                  </span>
+                  <span className="block text-[12px] text-slate-500">
+                    Programa de afiliados da loja
+                  </span>
+                </span>
+              </label>
+            )}
+          </div>
         </div>
 
         <div className="mt-2 flex items-center justify-between border-t border-hair pt-4">

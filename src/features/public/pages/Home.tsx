@@ -2,7 +2,7 @@ import { PublicShell } from "../PublicShell";
 import { HomeHero } from "../components/home/HomeHero";
 import { HomeMarcas } from "../components/home/HomeMarcas";
 import { HomeQuemSomos } from "../components/home/HomeQuemSomos";
-import { useSiteSettings } from "../queries";
+import { useSiteSettings, SITE_SETTINGS_PADRAO } from "../queries";
 import { Seo } from "@/components/Seo";
 
 export function Home() {
@@ -15,7 +15,7 @@ export function Home() {
         path="/"
       />
       {/* A home é do comprador: os planos ficam só em /vender, o funil do garagista. */}
-      <HomeHero bannerUrl={settings?.home_banner_url} />
+      <HomeHero settings={settings ?? SITE_SETTINGS_PADRAO} />
       <HomeMarcas />
       <HomeQuemSomos />
     </PublicShell>

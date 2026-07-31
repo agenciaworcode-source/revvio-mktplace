@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "../icons";
+import { HomeCarousel } from "./HomeCarousel";
+import { useHomeSlides, type SiteSettings } from "../../queries";
 
 const POPULAR = ["Volkswagen", "Chevrolet", "Fiat", "Toyota", "Honda", "Motos"];
 
-export function HomeHero({ bannerUrl }: { bannerUrl?: string | null }) {
+export function HomeHero({ settings }: { settings: SiteSettings }) {
   const navigate = useNavigate();
+  const { data: slides } = useHomeSlides();
   const [cat, setCat] = useState("Carros");
   const [term, setTerm] = useState("");
 
@@ -16,15 +19,7 @@ export function HomeHero({ bannerUrl }: { bannerUrl?: string | null }) {
 
   return (
     <section className="relative z-20">
-      {/* banner: usa o enviado pelo admin; senão, foto de banco de imagens */}
-      <img
-        src={
-          bannerUrl ||
-          "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1600&h=548&q=75"
-        }
-        alt="Banner REVVIO"
-        className="h-[460px] w-full object-cover sm:h-[548px]"
-      />
+      <HomeCarousel slides={slides ?? []} config={settings} />
 
       {/* Busca Rápida — centralizada no fim do banner (metade sobre o banner, metade sobre a seção de baixo) */}
       <div className="absolute bottom-0 left-1/2 z-30 w-full max-w-[1100px] -translate-x-1/2 translate-y-1/2 px-5 sm:px-7">

@@ -485,9 +485,12 @@ export type Database = {
           color: string
           created_at: string
           cta_label: string
+          equipe_enabled: boolean
+          financeiro_enabled: boolean
           highlights: string[]
           id: string
           key: string
+          leads_enabled: boolean
           name: string
           popular: boolean
           price_annual: number
@@ -497,6 +500,7 @@ export type Database = {
           trial_days: number
           updated_at: string
           vehicle_limit: number | null
+          whatsapp_enabled: boolean
         }
         Insert: {
           active?: boolean
@@ -504,9 +508,12 @@ export type Database = {
           color?: string
           created_at?: string
           cta_label?: string
+          equipe_enabled?: boolean
+          financeiro_enabled?: boolean
           highlights?: string[]
           id?: string
           key: string
+          leads_enabled?: boolean
           name: string
           popular?: boolean
           price_annual: number
@@ -516,6 +523,7 @@ export type Database = {
           trial_days?: number
           updated_at?: string
           vehicle_limit?: number | null
+          whatsapp_enabled?: boolean
         }
         Update: {
           active?: boolean
@@ -523,9 +531,12 @@ export type Database = {
           color?: string
           created_at?: string
           cta_label?: string
+          equipe_enabled?: boolean
+          financeiro_enabled?: boolean
           highlights?: string[]
           id?: string
           key?: string
+          leads_enabled?: boolean
           name?: string
           popular?: boolean
           price_annual?: number
@@ -535,6 +546,7 @@ export type Database = {
           trial_days?: number
           updated_at?: string
           vehicle_limit?: number | null
+          whatsapp_enabled?: boolean
         }
         Relationships: []
       }
@@ -617,6 +629,7 @@ export type Database = {
           asaas_customer_id: string | null
           asaas_subscription_id: string | null
           avatar_url: string | null
+          banner_mobile_url: string | null
           banner_url: string | null
           bio: string | null
           city: string | null
@@ -638,12 +651,20 @@ export type Database = {
           status: Database["public"]["Enums"]["seller_status"]
           updated_at: string
           user_id: string
+          vend_add_veiculo: boolean
+          vend_editar_veiculo: boolean
+          vend_excluir_veiculo: boolean
+          vend_gerador_whatsapp: boolean
+          vend_ver_financeiro: boolean
+          vend_ver_leads: boolean
+          vend_ver_todas_vendas: boolean
           whatsapp: string | null
         }
         Insert: {
           asaas_customer_id?: string | null
           asaas_subscription_id?: string | null
           avatar_url?: string | null
+          banner_mobile_url?: string | null
           banner_url?: string | null
           bio?: string | null
           city?: string | null
@@ -671,6 +692,7 @@ export type Database = {
           asaas_customer_id?: string | null
           asaas_subscription_id?: string | null
           avatar_url?: string | null
+          banner_mobile_url?: string | null
           banner_url?: string | null
           bio?: string | null
           city?: string | null
@@ -692,6 +714,13 @@ export type Database = {
           status?: Database["public"]["Enums"]["seller_status"]
           updated_at?: string
           user_id?: string
+          vend_add_veiculo?: boolean
+          vend_editar_veiculo?: boolean
+          vend_excluir_veiculo?: boolean
+          vend_gerador_whatsapp?: boolean
+          vend_ver_financeiro?: boolean
+          vend_ver_leads?: boolean
+          vend_ver_todas_vendas?: boolean
           whatsapp?: string | null
         }
         Relationships: [
@@ -711,18 +740,78 @@ export type Database = {
           },
         ]
       }
+      rv_home_slides: {
+        Row: {
+          active: boolean
+          created_at: string
+          cta2_label: string | null
+          cta2_url: string | null
+          cta_label: string | null
+          cta_url: string | null
+          id: string
+          image_mobile_url: string | null
+          image_url: string | null
+          sort_order: number
+          subtitle: string | null
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          cta2_label?: string | null
+          cta2_url?: string | null
+          cta_label?: string | null
+          cta_url?: string | null
+          id?: string
+          image_mobile_url?: string | null
+          image_url?: string | null
+          sort_order?: number
+          subtitle?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          cta2_label?: string | null
+          cta2_url?: string | null
+          cta_label?: string | null
+          cta_url?: string | null
+          id?: string
+          image_mobile_url?: string | null
+          image_url?: string | null
+          sort_order?: number
+          subtitle?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       rv_site_settings: {
         Row: {
+          carousel_autoplay: boolean
+          carousel_interval_ms: number
+          carousel_show_arrows: boolean
+          carousel_show_dots: boolean
           home_banner_url: string | null
           id: number
           updated_at: string
         }
         Insert: {
+          carousel_autoplay?: boolean
+          carousel_interval_ms?: number
+          carousel_show_arrows?: boolean
+          carousel_show_dots?: boolean
           home_banner_url?: string | null
           id?: number
           updated_at?: string
         }
         Update: {
+          carousel_autoplay?: boolean
+          carousel_interval_ms?: number
+          carousel_show_arrows?: boolean
+          carousel_show_dots?: boolean
           home_banner_url?: string | null
           id?: number
           updated_at?: string
@@ -897,6 +986,8 @@ export type Database = {
         Args: { p_ref_code: string; p_vehicle_id?: number }
         Returns: undefined
       }
+      meu_acesso: { Args: never; Returns: Json }
+      vendedor_pode: { Args: { p_perm: string }; Returns: boolean }
       log_click_event: {
         Args: { p_kind: string; p_seller_id: string; p_vehicle_id?: number }
         Returns: undefined

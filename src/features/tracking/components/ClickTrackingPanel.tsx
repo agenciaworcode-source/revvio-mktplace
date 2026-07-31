@@ -1,5 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { Spinner } from "@/components/ui";
+import { Icon } from "@/features/public/components/icons";
+import { whatsappLink } from "@/lib/whatsapp";
 import {
   useClicksByVehicle,
   useClickBuyers,
@@ -15,6 +17,28 @@ const CHANNEL_LABEL: Record<string, string> = {
   store_instagram: "Instagram da mini-loja",
 };
 
+/**
+ * Telefone do lead como atalho para o WhatsApp. Números inválidos/curtos
+ * (whatsappLink devolve null) caem em texto simples, sem link quebrado.
+ */
+function PhoneCell({ buyer }: { buyer: ClickBuyer }) {
+  if (!buyer.phone) return <span className="text-slate-400">—</span>;
+  const wa = whatsappLink(buyer.phone, `Olá ${buyer.name}!`);
+  if (!wa) return <>{buyer.phone}</>;
+  return (
+    <a
+      href={wa}
+      target="_blank"
+      rel="noreferrer"
+      title="Abrir conversa no WhatsApp"
+      className="inline-flex items-center gap-1.5 font-semibold text-emerald-600 hover:text-emerald-700 hover:underline"
+    >
+      <Icon name="whatsapp" size={14} className="shrink-0" />
+      {buyer.phone}
+    </a>
+  );
+}
+
 function BuyersTable({ buyers, unit }: { buyers: ClickBuyer[]; unit: string }) {
   if (buyers.length === 0)
     return <p className="px-1 py-2 text-[13px] text-slate-400">Sem registros.</p>;
@@ -24,7 +48,7 @@ function BuyersTable({ buyers, unit }: { buyers: ClickBuyer[]; unit: string }) {
       <thead className="text-left text-[11px] uppercase tracking-[.5px] text-slate-400">
         <tr>
           <th className="py-1">Nome</th>
-          <th>Telefone</th>
+          <th>WhatsApp</th>
           <th>E-mail</th>
           <th>Cidade</th>
           <th className="text-right">{unit}</th>
@@ -34,7 +58,9 @@ function BuyersTable({ buyers, unit }: { buyers: ClickBuyer[]; unit: string }) {
         {buyers.map((b, i) => (
           <tr key={(b.buyer_id ?? "anon") + i}>
             <td className="py-1.5">{b.name}</td>
-            <td>{b.phone ?? "—"}</td>
+            <td>
+              <PhoneCell buyer={b} />
+            </td>
             <td>{b.email ?? "—"}</td>
             <td>{b.city ?? "—"}</td>
             <td className="text-right font-semibold">{b.count}</td>

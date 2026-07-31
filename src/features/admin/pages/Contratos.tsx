@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import { useState } from "react";
+import { createPortal, flushSync } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Button,
@@ -23,6 +23,7 @@ import {
 } from "../contracts/queries";
 import { CONTRACT_TYPE_LABEL, CONTRACT_TYPE_OPTIONS } from "../contracts/templates";
 import { ContractSheet, isSinglePage } from "../contracts/ContractSheet";
+import { printContractSheet } from "@/lib/printContract";
 
 /** Exporta as linhas filtradas no formato do relatório contábil.
  *  Separador `;` + BOM: abre direto no Excel pt-BR sem desconfigurar. */
@@ -71,18 +72,17 @@ export function Contratos() {
   const deleteMut = useDeleteContract();
   const rows = contractsQ.data ?? [];
 
-  /* Imprime direto da lista: monta a folha no <body> (mesmo portal do
-     editor), espera o paint e chama print. Sai do modo ao terminar. */
-  useEffect(() => {
-    if (!printing) return;
-    const done = () => setPrinting(null);
-    window.addEventListener("afterprint", done);
-    const frame = requestAnimationFrame(() => window.print());
-    return () => {
-      window.removeEventListener("afterprint", done);
-      cancelAnimationFrame(frame);
-    };
-  }, [printing]);
+  /* Imprime direto da lista: monta a folha no <body> (mesmo portal do editor)
+     e chama print. O flushSync commita o portal ANTES do print, sem sair do
+     handler do clique — o Safari do iPhone descarta `window.print()` chamado
+     fora da ativação do usuário, que era o motivo de só falhar no iOS.
+     A folha fica montada depois (é `hidden` na tela) e é substituída na
+     impressão seguinte; não dá para depender de `afterprint`, que o iOS não
+     dispara. */
+  function imprimir(c: Contract) {
+    flushSync(() => setPrinting(c));
+    printContractSheet();
+  }
 
   async function confirmDelete() {
     if (!deleting) return;
@@ -233,7 +233,7 @@ export function Contratos() {
                       <button
                         type="button"
                         title="Imprimir / PDF"
-                        onClick={() => setPrinting(c)}
+                        onClick={() => imprimir(c)}
                         className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
                       >
                         <Icon name="download" size={16} />

@@ -66,6 +66,13 @@ function InviteForm({ lojaId, onClose }: { lojaId?: string; onClose: () => void 
       <Field label="Comissão (%)" htmlFor="rate" error={errors.commission_rate?.message}>
         <Input id="rate" type="number" step="0.01" {...register("commission_rate")} />
       </Field>
+      <p className="rounded-lg bg-slate-50 px-3.5 py-3 text-[12.5px] leading-snug text-slate-500">
+        O que este vendedor poderá ver e fazer segue as permissões da loja, em{" "}
+        <strong className="font-semibold text-slate-700">
+          Configurações da Loja → Permissões da equipe
+        </strong>
+        . Elas valem para todos os vendedores.
+      </p>
       <div className="flex justify-end gap-2">
         <Button variant="ghost" type="button" onClick={onClose}>
           Cancelar

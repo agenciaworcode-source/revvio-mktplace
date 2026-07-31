@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAdminOverview, useDeleteStore } from "../queries";
+import { useAdminOverview, useDeleteStore, useSetSellerStatus } from "../queries";
 import { AdminActions } from "../components";
 import { PanelHeader, StatusPill } from "@/components/panel";
 import { Icon } from "@/features/public/components/icons";
@@ -75,10 +75,75 @@ function DeleteStoreModal({ store, onClose }: { store: Seller; onClose: () => vo
   );
 }
 
+/**
+ * Suspender tira a vitrine do ar (o RLS público só lê `status = 'active'`) e
+ * bloqueia o login do lojista, mas não apaga nada — dá para reativar.
+ */
+function SuspendStoreModal({ store, onClose }: { store: Seller; onClose: () => void }) {
+  const setStatus = useSetSellerStatus();
+  const suspendendo = store.status === "active";
+
+  async function confirmar() {
+    try {
+      await setStatus.mutateAsync({
+        id: store.id,
+        status: suspendendo ? "suspended" : "active",
+      });
+      onClose();
+    } catch {
+      /* erro exibido no Alert via setStatus.error */
+    }
+  }
+
+  return (
+    <Modal
+      open
+      onClose={onClose}
+      title={suspendendo ? "Suspender mini-loja" : "Reativar mini-loja"}
+      closeOnBackdrop={false}
+    >
+      <p className="text-sm text-slate-600">
+        {suspendendo ? (
+          <>
+            A vitrine de <strong className="text-slate-900">{store.name}</strong> sai do
+            ar e o lojista perde o acesso ao painel. Os veículos, vendas e comissões são
+            mantidos — é reversível a qualquer momento.
+          </>
+        ) : (
+          <>
+            A vitrine de <strong className="text-slate-900">{store.name}</strong> volta ao
+            ar e o lojista recupera o acesso ao painel.
+          </>
+        )}
+      </p>
+
+      {setStatus.isError && (
+        <div className="mt-4">
+          <Alert variant="error">{errorMessage(setStatus.error)}</Alert>
+        </div>
+      )}
+
+      <div className="mt-5 flex justify-end gap-2">
+        <Button variant="ghost" onClick={onClose} disabled={setStatus.isPending}>
+          Cancelar
+        </Button>
+        <Button
+          variant={suspendendo ? "danger" : "primary"}
+          loading={setStatus.isPending}
+          onClick={confirmar}
+        >
+          {suspendendo ? "Suspender" : "Reativar"}
+        </Button>
+      </div>
+    </Modal>
+  );
+}
+
 export function Stores() {
   const o = useAdminOverview();
   const stores = o.stores.filter((s) => s.status !== "pending");
   const [target, setTarget] = useState<Seller | null>(null);
+  const [suspending, setSuspending] = useState<Seller | null>(null);
 
   return (
     <div>
@@ -152,18 +217,36 @@ export function Stores() {
                   </div>
                 )}
                 {s.role !== "admin" && (
-                  <button
-                    type="button"
-                    onClick={() => setTarget(s)}
-                    className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-[9px] border border-red-200 bg-white py-2.5 text-[13px] font-bold text-red-600 hover:bg-red-50"
-                  >
-                    <Icon name="logout" size={15} /> Excluir
-                  </button>
+                  <div className="mt-2 flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSuspending(s)}
+                      className={`flex flex-1 items-center justify-center gap-1.5 rounded-[9px] border bg-white py-2.5 text-[13px] font-bold ${
+                        s.status === "active"
+                          ? "border-amber-200 text-amber-700 hover:bg-amber-50"
+                          : "border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                      }`}
+                    >
+                      <Icon name={s.status === "active" ? "lock" : "check"} size={15} />
+                      {s.status === "active" ? "Suspender" : "Reativar"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTarget(s)}
+                      className="flex flex-1 items-center justify-center gap-1.5 rounded-[9px] border border-red-200 bg-white py-2.5 text-[13px] font-bold text-red-600 hover:bg-red-50"
+                    >
+                      <Icon name="logout" size={15} /> Excluir
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
           ))}
         </div>
+      )}
+
+      {suspending && (
+        <SuspendStoreModal store={suspending} onClose={() => setSuspending(null)} />
       )}
 
       {target && (

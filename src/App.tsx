@@ -1,6 +1,12 @@
 import { lazy, Suspense, type ReactNode } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { useAuth } from "@/features/auth/AuthProvider";
+import {
+  useAcesso,
+  podeAcessar,
+  type Modulo,
+  type Permissao,
+} from "@/features/auth/acesso";
 import { ProtectedRoute, RoleRoute } from "@/features/auth/routeGuards";
 import { Placeholder } from "@/components/Placeholder";
 import { AFFILIATES_ENABLED } from "@/config/features";
@@ -166,6 +172,28 @@ function ManagerOnly({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
+/**
+ * Restringe uma rota do painel a uma permissão + (opcionalmente) a um módulo
+ * do plano. Espelha o que o menu esconde, para a URL digitada à mão não
+ * escapar do gate. A RLS repete a checagem no banco.
+ */
+function Permitido({
+  perm,
+  modulo,
+  children,
+}: {
+  perm: Permissao;
+  modulo?: Modulo;
+  children: ReactNode;
+}) {
+  const { loading, seller, isAdmin } = useAuth();
+  const { data: acesso, isLoading } = useAcesso(!!seller);
+  if (loading || isLoading) return <div className="p-8 text-slate-400">Carregando…</div>;
+  const temModulo = isAdmin || !modulo || acesso?.modulos[modulo] === true;
+  if (!temModulo || !podeAcessar(acesso, perm)) return <Navigate to="/painel" replace />;
+  return <>{children}</>;
+}
+
 /** Após login, manda cada papel para o lugar certo. */
 function RoleRedirect() {
   const { loading, user, seller, isAdmin, isBuyer } = useAuth();
@@ -216,9 +244,23 @@ export default function App() {
           }
         >
           <Route index element={<SellerDashboard />} />
-          <Route path="leads" element={<SellerLeads />} />
+          <Route
+            path="leads"
+            element={
+              <Permitido perm="ver_leads" modulo="leads">
+                <SellerLeads />
+              </Permitido>
+            }
+          />
           <Route path="veiculos" element={<SellerVehicles />} />
-          <Route path="vendedores" element={<SellerEquipe />} />
+          <Route
+            path="vendedores"
+            element={
+              <ManagerOnly>
+                <SellerEquipe />
+              </ManagerOnly>
+            }
+          />
           {AFFILIATES_ENABLED && (
             <Route path="afiliados" element={<SellerAfiliados />} />
           )}
@@ -226,13 +268,27 @@ export default function App() {
           <Route
             path="financeiro"
             element={
-              <ManagerOnly>
+              <Permitido perm="ver_financeiro" modulo="financeiro">
                 <SellerFinancial />
+              </Permitido>
+            }
+          />
+          <Route
+            path="gerador-whatsapp"
+            element={
+              <Permitido perm="gerador_whatsapp" modulo="whatsapp">
+                <SellerWhatsappGenerator />
+              </Permitido>
+            }
+          />
+          <Route
+            path="perfil"
+            element={
+              <ManagerOnly>
+                <SellerProfile />
               </ManagerOnly>
             }
           />
-          <Route path="gerador-whatsapp" element={<SellerWhatsappGenerator />} />
-          <Route path="perfil" element={<SellerProfile />} />
         </Route>
 
         {/* ── Afiliado ──────────────────────────── */}

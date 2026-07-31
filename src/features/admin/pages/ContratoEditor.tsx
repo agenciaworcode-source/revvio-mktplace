@@ -43,6 +43,7 @@ import {
 } from "../contracts/templates";
 import { CameraCapture } from "../contracts/CameraCapture";
 import { ContractSheet, isSinglePage } from "../contracts/ContractSheet";
+import { printContractSheet } from "@/lib/printContract";
 
 /** 4160.5 → "4.160,50" (string editável no input de valor) */
 function moneyToInput(n: number): string {
@@ -277,7 +278,7 @@ export function ContratoEditor() {
             <Button variant="ghost" onClick={() => navigate("/dashboard/contratos")}>
               Voltar
             </Button>
-            <Button variant="outline" onClick={() => window.print()}>
+            <Button variant="outline" onClick={printContractSheet}>
               <Icon name="download" size={16} /> Imprimir / PDF
             </Button>
             <Button loading={saving} onClick={save}>

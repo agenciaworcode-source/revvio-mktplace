@@ -6,6 +6,7 @@ import { useAuth } from "@/features/auth/AuthProvider";
 import { useUpdateProfile } from "../queries";
 import { uploadMedia, type MediaBucket } from "@/lib/storage";
 import { ImageCropModal } from "@/components/ImageCropModal";
+import { PermissoesEquipe } from "../components/PermissoesEquipe";
 import { maskPhone } from "@/lib/masks";
 import { UFS, fetchCidades } from "@/lib/ibge";
 
@@ -13,17 +14,31 @@ import { UFS, fetchCidades } from "@/lib/ibge";
 const IMAGE_SPECS = {
   banner: {
     bucket: "banners" as MediaBucket,
-    title: "Ajustar banner",
+    column: "banner_url",
+    title: "Ajustar banner do computador",
     // mesma proporção da faixa exibida na mini-loja (1180 × 230 ≈ 5,13:1)
     aspect: 1180 / 230,
     outWidth: 1600,
     outHeight: 312,
     cropShape: "rect" as const,
     mime: "image/jpeg" as const,
-    hint: "Banner recomendado: 1600 × 312 px (paisagem, ~5:1) · JPG, PNG ou WebP · até ~5 MB.",
+    hint: "Banner de computador recomendado: 1600 × 312 px (paisagem, ~5:1) · JPG, PNG ou WebP · até ~5 MB.",
+  },
+  bannerMobile: {
+    bucket: "banners" as MediaBucket,
+    column: "banner_mobile_url",
+    title: "Ajustar banner do celular",
+    // faixa estreita do celular — bem mais alta que a de computador (3:2)
+    aspect: 3 / 2,
+    outWidth: 1080,
+    outHeight: 720,
+    cropShape: "rect" as const,
+    mime: "image/jpeg" as const,
+    hint: "Banner de celular recomendado: 1080 × 720 px (retrato-paisagem, 3:2) · JPG, PNG ou WebP · até ~5 MB.",
   },
   avatar: {
     bucket: "avatars" as MediaBucket,
+    column: "avatar_url",
     title: "Ajustar avatar",
     aspect: 1,
     outWidth: 400,
@@ -65,7 +80,8 @@ export function Profile() {
   const [feedback, setFeedback] = useState<
     { type: "success" | "error"; msg: string } | null
   >(null);
-  const [uploadingField, setUploadingField] = useState<"avatar" | "banner" | null>(null);
+  const [aba, setAba] = useState<"dados" | "permissoes">("dados");
+  const [uploadingField, setUploadingField] = useState<ImageField | null>(null);
   const [cropField, setCropField] = useState<ImageField | null>(null);
   const [cropFile, setCropFile] = useState<File | null>(null);
 
@@ -164,19 +180,14 @@ export function Profile() {
     }
   }
 
-  async function handleImage(
-    field: "avatar" | "banner",
-    bucket: MediaBucket,
-    file?: File
-  ) {
+  async function handleImage(field: ImageField, file?: File) {
     if (!file || !seller) return;
+    const spec = IMAGE_SPECS[field];
     setUploadingField(field);
     setFeedback(null);
     try {
-      const url = await uploadMedia(bucket, seller.id, file);
-      await update.mutateAsync(
-        field === "avatar" ? { avatar_url: url } : { banner_url: url }
-      );
+      const url = await uploadMedia(spec.bucket, seller.id, file);
+      await update.mutateAsync({ [spec.column]: url });
       await refreshSeller();
       setFeedback({ type: "success", msg: "Imagem atualizada." });
     } catch (e) {
@@ -192,8 +203,8 @@ export function Profile() {
   return (
     <div>
       <PageHeader
-        title="Perfil / Mini-Loja"
-        subtitle="Estes dados aparecem na sua página pública."
+        title="Configurações da Loja"
+        subtitle="Dados da sua página pública e permissões da equipe."
         action={
           <a href={`/loja/${seller.slug}`} target="_blank" rel="noreferrer">
             <Button variant="outline">Ver mini-loja ↗</Button>
@@ -201,33 +212,70 @@ export function Profile() {
         }
       />
 
+      <div className="mb-5 flex gap-1 border-b border-hair">
+        {(
+          [
+            ["dados", "Dados da loja"],
+            ["permissoes", "Permissões da equipe"],
+          ] as const
+        ).map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => setAba(id)}
+            aria-current={aba === id}
+            className={`-mb-px border-b-2 px-4 py-2.5 text-[14px] font-semibold transition-colors ${
+              aba === id
+                ? "border-brand text-brand"
+                : "border-transparent text-slate-500 hover:text-slate-700"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {aba === "permissoes" ? (
+        <PermissoesEquipe />
+      ) : (
+        <>
       {feedback && (
         <div className="mb-4">
           <Alert variant={feedback.type}>{feedback.msg}</Alert>
         </div>
       )}
 
-      {/* Banner + avatar */}
+      {/* Banners responsivos (computador + celular) + avatar */}
       <Card className="mb-6 p-0">
-        <div className="relative h-40 overflow-hidden rounded-t-2xl bg-slate-100">
-          {seller.banner_url && (
-            <img src={seller.banner_url} alt="" className="h-full w-full object-cover" />
-          )}
-          <label className="absolute right-3 top-3 cursor-pointer rounded-lg bg-black/70 px-3 py-1.5 text-xs font-medium text-white hover:bg-black">
-            {uploadingField === "banner" ? "Enviando…" : "Trocar banner"}
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => {
-                selectImage("banner", e.target.files?.[0]);
-                e.target.value = "";
-              }}
+        <div className="border-b border-slate-100 p-5">
+          <h2 className="text-sm font-semibold text-slate-900">Banners da mini-loja</h2>
+          <p className="mt-1 text-xs text-slate-400">
+            Envie um banner para computador e outro para celular — assim a imagem
+            fica no enquadramento certo em cada tela. Se você enviar só um, ele é
+            usado nos dois tamanhos.
+          </p>
+
+          <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-[1fr_260px]">
+            <BannerSlot
+              label="Banner do computador"
+              spec={IMAGE_SPECS.banner}
+              url={seller.banner_url}
+              uploading={uploadingField === "banner"}
+              frameClass="aspect-[1180/230]"
+              onSelect={(file) => selectImage("banner", file)}
             />
-          </label>
+            <BannerSlot
+              label="Banner do celular"
+              spec={IMAGE_SPECS.bannerMobile}
+              url={seller.banner_mobile_url}
+              uploading={uploadingField === "bannerMobile"}
+              frameClass="aspect-[3/2]"
+              onSelect={(file) => selectImage("bannerMobile", file)}
+            />
+          </div>
         </div>
         <div className="flex items-center gap-4 p-5">
-          <div className="relative -mt-12 h-20 w-20 shrink-0 overflow-hidden rounded-full border-4 border-slate-900 bg-slate-700">
+          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border-4 border-slate-900 bg-slate-700">
             {seller.avatar_url ? (
               <img
                 src={seller.avatar_url}
@@ -254,8 +302,8 @@ export function Profile() {
               />
             </label>
             <p className="text-xs text-slate-400">
-              Banner {IMAGE_SPECS.banner.outWidth}×{IMAGE_SPECS.banner.outHeight}px · Avatar{" "}
-              {IMAGE_SPECS.avatar.outWidth}×{IMAGE_SPECS.avatar.outHeight}px · JPG, PNG ou WebP
+              Avatar {IMAGE_SPECS.avatar.outWidth}×{IMAGE_SPECS.avatar.outHeight}px ·
+              JPG, PNG ou WebP
             </p>
           </div>
         </div>
@@ -279,7 +327,7 @@ export function Profile() {
             const field = cropField;
             setCropField(null);
             setCropFile(null);
-            void handleImage(field, IMAGE_SPECS[field].bucket, out);
+            void handleImage(field, out);
           }}
         />
       )}
@@ -379,6 +427,60 @@ export function Profile() {
           </div>
         </form>
       </Card>
+        </>
+      )}
+    </div>
+  );
+}
+
+/** Pré-visualização + botão de upload de um dos banners da mini-loja. */
+function BannerSlot({
+  label,
+  spec,
+  url,
+  uploading,
+  frameClass,
+  onSelect,
+}: {
+  label: string;
+  spec: (typeof IMAGE_SPECS)[Exclude<ImageField, "avatar">];
+  url: string | null;
+  uploading: boolean;
+  /** Proporção do quadro de preview (espelha o formato final da imagem). */
+  frameClass: string;
+  onSelect: (file?: File | null) => void;
+}) {
+  return (
+    <div>
+      <div className="mb-1.5 flex items-baseline justify-between gap-2">
+        <span className="text-[13px] font-medium text-slate-700">{label}</span>
+        <span className="text-[11px] text-slate-400">
+          {spec.outWidth}×{spec.outHeight}px
+        </span>
+      </div>
+      <div
+        className={`relative overflow-hidden rounded-xl bg-slate-100 ${frameClass}`}
+      >
+        {url ? (
+          <img src={url} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex h-full items-center justify-center text-xs text-slate-400">
+            Nenhuma imagem enviada
+          </div>
+        )}
+        <label className="absolute right-3 top-3 cursor-pointer rounded-lg bg-black/70 px-3 py-1.5 text-xs font-medium text-white hover:bg-black">
+          {uploading ? "Enviando…" : url ? "Trocar" : "Enviar"}
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              onSelect(e.target.files?.[0]);
+              e.target.value = "";
+            }}
+          />
+        </label>
+      </div>
     </div>
   );
 }

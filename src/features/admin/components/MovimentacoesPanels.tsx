@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Badge, Card } from "@/components/ui-light";
 import { formatCurrency, formatDate } from "@/lib/format";
 import type { AdminRemovalRow, AdminSaleRow } from "../queries";
@@ -7,6 +8,41 @@ const PAYMENT_LABELS: Record<string, string> = {
   financiamento: "Financiamento",
   a_vista: "À vista",
 };
+
+/* Linha rótulo/valor dos cards de celular. */
+function DataRow({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="flex items-baseline justify-between gap-3 py-1">
+      <span className="shrink-0 text-[11.5px] font-semibold uppercase tracking-[.4px] text-slate-400">
+        {label}
+      </span>
+      <span className="min-w-0 truncate text-right text-[13px] text-slate-700">{children}</span>
+    </div>
+  );
+}
+
+/* Cabeçalho comum dos cards: veículo à esquerda, valor à direita. */
+function MobileCard({
+  title,
+  value,
+  children,
+}: {
+  title: string;
+  value: number;
+  children: ReactNode;
+}) {
+  return (
+    <Card className="p-4">
+      <div className="flex items-start justify-between gap-3">
+        <p className="min-w-0 flex-1 font-semibold text-slate-900">{title}</p>
+        <span className="shrink-0 font-bold text-slate-900">{formatCurrency(value)}</span>
+      </div>
+      <div className="mt-2 divide-y divide-slate-100 border-t border-slate-100 pt-1">
+        {children}
+      </div>
+    </Card>
+  );
+}
 
 /** Chips "motivo: contagem" do conjunto recebido (já filtrado). Omite zeros. */
 export function ReasonSummary({
@@ -53,7 +89,23 @@ export function SalesReasonTable({
     return <p className="py-8 text-center text-sm text-slate-500">Nenhuma venda no período/filtro.</p>;
   }
   return (
-    <Card className="overflow-x-auto p-0">
+    <>
+      {/* Celular/tablet: cards. A tabela só cabe a partir de `lg`. */}
+      <div className="flex flex-col gap-3 lg:hidden">
+        {rows.map((s) => (
+          <MobileCard key={s.id} title={s.vehicle_label} value={s.sale_price}>
+            <DataRow label="Data">{formatDate(s.sale_date)}</DataRow>
+            {showSeller && <DataRow label="Garagista">{s.seller_name}</DataRow>}
+            <DataRow label="Comprador">{s.buyer_name}</DataRow>
+            <DataRow label="Pagamento">
+              <Badge tone="sky">{PAYMENT_LABELS[s.payment_method] ?? s.payment_method}</Badge>
+            </DataRow>
+            <DataRow label="Motivo">{s.sale_reason ?? "—"}</DataRow>
+          </MobileCard>
+        ))}
+      </div>
+
+      <Card className="hidden overflow-x-auto p-0 lg:block">
       <table className="w-full min-w-[780px] text-sm">
         <thead className="border-b border-slate-200 text-left text-xs uppercase text-slate-500">
           <tr>
@@ -84,7 +136,8 @@ export function SalesReasonTable({
           ))}
         </tbody>
       </table>
-    </Card>
+      </Card>
+    </>
   );
 }
 
@@ -103,7 +156,21 @@ export function RemovalsReasonTable({
     );
   }
   return (
-    <Card className="overflow-x-auto p-0">
+    <>
+      {/* Celular/tablet: cards. A tabela só cabe a partir de `lg`. */}
+      <div className="flex flex-col gap-3 lg:hidden">
+        {rows.map((v) => (
+          <MobileCard key={v.id} title={v.vehicle_label} value={v.price}>
+            <DataRow label="Removido em">
+              {v.removed_at ? formatDate(v.removed_at) : "—"}
+            </DataRow>
+            {showSeller && <DataRow label="Garagista">{v.seller_name}</DataRow>}
+            <DataRow label="Motivo">{v.removal_reason ?? "—"}</DataRow>
+          </MobileCard>
+        ))}
+      </div>
+
+      <Card className="hidden overflow-x-auto p-0 lg:block">
       <table className="w-full min-w-[780px] text-sm">
         <thead className="border-b border-slate-200 text-left text-xs uppercase text-slate-500">
           <tr>
@@ -130,6 +197,7 @@ export function RemovalsReasonTable({
           ))}
         </tbody>
       </table>
-    </Card>
+      </Card>
+    </>
   );
 }

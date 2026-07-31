@@ -38,6 +38,12 @@ export function Dashboard() {
     commissions.data
       ?.filter((c) => c.status === "pending")
       .reduce((acc, c) => acc + Number(c.amount), 0) ?? 0;
+  // Já quitadas: mesmo conjunto que o "Pagas" do Financeiro (baixa via
+  // mark_commission_paid), aqui só somado para o resumo do dashboard.
+  const paidCommission =
+    commissions.data
+      ?.filter((c) => c.status === "paid")
+      .reduce((acc, c) => acc + Number(c.amount), 0) ?? 0;
 
   // Comissões a receber (vendedor): pendentes + atrasadas, por vencimento.
   const receivable = (commissions.data ?? [])
@@ -64,7 +70,7 @@ export function Dashboard() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
             <StatCard label="Veículos ativos" value={available} />
             <StatCard label="Veículos vendidos" value={sold} />
             <StatCard label="Faturamento do mês" value={formatCurrency(monthRevenue)} />
@@ -73,6 +79,13 @@ export function Dashboard() {
               value={formatCurrency(pendingCommission)}
               hint={
                 isVendedor ? "Seu ganho pelas vendas intermediadas" : "Para a equipe da loja"
+              }
+            />
+            <StatCard
+              label={isVendedor ? "Comissões já recebidas" : "Comissões já pagas"}
+              value={formatCurrency(paidCommission)}
+              hint={
+                isVendedor ? "Total já recebido pelas vendas" : "Total já acertado com a equipe"
               }
             />
           </div>

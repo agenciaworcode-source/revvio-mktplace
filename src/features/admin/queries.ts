@@ -7,7 +7,14 @@ import {
 } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { uploadMedia, removeMedia } from "@/lib/storage";
-import { usePricingPlans, type PricingPlan } from "@/features/public/queries";
+import {
+  usePricingPlans,
+  HOME_SLIDE_COLS,
+  SITE_SETTINGS_PADRAO,
+  type HomeSlide,
+  type PricingPlan,
+  type SiteSettings,
+} from "@/features/public/queries";
 import type { VehicleWithOwner } from "@/features/seller/queries";
 import { planColor } from "@/components/panel";
 import {
@@ -478,7 +485,18 @@ export function useAdminDeleteVehicle() {
 }
 
 /* ── Planos de assinatura (CRUD admin) ──────────────────── */
-export type AdminPricingPlan = PricingPlan & { active: boolean; affiliates_enabled: boolean };
+/** Módulos do painel que o plano libera para a loja assinante. */
+export type PlanoModulos = {
+  leads_enabled: boolean;
+  financeiro_enabled: boolean;
+  whatsapp_enabled: boolean;
+  equipe_enabled: boolean;
+};
+
+export type AdminPricingPlan = PricingPlan & {
+  active: boolean;
+  affiliates_enabled: boolean;
+} & PlanoModulos;
 
 export function useAdminPricingPlans(): UseQueryResult<AdminPricingPlan[]> {
   return useQuery({
@@ -509,7 +527,7 @@ export type PricingPlanInput = {
   sort_order: number;
   active: boolean;
   affiliates_enabled: boolean;
-};
+} & PlanoModulos;
 
 export function useSavePricingPlan() {
   const qc = useQueryClient();
@@ -689,6 +707,159 @@ export function useUpdateHomeBanner() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-home-banner"] });
+      qc.invalidateQueries({ queryKey: ["site-settings"] });
+    },
+  });
+}
+
+/* ── Aparência: carrossel da home (rv_home_slides) ────────── */
+
+/** Todos os slides, inclusive os inativos (o RLS libera os inativos ao admin). */
+export function useAdminHomeSlides(): UseQueryResult<HomeSlide[]> {
+  return useQuery({
+    queryKey: ["admin-home-slides"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("rv_home_slides")
+        .select(HOME_SLIDE_COLS)
+        .order("sort_order", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as HomeSlide[];
+    },
+  });
+}
+
+export type HomeSlideInput = Partial<Omit<HomeSlide, "id">>;
+
+/** Invalida tudo que depende dos slides (admin + home pública). */
+function invalidarSlides(qc: ReturnType<typeof useQueryClient>) {
+  qc.invalidateQueries({ queryKey: ["admin-home-slides"] });
+  qc.invalidateQueries({ queryKey: ["home-slides"] });
+}
+
+/** Cria um slide vazio no fim da fila (o admin preenche em seguida). */
+export function useCreateHomeSlide() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (sortOrder: number) => {
+      const { data, error } = await supabase
+        .from("rv_home_slides")
+        .insert({ sort_order: sortOrder, active: false })
+        .select(HOME_SLIDE_COLS)
+        .single();
+      if (error) throw error;
+      return data as HomeSlide;
+    },
+    onSuccess: () => invalidarSlides(qc),
+  });
+}
+
+export function useUpdateHomeSlide() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...fields }: { id: string } & HomeSlideInput) => {
+      const { error } = await supabase.from("rv_home_slides").update(fields).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => invalidarSlides(qc),
+  });
+}
+
+/** Remove o slide e as imagens dele do bucket (best-effort). */
+export function useDeleteHomeSlide() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (slide: HomeSlide) => {
+      const { error } = await supabase.from("rv_home_slides").delete().eq("id", slide.id);
+      if (error) throw error;
+      for (const url of [slide.image_url, slide.image_mobile_url]) {
+        if (url) await removeMedia("banners", url).catch(() => {});
+      }
+    },
+    onSuccess: () => invalidarSlides(qc),
+  });
+}
+
+/** Grava a nova ordem (uma linha por slide) depois de subir/descer um item. */
+export function useReorderHomeSlides() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (ids: string[]) => {
+      for (const [i, id] of ids.entries()) {
+        const { error } = await supabase
+          .from("rv_home_slides")
+          .update({ sort_order: i })
+          .eq("id", id);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => invalidarSlides(qc),
+  });
+}
+
+/**
+ * Sobe a imagem de um slide (computador ou celular) para a pasta `home/` do
+ * bucket `banners`, grava a URL e apaga a anterior.
+ */
+export function useUploadSlideImage() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      slide: HomeSlide;
+      campo: "image_url" | "image_mobile_url";
+      file: File;
+    }) => {
+      const anterior = input.slide[input.campo];
+      const url = await uploadMedia("banners", "home", input.file);
+      const patch: HomeSlideInput =
+        input.campo === "image_url" ? { image_url: url } : { image_mobile_url: url };
+      const { error } = await supabase
+        .from("rv_home_slides")
+        .update(patch)
+        .eq("id", input.slide.id);
+      if (error) throw error;
+      if (anterior) await removeMedia("banners", anterior).catch(() => {});
+      return url;
+    },
+    onSuccess: () => invalidarSlides(qc),
+  });
+}
+
+/* ── Aparência: configurações do carrossel ────────────────── */
+export type CarouselConfig = Pick<
+  SiteSettings,
+  | "carousel_autoplay"
+  | "carousel_interval_ms"
+  | "carousel_show_arrows"
+  | "carousel_show_dots"
+>;
+
+export function useCarouselConfig(): UseQueryResult<CarouselConfig> {
+  return useQuery({
+    queryKey: ["admin-carousel-config"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("rv_site_settings")
+        .select(
+          "carousel_autoplay, carousel_interval_ms, carousel_show_arrows, carousel_show_dots"
+        )
+        .eq("id", 1)
+        .maybeSingle();
+      if (error) throw error;
+      return (data ?? SITE_SETTINGS_PADRAO) as CarouselConfig;
+    },
+  });
+}
+
+export function useUpdateCarouselConfig() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: Partial<CarouselConfig>) => {
+      const { error } = await supabase.from("rv_site_settings").update(input).eq("id", 1);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-carousel-config"] });
       qc.invalidateQueries({ queryKey: ["site-settings"] });
     },
   });

@@ -3,6 +3,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "@/features/auth/AuthProvider";
+import { useAcesso, podeAcessar } from "@/features/auth/acesso";
 import {
   useDeleteVehicle,
   useSaveVehicle,
@@ -702,8 +703,14 @@ export function VehicleForm({
 }
 
 export function Vehicles() {
-  const { lojaId, personId, isGaragista, isAdmin } = useAuth();
-  const manager = isGaragista || isAdmin;
+  const { lojaId, personId, seller } = useAuth();
+  const { data: acesso } = useAcesso(!!seller);
+  // Cadastrar/editar/excluir são permissões separadas: o garagista pode
+  // liberar cada uma para os vendedores em Configurações da Loja. A RLS
+  // (0050) aplica as mesmas regras no banco.
+  const podeCriar = podeAcessar(acesso, "add_veiculo");
+  const podeEditar = podeAcessar(acesso, "editar_veiculo");
+  const podeExcluir = podeAcessar(acesso, "excluir_veiculo");
   const { data, isLoading } = useVehicles(lojaId ?? undefined);
   const remove = useDeleteVehicle(lojaId ?? undefined);
   const [editing, setEditing] = useState<VehicleWithOwner | null>(null);
@@ -771,7 +778,11 @@ export function Vehicles() {
       <PageHeader
         title="Meus Veículos"
         subtitle="Cadastre e gerencie o seu estoque."
-        action={<Button onClick={() => setCreating(true)}>+ Novo veículo</Button>}
+        action={
+          podeCriar ? (
+            <Button onClick={() => setCreating(true)}>+ Novo veículo</Button>
+          ) : undefined
+        }
       />
 
       {isLoading ? (
@@ -781,8 +792,16 @@ export function Vehicles() {
       ) : vehicles.length === 0 ? (
         <EmptyState
           title="Nenhum veículo cadastrado"
-          description="Adicione seu primeiro veículo para começar a vender."
-          action={<Button onClick={() => setCreating(true)}>+ Novo veículo</Button>}
+          description={
+            podeCriar
+              ? "Adicione seu primeiro veículo para começar a vender."
+              : "A loja ainda não cadastrou veículos."
+          }
+          action={
+            podeCriar ? (
+              <Button onClick={() => setCreating(true)}>+ Novo veículo</Button>
+            ) : undefined
+          }
         />
       ) : (
         <div className="flex flex-col gap-4">
@@ -943,22 +962,26 @@ export function Vehicles() {
                         👁 {formatNumber(v.clicks)} {v.clicks === 1 ? "clique" : "cliques"}
                       </span>
                     </div>
-                    {manager && (
+                    {(podeEditar || podeExcluir) && (
                       <div className="mt-1 flex gap-2">
-                        <Button
-                          variant="outline"
-                          className="flex-1 py-2"
-                          onClick={() => setEditing(v)}
-                        >
-                          Editar
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          className="px-3 py-2 text-red-400 hover:bg-red-950/40"
-                          onClick={() => setDeleting(v)}
-                        >
-                          Excluir
-                        </Button>
+                        {podeEditar && (
+                          <Button
+                            variant="outline"
+                            className="flex-1 py-2"
+                            onClick={() => setEditing(v)}
+                          >
+                            Editar
+                          </Button>
+                        )}
+                        {podeExcluir && (
+                          <Button
+                            variant="ghost"
+                            className="px-3 py-2 text-red-400 hover:bg-red-950/40"
+                            onClick={() => setDeleting(v)}
+                          >
+                            Excluir
+                          </Button>
+                        )}
                       </div>
                     )}
                   </div>
@@ -966,7 +989,80 @@ export function Vehicles() {
               ))}
             </div>
           ) : (
-            <Card className="overflow-x-auto p-0">
+            <>
+              {/* Celular/tablet: a tabela não cabe, então a "Lista" vira linhas
+                  compactas em card. Em desktop (`lg`) segue a tabela normal. */}
+              <div className="flex flex-col gap-3 lg:hidden">
+                {filtered.map((v) => (
+                  <Card key={v.id} className="p-3">
+                    <div className="flex items-start gap-3">
+                      {v.images[0] ? (
+                        <img
+                          src={v.images[0]}
+                          alt=""
+                          className="h-16 w-20 shrink-0 rounded-xl object-cover"
+                        />
+                      ) : (
+                        <span className="h-16 w-20 shrink-0 rounded-xl bg-slate-100" />
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="truncate font-semibold text-slate-900">
+                            {v.make} {v.model}
+                          </p>
+                          <Badge tone={statusMeta[v.status].tone}>
+                            {statusMeta[v.status].label}
+                          </Badge>
+                        </div>
+                        <p className="truncate text-xs text-slate-500">
+                          <span className="font-semibold text-slate-400">{vehicleRef(v.id)}</span>
+                          {" · "}
+                          {v.year ?? "—"}
+                          {v.mileage != null && ` · ${formatNumber(v.mileage)} km`}
+                        </p>
+                        <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                          <span className="font-bold text-brand">{formatCurrency(v.price)}</span>
+                          {v.fipe_price && (
+                            <span className="text-xs text-slate-400 line-through">
+                              {formatCurrency(v.fipe_price)}
+                            </span>
+                          )}
+                          <span
+                            className="text-xs font-medium text-slate-500"
+                            title={'Cliques no botão "Quero ver o carro"'}
+                          >
+                            👁 {formatNumber(v.clicks)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    {(podeEditar || podeExcluir) && (
+                      <div className="mt-3 flex gap-2">
+                        {podeEditar && (
+                          <Button
+                            variant="outline"
+                            className="flex-1 py-2"
+                            onClick={() => setEditing(v)}
+                          >
+                            Editar
+                          </Button>
+                        )}
+                        {podeExcluir && (
+                          <Button
+                            variant="ghost"
+                            className="px-3 py-2 text-red-400 hover:bg-red-950/40"
+                            onClick={() => setDeleting(v)}
+                          >
+                            Excluir
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </Card>
+                ))}
+              </div>
+
+              <Card className="hidden overflow-x-auto p-0 lg:block">
               <table className="w-full min-w-[820px] text-sm">
                 <thead className="border-b border-slate-200 text-left text-xs uppercase text-slate-500">
                   <tr>
@@ -976,7 +1072,9 @@ export function Vehicles() {
                     <th className="px-5 py-3 text-center font-medium">Cliques</th>
                     <th className="px-5 py-3 text-right font-medium">Preço</th>
                     <th className="px-5 py-3 text-right font-medium">FIPE</th>
-                    {manager && <th className="px-5 py-3 text-right font-medium">Ações</th>}
+                    {(podeEditar || podeExcluir) && (
+                      <th className="px-5 py-3 text-right font-medium">Ações</th>
+                    )}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -1027,19 +1125,23 @@ export function Vehicles() {
                           "—"
                         )}
                       </td>
-                      {manager && (
+                      {(podeEditar || podeExcluir) && (
                         <td className="px-5 py-3">
                           <div className="flex justify-end gap-2">
-                            <Button variant="outline" className="px-3 py-1.5" onClick={() => setEditing(v)}>
-                              Editar
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              className="px-3 py-1.5 text-red-400 hover:bg-red-950/40"
-                              onClick={() => setDeleting(v)}
-                            >
-                              Excluir
-                            </Button>
+                            {podeEditar && (
+                              <Button variant="outline" className="px-3 py-1.5" onClick={() => setEditing(v)}>
+                                Editar
+                              </Button>
+                            )}
+                            {podeExcluir && (
+                              <Button
+                                variant="ghost"
+                                className="px-3 py-1.5 text-red-400 hover:bg-red-950/40"
+                                onClick={() => setDeleting(v)}
+                              >
+                                Excluir
+                              </Button>
+                            )}
                           </div>
                         </td>
                       )}
@@ -1047,7 +1149,8 @@ export function Vehicles() {
                   ))}
                 </tbody>
               </table>
-            </Card>
+              </Card>
+            </>
           )}
         </div>
       )}

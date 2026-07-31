@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useAdminVehicles,
@@ -58,6 +58,109 @@ const selectCls =
   "w-full max-w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-[13px] text-slate-700 outline-none focus:border-brand sm:w-auto sm:min-w-[160px]";
 const inputCls =
   "w-full min-w-0 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[13px] text-slate-700 outline-none focus:border-brand sm:w-28";
+
+/* Linha rótulo/valor dos cards de celular. */
+function DataRow({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="flex items-baseline justify-between gap-3 py-1">
+      <span className="shrink-0 text-[11.5px] font-semibold uppercase tracking-[.4px] text-slate-400">
+        {label}
+      </span>
+      <span className="min-w-0 truncate text-right text-[13px] text-slate-700">{children}</span>
+    </div>
+  );
+}
+
+/**
+ * Card de veículo para telas estreitas. A tabela tem 8 colunas e só cabe
+ * em desktop (`lg`), onde ela continua sendo a visualização usada.
+ */
+function VehicleCard({
+  v,
+  onEdit,
+  onToggleBlock,
+  onDelete,
+  blocking,
+}: {
+  v: AdminVehicle;
+  onEdit: () => void;
+  onToggleBlock: () => void;
+  onDelete: () => void;
+  blocking: boolean;
+}) {
+  return (
+    <div className="rounded-2xl border border-hair bg-white p-4 shadow-card">
+      <div className="flex items-start gap-3">
+        {v.images?.[0] ? (
+          <img src={v.images[0]} alt="" className="h-16 w-20 shrink-0 rounded-xl object-cover" />
+        ) : (
+          <span className="h-16 w-20 shrink-0 rounded-xl bg-slate-100" />
+        )}
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-[14px] font-bold uppercase text-slate-950">{v.make}</div>
+          <div className="truncate text-[12.5px] text-slate-400">
+            <span className="font-semibold">{vehicleRef(v.id)}</span>
+            {" · "}
+            {v.model}
+          </div>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            <span
+              className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset ${
+                statusMeta(v.status).cls
+              }`}
+            >
+              {statusMeta(v.status).label}
+            </span>
+            {v.blocked && (
+              <span className="inline-flex items-center rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-red-600 ring-1 ring-inset ring-red-200">
+                Bloqueado
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-3 divide-y divide-cloud border-t border-cloud pt-1">
+        <DataRow label="Garagem">{v.seller?.name ?? "—"}</DataRow>
+        <DataRow label="Ano">{v.year ?? "—"}</DataRow>
+        <DataRow label="Preço">
+          <span className="font-extrabold text-brand-dark">{formatCurrency(v.price)}</span>
+        </DataRow>
+        <DataRow label="FIPE">
+          {v.fipe_price ? (
+            <span className="text-slate-400 line-through">{formatCurrency(v.fipe_price)}</span>
+          ) : (
+            "—"
+          )}
+        </DataRow>
+        <DataRow label="Cliques">
+          <span className="font-semibold">{formatNumber(v.clicks ?? 0)}</span>
+        </DataRow>
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Button variant="outline" className="flex-1 px-3 py-2 text-xs" onClick={onEdit}>
+          Editar
+        </Button>
+        <Button
+          variant="ghost"
+          className="flex-1 px-3 py-2 text-xs"
+          loading={blocking}
+          onClick={onToggleBlock}
+        >
+          {v.blocked ? "Desbloquear" : "Bloquear"}
+        </Button>
+        <Button
+          variant="ghost"
+          className="px-3 py-2 text-xs text-red-500 hover:bg-red-50"
+          onClick={onDelete}
+        >
+          Excluir
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 export function Vehicles() {
   const { data, isLoading } = useAdminVehicles();
@@ -259,7 +362,22 @@ export function Vehicles() {
               Nenhum veículo corresponde aos filtros.
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <>
+              {/* Celular/tablet: cards. A tabela de 8 colunas só cabe em desktop. */}
+              <div className="flex flex-col gap-3 bg-raised p-4 lg:hidden">
+                {filtered.map((v) => (
+                  <VehicleCard
+                    key={v.id}
+                    v={v}
+                    onEdit={() => setEditing(v)}
+                    onToggleBlock={() => setBlocked.mutate({ id: v.id, blocked: !v.blocked })}
+                    onDelete={() => setDeleting(v)}
+                    blocking={setBlocked.isPending && setBlocked.variables?.id === v.id}
+                  />
+                ))}
+              </div>
+
+              <div className="hidden overflow-x-auto lg:block">
               <table className="w-full min-w-[1020px] border-collapse text-sm">
                 <thead>
                   <tr>
@@ -369,7 +487,8 @@ export function Vehicles() {
                   ))}
                 </tbody>
               </table>
-            </div>
+              </div>
+            </>
           )}
         </SectionCard>
       )}

@@ -5,22 +5,24 @@ import { Icon } from "../icons";
  *  não bate com o fabricante cadastrado (ex.: "BMW Motorrad" → "BMW"). */
 type Marca = { nome: string; arquivo: string; busca?: string };
 
+// Logos em SVG (nítidas em qualquer densidade de tela). A Dafra segue em PNG
+// porque não há versão vetorial em fonte livre — ver docs/marcas-logos.md.
 const CARROS: Marca[] = [
-  { nome: "Chevrolet", arquivo: "chevrolet.png" },
-  { nome: "Fiat", arquivo: "fiat.png" },
-  { nome: "Volkswagen", arquivo: "volkswagem.png" },
-  { nome: "Toyota", arquivo: "toyota.png" },
-  { nome: "Honda", arquivo: "honda.png" },
-  { nome: "Hyundai", arquivo: "hyundai.png" },
+  { nome: "Chevrolet", arquivo: "chevrolet.svg" },
+  { nome: "Fiat", arquivo: "fiat.svg" },
+  { nome: "Volkswagen", arquivo: "volkswagem.svg" },
+  { nome: "Toyota", arquivo: "toyota.svg" },
+  { nome: "Honda", arquivo: "honda.svg" },
+  { nome: "Hyundai", arquivo: "hyundai.svg" },
 ];
 
 const MOTOS: Marca[] = [
-  { nome: "Honda", arquivo: "honda.png" },
-  { nome: "Yamaha", arquivo: "yamaha.png" },
+  { nome: "Honda", arquivo: "honda.svg" },
+  { nome: "Yamaha", arquivo: "yamaha.svg" },
   { nome: "Dafra", arquivo: "dafra.png" },
-  { nome: "Suzuki", arquivo: "suzuki.png" },
-  { nome: "Kawasaki", arquivo: "kawasaki.png" },
-  { nome: "BMW Motorrad", arquivo: "bmwmotor.png", busca: "BMW" },
+  { nome: "Suzuki", arquivo: "suzuki.svg" },
+  { nome: "Kawasaki", arquivo: "kawasaki.svg" },
+  { nome: "BMW Motorrad", arquivo: "bmwmotor.svg", busca: "BMW" },
 ];
 
 function Grupo({

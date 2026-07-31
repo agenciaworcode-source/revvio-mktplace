@@ -112,12 +112,22 @@ export function Storefront() {
       {/* Banner + perfil */}
       <div className="mx-auto mt-3.5 max-w-[1180px] px-7">
         <div className="relative h-[230px] overflow-hidden rounded-[18px] bg-panel-top">
-          {seller.banner_url && (
-            <img
-              src={seller.banner_url}
-              alt=""
-              className="h-full w-full object-cover opacity-65"
-            />
+          {/* Banner responsivo: a loja pode subir uma imagem para computador e
+              outra para celular. Com apenas uma, ela vale para os dois tamanhos. */}
+          {(seller.banner_url || seller.banner_mobile_url) && (
+            <picture className="absolute inset-0 block h-full w-full">
+              {seller.banner_mobile_url && (
+                <source
+                  media="(max-width: 639px)"
+                  srcSet={seller.banner_mobile_url}
+                />
+              )}
+              <img
+                src={seller.banner_url ?? seller.banner_mobile_url ?? undefined}
+                alt=""
+                className="h-full w-full object-cover opacity-65"
+              />
+            </picture>
           )}
           <div
             className="absolute inset-0"

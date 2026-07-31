@@ -271,6 +271,7 @@ export type ProfileInput = Partial<
     | "instagram"
     | "avatar_url"
     | "banner_url"
+    | "banner_mobile_url"
   >
 >;
 
@@ -286,6 +287,38 @@ export function useUpdateProfile(seller?: Seller | null) {
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["seller"] }),
+  });
+}
+
+/* ── Permissões da equipe (linha da loja) ───────────────── */
+export type PermissoesInput = Pick<
+  Seller,
+  | "vend_ver_leads"
+  | "vend_ver_financeiro"
+  | "vend_ver_todas_vendas"
+  | "vend_add_veiculo"
+  | "vend_editar_veiculo"
+  | "vend_excluir_veiculo"
+  | "vend_gerador_whatsapp"
+>;
+
+/**
+ * Salva as permissões que valem para todos os vendedores da loja. Só o
+ * garagista consegue (trigger `protect_seller_columns` + RLS da 0050).
+ * Invalida `meu-acesso` para o menu e as rotas reagirem na hora.
+ */
+export function useUpdatePermissoes(lojaId?: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: PermissoesInput) => {
+      if (!lojaId) throw new Error("Loja não carregada.");
+      const { error } = await supabase.from("rv_sellers").update(input).eq("id", lojaId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["seller"] });
+      qc.invalidateQueries({ queryKey: ["meu-acesso"] });
+    },
   });
 }
 

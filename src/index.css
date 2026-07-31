@@ -36,16 +36,20 @@ textarea:-webkit-autofill:focus {
    A folha do contrato é um portal React montado direto no <body>
    (fora do layout do painel, que tem scroll/sticky e cortaria o
    conteúdo). Ao imprimir, o app inteiro (#root) some e só a folha
-   fica no fluxo normal — funciona com quantas páginas precisar. */
+   fica no fluxo normal — funciona com quantas páginas precisar.
+
+   O gatilho é a classe `printing-contract` no <body>, posta por
+   printContractSheet(). Antes era `body:has(#contract-print-sheet)`,
+   que exige iOS 15.4+ — a classe funciona em qualquer versão. */
 @media print {
   @page {
     size: A4;
     margin: 20mm 18mm;
   }
-  body:has(#contract-print-sheet) {
+  body.printing-contract {
     background: #fff !important;
   }
-  body:has(#contract-print-sheet) > #root {
+  body.printing-contract > #root {
     display: none !important;
   }
   /* Timbre: garante que a marca e o verde da wordmark saiam na impressão

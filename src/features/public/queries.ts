@@ -10,6 +10,7 @@ export type PublicSeller = Pick<
   | "slug"
   | "avatar_url"
   | "banner_url"
+  | "banner_mobile_url"
   | "bio"
   | "city"
   | "state"
@@ -23,7 +24,7 @@ export type PublicSeller = Pick<
 export type PublicVehicle = Vehicle & { seller: PublicSeller | null };
 
 const SELLER_COLS =
-  "id, name, slug, avatar_url, banner_url, bio, city, state, whatsapp, phone, instagram, pricing_plan_key, created_at";
+  "id, name, slug, avatar_url, banner_url, banner_mobile_url, bio, city, state, whatsapp, phone, instagram, pricing_plan_key, created_at";
 
 /**
  * Vitrine geral: veículos disponíveis cujo vendedor está ativo.
@@ -156,21 +157,71 @@ export function usePricingPlans(): UseQueryResult<PricingPlan[]> {
 
 /** Configurações globais do site (singleton `rv_site_settings`). Leitura pública. */
 export type SiteSettings = {
+  /** Fallback: usado quando não há nenhum slide ativo no carrossel. */
   home_banner_url: string | null;
+  carousel_autoplay: boolean;
+  carousel_interval_ms: number;
+  carousel_show_arrows: boolean;
+  carousel_show_dots: boolean;
 };
 
-/** Lê a config do site (id=1). A landing usa `home_banner_url` no banner da home. */
+export const SITE_SETTINGS_PADRAO: SiteSettings = {
+  home_banner_url: null,
+  carousel_autoplay: true,
+  carousel_interval_ms: 6000,
+  carousel_show_arrows: true,
+  carousel_show_dots: true,
+};
+
+const SITE_SETTINGS_COLS =
+  "home_banner_url, carousel_autoplay, carousel_interval_ms, carousel_show_arrows, carousel_show_dots";
+
+/** Lê a config do site (id=1): banner de fallback + comportamento do carrossel. */
 export function useSiteSettings(): UseQueryResult<SiteSettings> {
   return useQuery({
     queryKey: ["site-settings"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("rv_site_settings")
-        .select("home_banner_url")
+        .select(SITE_SETTINGS_COLS)
         .eq("id", 1)
         .maybeSingle();
       if (error) throw error;
-      return (data ?? { home_banner_url: null }) as SiteSettings;
+      return (data ?? SITE_SETTINGS_PADRAO) as SiteSettings;
+    },
+  });
+}
+
+/** Slide do carrossel da home. */
+export type HomeSlide = {
+  id: string;
+  image_url: string | null;
+  image_mobile_url: string | null;
+  title: string | null;
+  subtitle: string | null;
+  cta_label: string | null;
+  cta_url: string | null;
+  cta2_label: string | null;
+  cta2_url: string | null;
+  sort_order: number;
+  active: boolean;
+};
+
+export const HOME_SLIDE_COLS =
+  "id, image_url, image_mobile_url, title, subtitle, cta_label, cta_url, cta2_label, cta2_url, sort_order, active";
+
+/** Slides ativos do carrossel, na ordem definida no admin. Leitura pública. */
+export function useHomeSlides(): UseQueryResult<HomeSlide[]> {
+  return useQuery({
+    queryKey: ["home-slides"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("rv_home_slides")
+        .select(HOME_SLIDE_COLS)
+        .eq("active", true)
+        .order("sort_order", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as HomeSlide[];
     },
   });
 }
