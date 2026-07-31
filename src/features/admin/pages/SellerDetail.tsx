@@ -20,7 +20,7 @@ import { SELLER_STATUS_ACTIONS } from "../components";
 import { StatusPill } from "@/components/panel";
 import { formatCurrency, formatDate } from "@/lib/format";
 import type { Charge, CommissionStatus, Seller } from "@/lib/database.types";
-import { Alert, Badge, Button, Card, Field, Input, Modal, PageHeader, Spinner } from "@/components/ui-light";
+import { Alert, Badge, Button, Card, Field, Input, Modal, PageHeader, Spinner, StatCard } from "@/components/ui-light";
 import { maskPhone } from "@/lib/masks";
 
 /* ── Histórico de cobranças ─────────────────────────────── */
@@ -147,15 +147,20 @@ function CommissionsCard({ sellerId }: { sellerId: string }) {
 
   return (
     <Card className="p-0">
-      <div className="flex items-center justify-between px-6 pt-5">
+      <div className="px-6 pt-5">
         <h2 className="text-lg font-bold text-slate-900">Comissões de venda</h2>
-        <p className="text-sm text-slate-400">
-          A receber:{" "}
-          <span className="font-semibold text-slate-900">
-            {formatCurrency(pending)}
-          </span>{" "}
-          · Total: {formatCurrency(total)}
-        </p>
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+          <StatCard
+            label="A receber"
+            value={formatCurrency(pending)}
+            hint="Pendentes e atrasadas"
+          />
+          <StatCard
+            label="Total"
+            value={formatCurrency(total)}
+            hint="Todas as comissões geradas"
+          />
+        </div>
       </div>
       {isLoading ? (
         <div className="flex justify-center py-8 text-slate-500">
@@ -166,7 +171,7 @@ function CommissionsCard({ sellerId }: { sellerId: string }) {
           Nenhuma comissão gerada ainda (aparecem quando o vendedor registra vendas).
         </p>
       ) : (
-        <div className="mt-3 overflow-x-auto">
+        <div className="mt-5 overflow-x-auto">
         <table className="w-full min-w-[640px] text-sm">
           <thead className="border-y border-slate-200 text-left text-xs uppercase text-slate-500">
             <tr>

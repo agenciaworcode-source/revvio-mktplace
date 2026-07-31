@@ -300,7 +300,7 @@ function PlanFormModal({
           <h3 className="text-[14px] font-bold text-slate-900">Módulos do painel</h3>
           <p className="mt-0.5 text-[12.5px] text-slate-500">
             Abas liberadas para a loja que assina este plano. O que o vendedor enxerga
-            dentro de cada módulo é o lojista quem define, em Configurações da Loja →
+            dentro de cada módulo é o lojista quem define, em Configurações de Perfil →
             Permissões.
           </p>
           <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">

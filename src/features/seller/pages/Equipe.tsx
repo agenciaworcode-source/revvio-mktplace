@@ -69,7 +69,7 @@ function InviteForm({ lojaId, onClose }: { lojaId?: string; onClose: () => void 
       <p className="rounded-lg bg-slate-50 px-3.5 py-3 text-[12.5px] leading-snug text-slate-500">
         O que este vendedor poderá ver e fazer segue as permissões da loja, em{" "}
         <strong className="font-semibold text-slate-700">
-          Configurações da Loja → Permissões da equipe
+          Configurações de Perfil → Permissões da equipe
         </strong>
         . Elas valem para todos os vendedores.
       </p>

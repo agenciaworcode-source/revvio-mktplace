@@ -43,7 +43,7 @@ export function PainelLayout() {
       ? [
           {
             to: "/painel/perfil",
-            label: "Configurações da Loja",
+            label: "Configurações de Perfil",
             icon: "settings",
           } as PanelNavItem,
         ]

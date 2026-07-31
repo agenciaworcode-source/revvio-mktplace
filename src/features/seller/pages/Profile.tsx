@@ -203,7 +203,7 @@ export function Profile() {
   return (
     <div>
       <PageHeader
-        title="Configurações da Loja"
+        title="Configurações de Perfil"
         subtitle="Dados da sua página pública e permissões da equipe."
         action={
           <a href={`/loja/${seller.slug}`} target="_blank" rel="noreferrer">

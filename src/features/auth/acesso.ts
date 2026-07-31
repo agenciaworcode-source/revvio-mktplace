@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
  *
  * Duas camadas independentes:
  *  - `perms`   — o que o garagista liberou para os vendedores da loja
- *                (Configurações da Loja → aba Permissões).
+ *                (Configurações de Perfil → aba Permissões).
  *  - `modulos` — o que o plano de assinatura da loja libera. Vale para a loja
  *                inteira, garagista incluído, e é definido pelo superadmin
  *                em Controle de Planos.

@@ -706,7 +706,7 @@ export function Vehicles() {
   const { lojaId, personId, seller } = useAuth();
   const { data: acesso } = useAcesso(!!seller);
   // Cadastrar/editar/excluir são permissões separadas: o garagista pode
-  // liberar cada uma para os vendedores em Configurações da Loja. A RLS
+  // liberar cada uma para os vendedores em Configurações de Perfil. A RLS
   // (0050) aplica as mesmas regras no banco.
   const podeCriar = podeAcessar(acesso, "add_veiculo");
   const podeEditar = podeAcessar(acesso, "editar_veiculo");
