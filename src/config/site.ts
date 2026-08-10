@@ -32,6 +32,7 @@ export const SITEMAP_ROUTES: {
   { path: "/", changefreq: "daily", priority: "1.0" },
   { path: "/comprar", changefreq: "daily", priority: "0.9" },
   { path: "/vender", changefreq: "weekly", priority: "0.8" },
+  { path: "/tabela-fipe", changefreq: "monthly", priority: "0.8" },
   { path: "/politica-de-privacidade", changefreq: "yearly", priority: "0.3" },
   { path: "/termos-e-condicoes", changefreq: "yearly", priority: "0.3" },
 ];

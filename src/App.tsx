@@ -57,6 +57,24 @@ const Home = lazy(() =>
 const Vender = lazy(() =>
   import("@/features/public/pages/Vender").then((m) => ({ default: m.Vender }))
 );
+const TabelaFipe = lazy(() =>
+  import("@/features/public/pages/TabelaFipe").then((m) => ({ default: m.TabelaFipe }))
+);
+const TabelaFipeMarca = lazy(() =>
+  import("@/features/public/pages/TabelaFipeMarca").then((m) => ({
+    default: m.TabelaFipeMarca,
+  }))
+);
+const TabelaFipeModelo = lazy(() =>
+  import("@/features/public/pages/TabelaFipeModelo").then((m) => ({
+    default: m.TabelaFipeModelo,
+  }))
+);
+const TabelaFipeValor = lazy(() =>
+  import("@/features/public/pages/TabelaFipeValor").then((m) => ({
+    default: m.TabelaFipeValor,
+  }))
+);
 const PoliticaPrivacidade = lazy(() =>
   import("@/features/public/pages/PoliticaPrivacidade").then((m) => ({
     default: m.PoliticaPrivacidade,
@@ -218,6 +236,10 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/comprar" element={<Marketplace />} />
         <Route path="/vender" element={<Vender />} />
+        <Route path="/tabela-fipe" element={<TabelaFipe />} />
+        <Route path="/tabela-fipe/:marca" element={<TabelaFipeMarca />} />
+        <Route path="/tabela-fipe/:marca/:modelo" element={<TabelaFipeModelo />} />
+        <Route path="/tabela-fipe/:marca/:modelo/:ano" element={<TabelaFipeValor />} />
         <Route path="/politica-de-privacidade" element={<PoliticaPrivacidade />} />
         <Route path="/termos-e-condicoes" element={<TermosCondicoes />} />
         <Route path="/veiculo/:id" element={<VehicleDetails />} />

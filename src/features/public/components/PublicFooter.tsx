@@ -31,7 +31,7 @@ const COLS: { title: string; links: { label: string; to: string; ext?: boolean }
   {
     title: "Links úteis",
     links: [
-      { label: "Tabela FIPE", to: "https://veiculos.fipe.org.br", ext: true },
+      { label: "Tabela FIPE", to: "/tabela-fipe" },
       { label: "DETRAN", to: "https://www.gov.br/pt-br/servicos-estaduais", ext: true },
       { label: "CNH Digital", to: "https://www.gov.br/pt-br/temas/carteira-de-motorista", ext: true },
     ],
