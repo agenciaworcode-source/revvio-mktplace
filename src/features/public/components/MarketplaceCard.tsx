@@ -6,7 +6,8 @@ import { Icon } from "./icons";
 /** Card de veículo do marketplace (tema claro, padrão do protótipo). */
 export function MarketplaceCard({ vehicle }: { vehicle: PublicVehicle }) {
   const photoCount = vehicle.images?.length ?? 0;
-  const fipe = vehicle.fipe_price ?? 0;
+  // O lojista pode esconder a FIPE do anúncio: sem ela, não há selo nem "DE".
+  const fipe = vehicle.hide_fipe ? 0 : vehicle.fipe_price ?? 0;
   const off = fipe > vehicle.price ? Math.round((1 - vehicle.price / fipe) * 100) : 0;
 
   return (

@@ -44,7 +44,7 @@ export function buildWhatsappCopy(v: Vehicle, sellerName?: string | null): strin
 
   // ── Preço ──
   linhas.push(bar);
-  if (v.fipe_price) linhas.push(`📈 FIPE: ${formatCurrency(v.fipe_price)}`);
+  if (v.fipe_price && !v.hide_fipe) linhas.push(`📈 FIPE: ${formatCurrency(v.fipe_price)}`);
   linhas.push(`📉 POR: ${formatCurrency(v.price)}`);
   linhas.push("🔥🔥🔥🔥🔥🔥🔥🔥🔥", "🚨 CHAMA NA PROPOSTA 🚨", bar);
 

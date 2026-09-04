@@ -113,6 +113,7 @@ export type VehicleInput = {
   year: number | null;
   price: number;
   fipe_price: number | null;
+  hide_fipe: boolean;
   mileage: number | null;
   color: string | null;
   fuel: FuelType | null;

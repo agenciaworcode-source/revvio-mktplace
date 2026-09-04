@@ -231,7 +231,7 @@ function LeadForm({ v }: { v: PublicVehicle }) {
 
   return (
     <div className="rounded-2xl border border-hair bg-white p-6 shadow-[0_10px_30px_theme(colors.shade/0.06)]">
-      {v.fipe_price && v.fipe_price > v.price && (
+      {!v.hide_fipe && v.fipe_price && v.fipe_price > v.price && (
         <p className="text-sm text-slate-400 line-through">FIPE {formatCurrency(v.fipe_price)}</p>
       )}
       <p className="text-[34px] font-extrabold leading-none tracking-[-1px] text-slate-950">

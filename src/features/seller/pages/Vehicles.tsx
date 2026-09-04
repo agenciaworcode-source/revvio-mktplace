@@ -64,6 +64,7 @@ const schema = z.object({
   ),
   price: z.coerce.number().gt(0, "Informe o preço"),
   fipe_price: z.preprocess(emptyToNull, z.coerce.number().min(0).nullable()),
+  hide_fipe: z.boolean().default(false),
   mileage: z.preprocess(emptyToNull, z.coerce.number().int().min(0).nullable()),
   color: z.string().optional(),
   fuel: z.preprocess(emptyToNull, z.enum(FUELS).nullable()),
@@ -100,6 +101,7 @@ function toDefaults(v?: VehicleWithOwner, fallbackVendedorId?: string): FormValu
     year: v?.year ?? null,
     price: v?.price ?? (0 as number),
     fipe_price: v?.fipe_price ?? null,
+    hide_fipe: v?.hide_fipe ?? false,
     mileage: v?.mileage ?? null,
     color: v?.color ?? "",
     fuel: v?.fuel ?? null,
@@ -365,6 +367,7 @@ export function VehicleForm({
       year: values.year,
       price: values.price,
       fipe_price: values.fipe_price,
+      hide_fipe: values.hide_fipe,
       mileage: values.mileage,
       color: values.color || null,
       fuel: values.fuel,
@@ -484,6 +487,20 @@ export function VehicleForm({
               />
             )}
           />
+          {/* O valor continua gravado; o anúncio público é que deixa de exibi-lo. */}
+          <label className="mt-1 flex items-start gap-2 text-sm text-slate-700">
+            <input
+              type="checkbox"
+              className="mt-0.5 h-4 w-4 accent-brand"
+              {...register("hide_fipe")}
+            />
+            <span>
+              Não exibir a FIPE no anúncio
+              <span className="block text-xs text-slate-400">
+                Esconde o valor da FIPE e o selo de desconto na vitrine pública.
+              </span>
+            </span>
+          </label>
         </Field>
         <Field label="Status" error={errors.status?.message}>
           <Select {...register("status")}>
@@ -1023,8 +1040,12 @@ export function Vehicles() {
                         <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                           <span className="font-bold text-brand">{formatCurrency(v.price)}</span>
                           {v.fipe_price && (
-                            <span className="text-xs text-slate-400 line-through">
+                            <span
+                              className="text-xs text-slate-400 line-through"
+                              title={v.hide_fipe ? "FIPE oculta no anúncio público" : undefined}
+                            >
                               {formatCurrency(v.fipe_price)}
+                              {v.hide_fipe && " (oculta)"}
                             </span>
                           )}
                           <span
@@ -1120,7 +1141,13 @@ export function Vehicles() {
                       </td>
                       <td className="px-5 py-3 text-right text-slate-400">
                         {v.fipe_price ? (
-                          <span className="line-through">{formatCurrency(v.fipe_price)}</span>
+                          <span
+                            className="line-through"
+                            title={v.hide_fipe ? "FIPE oculta no anúncio público" : undefined}
+                          >
+                            {formatCurrency(v.fipe_price)}
+                            {v.hide_fipe && " (oculta)"}
+                          </span>
                         ) : (
                           "—"
                         )}

@@ -99,7 +99,8 @@ export function Marketplace() {
       if (term && !`${v.make} ${v.model} ${v.color ?? ""}`.toLowerCase().includes(term))
         return false;
       if (brand !== "all" && v.make !== brand) return false;
-      if (belowFipe && !(v.fipe_price && v.price < v.fipe_price)) return false;
+      // Anúncio com a FIPE oculta não entra no filtro — ela não é mostrada nele.
+      if (belowFipe && !(!v.hide_fipe && v.fipe_price && v.price < v.fipe_price)) return false;
       if (special && !v.featured) return false;
       if (fuel !== "all" && v.fuel !== fuel) return false;
       if (transmission !== "all" && v.transmission !== transmission) return false;

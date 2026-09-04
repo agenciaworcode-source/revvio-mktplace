@@ -861,6 +861,7 @@ export type Database = {
           fipe_price: number | null
           fuel: Database["public"]["Enums"]["fuel_type"] | null
           garantia: string | null
+          hide_fipe: boolean
           id: number
           images: string[]
           ipva: string | null
@@ -895,6 +896,7 @@ export type Database = {
           fipe_price?: number | null
           fuel?: Database["public"]["Enums"]["fuel_type"] | null
           garantia?: string | null
+          hide_fipe?: boolean
           id?: never
           images?: string[]
           ipva?: string | null
@@ -929,6 +931,7 @@ export type Database = {
           fipe_price?: number | null
           fuel?: Database["public"]["Enums"]["fuel_type"] | null
           garantia?: string | null
+          hide_fipe?: boolean
           id?: never
           images?: string[]
           ipva?: string | null
