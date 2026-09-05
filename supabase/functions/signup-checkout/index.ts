@@ -6,6 +6,9 @@ import {
   getSubscriptionFirstPayment,
 } from "../_shared/asaas.ts";
 import { lookupCnpj, validateCnpj } from "../_shared/cnpj.ts";
+import { createAccountFromPending } from "../_shared/onboarding.ts";
+import { renderTemplate } from "../_shared/email-templates.ts";
+import { sendEmail } from "../_shared/resend.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -48,10 +51,25 @@ Deno.serve(async (req) => {
     // plano (tier)
     const { data: tier, error: pErr } = await db
       .from("rv_pricing_plans")
-      .select("key, name, price_monthly, price_annual")
+      .select("key, name, price_monthly, price_annual, is_free")
       .eq("key", plan)
       .single();
     if (pErr || !tier) return json({ error: "Plano inválido." }, 400);
+
+    const isFree = tier.is_free === true;
+    const value =
+      cycle === "annual" ? Number(tier.price_annual) * 12 : Number(tier.price_monthly);
+    // Plano pago sem preço quebraria o checkout: o ASAAS recusa a assinatura com
+    // "O parâmetro value deve ser informado", e o garagista lia isso como se
+    // faltasse algo no formulário dele. O CHECK do banco impede chegar aqui,
+    // mas a barreira fica: erro de configuração não vira erro de cobrança.
+    if (!isFree && (!Number.isFinite(value) || value <= 0)) {
+      console.error(`Plano "${plan}" sem preço válido (${cycle}): ${value}`);
+      return json(
+        { error: "Este plano está sem preço configurado. Escolha outro plano ou fale com o suporte." },
+        409
+      );
+    }
 
     // Gate definitivo: re-valida CNPJ/CNAE no servidor (o front pode ser burlado).
     const cnpjResult = await lookupCnpj(cnpj);
@@ -71,6 +89,53 @@ Deno.serve(async (req) => {
         400
       );
 
+    // ── Plano gratuito ──────────────────────────────────────────
+    // Sem cobrança não há webhook para disparar a criação da conta, então o
+    // cadastro libera o acesso aqui mesmo. O pending é gravado do mesmo jeito
+    // (sem ids do ASAAS) para reaproveitar a criação de conta do fluxo pago.
+    if (isFree) {
+      const { error: upErr } = await db.from("rv_pending_signups").upsert(
+        {
+          name,
+          email,
+          phone,
+          cpf_cnpj: cnpj,
+          city,
+          pricing_plan_key: plan,
+          plan_cycle: cycle,
+          asaas_customer_id: null,
+          asaas_subscription_id: null,
+          asaas_payment_id: null,
+          invoice_url: null,
+        },
+        { onConflict: "email" }
+      );
+      if (upErr) return json({ error: upErr.message }, 500);
+
+      const acc = await createAccountFromPending(db, { email });
+      if (!acc) return json({ error: "Não foi possível criar a conta. Tente novamente." }, 500);
+
+      // O link de senha vai só por e-mail, nunca na resposta: quem preencheu o
+      // formulário não é necessariamente o dono do e-mail.
+      const rendered = renderTemplate("garagista_welcome", {
+        name: acc.welcome.name,
+        set_password_url: acc.welcome.setPasswordUrl ?? `${APP_URL}/login`,
+      });
+      if (rendered) {
+        try {
+          await sendEmail({
+            to: acc.welcome.email,
+            subject: rendered.subject,
+            html: rendered.html,
+          });
+        } catch (e) {
+          console.error("Falha ao enviar boas-vindas do plano gratuito:", e);
+        }
+      }
+
+      return json({ free: true, email: acc.welcome.email });
+    }
+
     // reusa um pending anterior (mesmo e-mail) para não criar customer duplicado
     const { data: prev } = await db
       .from("rv_pending_signups")
@@ -89,8 +154,6 @@ Deno.serve(async (req) => {
       customerId = customer.id;
     }
 
-    const value =
-      cycle === "annual" ? Number(tier.price_annual) * 12 : Number(tier.price_monthly);
     const subInput = {
       customer: customerId!,
       billingType: "UNDEFINED",

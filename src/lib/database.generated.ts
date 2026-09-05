@@ -488,6 +488,7 @@ export type Database = {
           equipe_enabled: boolean
           financeiro_enabled: boolean
           highlights: string[]
+          is_free: boolean
           id: string
           key: string
           leads_enabled: boolean
@@ -511,6 +512,7 @@ export type Database = {
           equipe_enabled?: boolean
           financeiro_enabled?: boolean
           highlights?: string[]
+          is_free?: boolean
           id?: string
           key: string
           leads_enabled?: boolean
@@ -534,6 +536,7 @@ export type Database = {
           equipe_enabled?: boolean
           financeiro_enabled?: boolean
           highlights?: string[]
+          is_free?: boolean
           id?: string
           key?: string
           leads_enabled?: boolean

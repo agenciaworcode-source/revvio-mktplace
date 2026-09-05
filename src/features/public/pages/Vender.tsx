@@ -74,20 +74,31 @@ function PlanCard({
         {p.name}
       </div>
       <div className="mt-1 min-h-[38px] text-[13.5px] text-slate-400">{p.tagline}</div>
+      {/* Plano gratuito não tem preço nem ciclo de cobrança para anunciar. */}
       <div className="mt-1.5 flex items-baseline gap-1.5">
-        <span className="text-base font-bold text-slate-950">R$</span>
-        <span className="text-[44px] font-extrabold leading-none tracking-[-2px] text-slate-950">
-          {price}
-        </span>
-        <span className="text-sm text-slate-400">/mês</span>
+        {p.is_free ? (
+          <span className="text-[44px] font-extrabold leading-none tracking-[-2px] text-slate-950">
+            Grátis
+          </span>
+        ) : (
+          <>
+            <span className="text-base font-bold text-slate-950">R$</span>
+            <span className="text-[44px] font-extrabold leading-none tracking-[-2px] text-slate-950">
+              {price}
+            </span>
+            <span className="text-sm text-slate-400">/mês</span>
+          </>
+        )}
       </div>
       <div
         className="mt-1.5 min-h-[18px] text-[12.5px]"
         style={{ color: annual ? brand.dark : SLATE_400, fontWeight: annual ? 700 : 400 }}
       >
-        {annual
-          ? `Cobrado anualmente · economize R$ ${(p.price_monthly - p.price_annual) * 12}/ano`
-          : "Cobrado mensalmente"}
+        {p.is_free
+          ? "Sem cobrança · acesso liberado na hora"
+          : annual
+            ? `Cobrado anualmente · economize R$ ${(p.price_monthly - p.price_annual) * 12}/ano`
+            : "Cobrado mensalmente"}
       </div>
       <button
         onClick={onChoose}
@@ -118,7 +129,9 @@ function buildCompareRows(plans: PricingPlan[], annual: boolean) {
   return [
     {
       label: annual ? "Preço (anual)" : "Preço (mensal)",
-      values: plans.map((p) => `R$ ${annual ? p.price_annual : p.price_monthly}/mês`),
+      values: plans.map((p) =>
+        p.is_free ? "Grátis" : `R$ ${annual ? p.price_annual : p.price_monthly}/mês`
+      ),
     },
     {
       label: "Limite de veículos",
@@ -458,7 +471,7 @@ export function Vender() {
                       {p.name}
                     </div>
                     <div className="text-[12.5px] font-semibold text-slate-400">
-                      R$ {annual ? p.price_annual : p.price_monthly}/mês
+                      {p.is_free ? "Grátis" : `R$ ${annual ? p.price_annual : p.price_monthly}/mês`}
                     </div>
                   </th>
                 ))}

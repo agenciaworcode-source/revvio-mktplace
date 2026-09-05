@@ -40,6 +40,7 @@ type FormState = {
   tagline: string;
   price_monthly: string;
   price_annual: string;
+  is_free: boolean;
   color: string;
   popular: boolean;
   cta_label: string;
@@ -69,6 +70,7 @@ const EMPTY: FormState = {
   tagline: "",
   price_monthly: "",
   price_annual: "",
+  is_free: false,
   color: brand.DEFAULT,
   popular: false,
   cta_label: "Escolher plano",
@@ -92,6 +94,7 @@ function toForm(p: AdminPricingPlan): FormState {
     tagline: p.tagline ?? "",
     price_monthly: String(p.price_monthly),
     price_annual: String(p.price_annual),
+    is_free: p.is_free ?? false,
     color: p.color,
     popular: p.popular,
     cta_label: p.cta_label,
@@ -138,6 +141,13 @@ function PlanFormModal({
     const pa = Number(state.price_annual);
     if (Number.isNaN(pm) || Number.isNaN(pa))
       return setError("Preços mensal e anual precisam ser números.");
+    // Plano pago passa pelo ASAAS, que recusa cobrança sem valor: a R$ 0 o erro
+    // só apareceria no fim do checkout, na cara do lojista. Grátis é a flag,
+    // nunca o preço zerado por engano.
+    if (!state.is_free && (pm <= 0 || pa <= 0))
+      return setError(
+        'Plano pago precisa de preço maior que zero. Para liberar sem cobrança, marque "Plano gratuito".'
+      );
 
     save.mutate(
       {
@@ -145,8 +155,9 @@ function PlanFormModal({
         key,
         name,
         tagline: state.tagline.trim() || null,
-        price_monthly: pm,
-        price_annual: pa,
+        price_monthly: state.is_free ? 0 : pm,
+        price_annual: state.is_free ? 0 : pa,
+        is_free: state.is_free,
         color: state.color.trim() || brand.DEFAULT,
         popular: state.popular,
         cta_label: state.cta_label.trim() || "Escolher plano",
@@ -204,11 +215,38 @@ function PlanFormModal({
           <Input value={state.tagline} onChange={(e) => set("tagline", e.target.value)} />
         </Field>
 
+        {/* Gratuidade é decisão explícita: o cadastro nesse plano pula o ASAAS
+            e libera a conta na hora. Ligar/desligar a oferta é o "Ativo". */}
+        <label className="flex items-start gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+          <input
+            type="checkbox"
+            className="mt-0.5 h-4 w-4 accent-brand"
+            checked={state.is_free}
+            onChange={(e) => {
+              const free = e.target.checked;
+              setState((s) => ({
+                ...s,
+                is_free: free,
+                price_monthly: free ? "0" : s.price_monthly,
+                price_annual: free ? "0" : s.price_annual,
+              }));
+            }}
+          />
+          <span>
+            <span className="font-medium text-slate-800">Plano gratuito</span>
+            <span className="block text-xs text-slate-500">
+              Sem cobrança: a conta do garagista é criada e liberada assim que ele
+              termina o cadastro, sem passar pelo pagamento.
+            </span>
+          </span>
+        </label>
+
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Preço mensal (R$)">
             <Input
               inputMode="numeric"
               placeholder="R$ 0,00"
+              disabled={state.is_free}
               value={state.price_monthly ? formatCurrency(Number(state.price_monthly)) : ""}
               onChange={(e) => set("price_monthly", digitsToValue(e.target.value))}
             />
@@ -217,6 +255,7 @@ function PlanFormModal({
             <Input
               inputMode="numeric"
               placeholder="R$ 0,00"
+              disabled={state.is_free}
               value={state.price_annual ? formatCurrency(Number(state.price_annual)) : ""}
               onChange={(e) => set("price_annual", digitsToValue(e.target.value))}
             />
@@ -490,9 +529,9 @@ export function Plans() {
                 </span>
                 <div className="my-1 flex items-baseline gap-1">
                   <span className="text-[32px] font-extrabold tracking-[-1px] text-slate-950">
-                    {brlShort(p.price_monthly)}
+                    {p.is_free ? "Grátis" : brlShort(p.price_monthly)}
                   </span>
-                  <span className="text-[13px] text-slate-400">/mês</span>
+                  {!p.is_free && <span className="text-[13px] text-slate-400">/mês</span>}
                 </div>
                 <div className="mb-4 text-[13px] text-slate-500">
                   {p.vehicle_limit == null ? "Ilimitado" : `${p.vehicle_limit} veículos`} ·{" "}

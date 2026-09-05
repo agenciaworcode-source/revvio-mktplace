@@ -518,6 +518,7 @@ export type PricingPlanInput = {
   tagline: string | null;
   price_monthly: number;
   price_annual: number;
+  is_free: boolean;
   color: string;
   popular: boolean;
   cta_label: string;

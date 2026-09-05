@@ -51,6 +51,9 @@ export function CadastroVendedor() {
   const { data: plans = [] } = usePricingPlans();
   const selectedPlan = plans.find((p) => p.key === planKey) ?? null;
   const [formError, setFormError] = useState<string | null>(null);
+  // Plano gratuito não passa pelo pagamento: a conta já sai criada e o que
+  // resta é o e-mail com o link para definir a senha.
+  const [freeDone, setFreeDone] = useState<string | null>(null);
   const [cnpjStatus, setCnpjStatus] = useState<
     "idle" | "loading" | "valid" | "invalid"
   >("idle");
@@ -125,6 +128,10 @@ export function CadastroVendedor() {
       setFormError(data.error);
       return;
     }
+    if (data?.free) {
+      setFreeDone((data.email as string) ?? values.email);
+      return;
+    }
     if (data?.invoiceUrl) {
       window.location.href = data.invoiceUrl as string;
       return;
@@ -132,10 +139,36 @@ export function CadastroVendedor() {
     setFormError("Não foi possível iniciar o pagamento. Tente novamente.");
   }
 
+  if (freeDone)
+    return (
+      <AuthSplitLayout
+        title="Conta criada!"
+        subtitle="Sua mini-loja já está ativa. Falta só definir a senha."
+        footer={
+          <>
+            Já definiu a senha?{" "}
+            <Link to="/login" className="font-semibold text-brand hover:underline">
+              Entrar
+            </Link>
+          </>
+        }
+      >
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-4 text-sm text-emerald-800">
+          Enviamos um e-mail para <strong>{freeDone}</strong> com o link para você criar
+          sua senha e entrar no painel. Se não aparecer em alguns minutos, confira a caixa
+          de spam.
+        </div>
+      </AuthSplitLayout>
+    );
+
   return (
     <AuthSplitLayout
       title="Cadastro de Garagista"
-      subtitle="Crie sua mini-loja. O acesso é liberado após a confirmação do pagamento."
+      subtitle={
+        selectedPlan?.is_free
+          ? "Crie sua mini-loja. O acesso é liberado assim que você terminar o cadastro."
+          : "Crie sua mini-loja. O acesso é liberado após a confirmação do pagamento."
+      }
       footer={
         <>
           Já tem conta?{" "}
@@ -154,15 +187,24 @@ export function CadastroVendedor() {
 
         {selectedPlan && (
           <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-            Plano <strong>{selectedPlan.name}</strong> —{" "}
-            <strong>
-              R${" "}
-              {cycle === "annual"
-                ? selectedPlan.price_annual * 12
-                : selectedPlan.price_monthly}
-            </strong>{" "}
-            {cycle === "annual" ? "/ano" : "/mês"}. Após criar a conta você vai para o
-            pagamento.
+            {selectedPlan.is_free ? (
+              <>
+                Plano <strong>{selectedPlan.name}</strong> — <strong>grátis</strong>. Sem
+                cobrança: a conta é liberada assim que você terminar o cadastro.
+              </>
+            ) : (
+              <>
+                Plano <strong>{selectedPlan.name}</strong> —{" "}
+                <strong>
+                  R${" "}
+                  {cycle === "annual"
+                    ? selectedPlan.price_annual * 12
+                    : selectedPlan.price_monthly}
+                </strong>{" "}
+                {cycle === "annual" ? "/ano" : "/mês"}. Após criar a conta você vai para o
+                pagamento.
+              </>
+            )}
           </div>
         )}
 
@@ -247,7 +289,13 @@ export function CadastroVendedor() {
           disabled={isSubmitting || cnpjStatus !== "valid"}
           className="mt-1 inline-flex items-center justify-center rounded-xl bg-brand py-3 text-sm font-bold text-white transition-colors hover:bg-brand-dark disabled:opacity-50"
         >
-          {isSubmitting ? "Redirecionando ao pagamento…" : "Criar conta e pagar"}
+          {selectedPlan?.is_free
+            ? isSubmitting
+              ? "Criando sua conta…"
+              : "Criar conta grátis"
+            : isSubmitting
+              ? "Redirecionando ao pagamento…"
+              : "Criar conta e pagar"}
         </button>
       </form>
     </AuthSplitLayout>

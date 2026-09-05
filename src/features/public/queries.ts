@@ -124,6 +124,8 @@ export type PricingPlan = {
   tagline: string | null;
   price_monthly: number;
   price_annual: number;
+  /** Plano liberado sem cobrança: o cadastro não passa pelo ASAAS. */
+  is_free: boolean;
   color: string;
   popular: boolean;
   cta_label: string;
@@ -134,7 +136,7 @@ export type PricingPlan = {
 };
 
 const PRICING_COLS =
-  "id, key, name, tagline, price_monthly, price_annual, color, popular, cta_label, highlights, vehicle_limit, trial_days, sort_order";
+  "id, key, name, tagline, price_monthly, price_annual, is_free, color, popular, cta_label, highlights, vehicle_limit, trial_days, sort_order";
 
 /**
  * Catálogo público de planos da página Vender. O RLS `pricing_public_read`
