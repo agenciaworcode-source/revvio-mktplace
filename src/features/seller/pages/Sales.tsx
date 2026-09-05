@@ -362,59 +362,121 @@ export function Sales() {
           action={<Button onClick={() => setOpen(true)}>+ Registrar venda</Button>}
         />
       ) : (
-        <Card className="overflow-x-auto p-0">
-          <table className="w-full min-w-[840px] text-sm">
-            <thead className="border-b border-slate-200 text-left text-xs uppercase text-slate-500">
-              <tr>
-                <th className="px-5 py-3 font-medium">Veículo</th>
-                <th className="px-5 py-3 font-medium">Comprador</th>
-                <th className="px-5 py-3 font-medium">Pagamento</th>
-                <th className="px-5 py-3 font-medium">Venda realizada</th>
-                <th className="px-5 py-3 font-medium">Data</th>
-                <th className="px-5 py-3 text-right font-medium">Valor</th>
-                {manager && <th className="px-5 py-3 text-right font-medium">Ações</th>}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {data.map((s) => (
-                <tr key={s.id}>
-                  <td className="px-5 py-3 font-medium text-slate-900">
-                    {s.vehicle
-                      ? `${s.vehicle.make} ${s.vehicle.model}`
-                      : "Veículo removido"}
-                  </td>
-                  <td className="px-5 py-3 text-slate-600">
-                    {s.buyer_name}
-                    {s.buyer_phone && (
-                      <span className="block text-xs text-slate-500">{s.buyer_phone}</span>
-                    )}
-                  </td>
-                  <td className="px-5 py-3">
-                    <Badge tone="sky">
-                      {paymentLabels[s.payment_method] ?? s.payment_method}
-                    </Badge>
-                  </td>
-                  <td className="px-5 py-3 text-slate-600">{s.sale_reason ?? "—"}</td>
-                  <td className="px-5 py-3 text-slate-600">{formatDate(s.sale_date)}</td>
-                  <td className="px-5 py-3 text-right font-semibold text-slate-900">
+        <>
+          {/* Celular/tablet: a tabela não cabe, então cada venda vira um card
+              compacto. Em desktop (`lg`) segue a tabela normal. */}
+          <div className="flex flex-col gap-3 lg:hidden">
+            {data.map((s) => (
+              <Card key={s.id} className="p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold text-slate-900">
+                      {s.vehicle
+                        ? `${s.vehicle.make} ${s.vehicle.model}`
+                        : "Veículo removido"}
+                    </p>
+                    <p className="text-xs text-slate-500">{formatDate(s.sale_date)}</p>
+                  </div>
+                  <span className="shrink-0 text-right font-bold text-slate-900">
                     {formatCurrency(s.sale_price)}
-                  </td>
-                  {manager && (
-                    <td className="px-5 py-3 text-right">
-                      <Button
-                        variant="danger"
-                        className="px-3 py-1.5 text-xs"
-                        onClick={() => setDeleting(s)}
-                      >
-                        Excluir
-                      </Button>
-                    </td>
-                  )}
+                  </span>
+                </div>
+
+                <dl className="mt-3 flex flex-col gap-2 border-t border-slate-100 pt-3 text-sm">
+                  <div className="flex items-start justify-between gap-3">
+                    <dt className="shrink-0 text-xs uppercase text-slate-500">Comprador</dt>
+                    <dd className="min-w-0 text-right text-slate-700">
+                      <span className="block truncate">{s.buyer_name}</span>
+                      {s.buyer_phone && (
+                        <span className="block text-xs text-slate-500">{s.buyer_phone}</span>
+                      )}
+                    </dd>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <dt className="shrink-0 text-xs uppercase text-slate-500">Pagamento</dt>
+                    <dd>
+                      <Badge tone="sky">
+                        {paymentLabels[s.payment_method] ?? s.payment_method}
+                      </Badge>
+                    </dd>
+                  </div>
+                  <div className="flex items-start justify-between gap-3">
+                    <dt className="shrink-0 text-xs uppercase text-slate-500">Venda realizada</dt>
+                    <dd className="min-w-0 break-words text-right text-slate-700">
+                      {s.sale_reason ?? "—"}
+                    </dd>
+                  </div>
+                </dl>
+
+                {manager && (
+                  <div className="mt-3 flex">
+                    <Button
+                      variant="outline"
+                      className="flex-1 py-2 text-red-600 hover:bg-red-50"
+                      onClick={() => setDeleting(s)}
+                    >
+                      Excluir
+                    </Button>
+                  </div>
+                )}
+              </Card>
+            ))}
+          </div>
+
+          <Card className="hidden overflow-x-auto p-0 lg:block">
+            <table className="w-full min-w-[840px] text-sm">
+              <thead className="border-b border-slate-200 text-left text-xs uppercase text-slate-500">
+                <tr>
+                  <th className="px-5 py-3 font-medium">Veículo</th>
+                  <th className="px-5 py-3 font-medium">Comprador</th>
+                  <th className="px-5 py-3 font-medium">Pagamento</th>
+                  <th className="px-5 py-3 font-medium">Venda realizada</th>
+                  <th className="px-5 py-3 font-medium">Data</th>
+                  <th className="px-5 py-3 text-right font-medium">Valor</th>
+                  {manager && <th className="px-5 py-3 text-right font-medium">Ações</th>}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {data.map((s) => (
+                  <tr key={s.id}>
+                    <td className="px-5 py-3 font-medium text-slate-900">
+                      {s.vehicle
+                        ? `${s.vehicle.make} ${s.vehicle.model}`
+                        : "Veículo removido"}
+                    </td>
+                    <td className="px-5 py-3 text-slate-600">
+                      {s.buyer_name}
+                      {s.buyer_phone && (
+                        <span className="block text-xs text-slate-500">{s.buyer_phone}</span>
+                      )}
+                    </td>
+                    <td className="px-5 py-3">
+                      <Badge tone="sky">
+                        {paymentLabels[s.payment_method] ?? s.payment_method}
+                      </Badge>
+                    </td>
+                    <td className="px-5 py-3 text-slate-600">{s.sale_reason ?? "—"}</td>
+                    <td className="px-5 py-3 text-slate-600">{formatDate(s.sale_date)}</td>
+                    <td className="px-5 py-3 text-right font-semibold text-slate-900">
+                      {formatCurrency(s.sale_price)}
+                    </td>
+                    {manager && (
+                      <td className="px-5 py-3 text-right">
+                        <Button
+                          variant="danger"
+                          className="px-3 py-1.5 text-xs"
+                          onClick={() => setDeleting(s)}
+                        >
+                          Excluir
+                        </Button>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Card>
+        </>
       )}
 
       <Modal open={open} onClose={() => setOpen(false)} title="Registrar venda" closeOnBackdrop={false}>
