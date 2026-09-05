@@ -636,6 +636,7 @@ export type Database = {
           banner_url: string | null
           bio: string | null
           city: string | null
+          contract_template: string | null
           commission_rate: number
           cpf_cnpj: string | null
           created_at: string
@@ -671,6 +672,7 @@ export type Database = {
           banner_url?: string | null
           bio?: string | null
           city?: string | null
+          contract_template?: string | null
           commission_rate?: number
           cpf_cnpj?: string | null
           created_at?: string
@@ -699,6 +701,7 @@ export type Database = {
           banner_url?: string | null
           bio?: string | null
           city?: string | null
+          contract_template?: string | null
           commission_rate?: number
           cpf_cnpj?: string | null
           created_at?: string

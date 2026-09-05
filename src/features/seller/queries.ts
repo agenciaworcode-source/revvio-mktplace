@@ -273,6 +273,7 @@ export type ProfileInput = Partial<
     | "avatar_url"
     | "banner_url"
     | "banner_mobile_url"
+    | "contract_template"
   >
 >;
 

@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useUpdateProfile } from "../queries";
+import { MoldeContrato } from "../components/MoldeContrato";
 import { uploadMedia, type MediaBucket } from "@/lib/storage";
 import { ImageCropModal } from "@/components/ImageCropModal";
 import { PermissoesEquipe } from "../components/PermissoesEquipe";
@@ -80,7 +81,7 @@ export function Profile() {
   const [feedback, setFeedback] = useState<
     { type: "success" | "error"; msg: string } | null
   >(null);
-  const [aba, setAba] = useState<"dados" | "permissoes">("dados");
+  const [aba, setAba] = useState<"dados" | "permissoes" | "contrato">("dados");
   const [uploadingField, setUploadingField] = useState<ImageField | null>(null);
   const [cropField, setCropField] = useState<ImageField | null>(null);
   const [cropFile, setCropFile] = useState<File | null>(null);
@@ -217,6 +218,7 @@ export function Profile() {
           [
             ["dados", "Dados da loja"],
             ["permissoes", "Permissões da equipe"],
+            ["contrato", "Molde do contrato"],
           ] as const
         ).map(([id, label]) => (
           <button
@@ -237,6 +239,8 @@ export function Profile() {
 
       {aba === "permissoes" ? (
         <PermissoesEquipe />
+      ) : aba === "contrato" ? (
+        <MoldeContrato />
       ) : (
         <>
       {feedback && (

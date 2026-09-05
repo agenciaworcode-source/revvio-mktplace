@@ -161,6 +161,14 @@ const AdminStores = lazy(() =>
 const AdminAparencia = lazy(() =>
   import("@/features/admin/pages/Aparencia").then((m) => ({ default: m.Aparencia }))
 );
+const SellerContratos = lazy(() =>
+  import("@/features/seller/pages/Contratos").then((m) => ({ default: m.SellerContratos }))
+);
+const SellerContratoEditor = lazy(() =>
+  import("@/features/seller/pages/ContratoEditor").then((m) => ({
+    default: m.SellerContratoEditor,
+  }))
+);
 const AdminContratos = lazy(() =>
   import("@/features/admin/pages/Contratos").then((m) => ({ default: m.Contratos }))
 );
@@ -301,6 +309,31 @@ export default function App() {
               <Permitido perm="gerador_whatsapp" modulo="whatsapp">
                 <SellerWhatsappGenerator />
               </Permitido>
+            }
+          />
+          {/* Contratos são da loja, não do vendedor: só o garagista emite. */}
+          <Route
+            path="contratos"
+            element={
+              <ManagerOnly>
+                <SellerContratos />
+              </ManagerOnly>
+            }
+          />
+          <Route
+            path="contratos/novo"
+            element={
+              <ManagerOnly>
+                <SellerContratoEditor />
+              </ManagerOnly>
+            }
+          />
+          <Route
+            path="contratos/:id"
+            element={
+              <ManagerOnly>
+                <SellerContratoEditor />
+              </ManagerOnly>
             }
           />
           <Route

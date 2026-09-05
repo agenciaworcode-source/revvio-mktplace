@@ -27,6 +27,10 @@ export function PainelLayout() {
       ? [{ to: "/painel/afiliados", label: "Afiliados", icon: "users" } as PanelNavItem]
       : []),
     { to: "/painel/vendas", label: "Vendas", icon: "dollar" },
+    // Contratos não dependem do plano — todo garagista emite os dele.
+    ...(manager
+      ? [{ to: "/painel/contratos", label: "Contratos", icon: "edit" } as PanelNavItem]
+      : []),
     ...(temModulo("financeiro") && pode("ver_financeiro")
       ? [{ to: "/painel/financeiro", label: "Financeiro", icon: "wallet" } as PanelNavItem]
       : []),

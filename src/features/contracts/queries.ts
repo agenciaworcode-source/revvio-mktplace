@@ -1,7 +1,10 @@
 // ============================================================
-// Queries do módulo de contratos (admin-only — RLS garante que
-// somente public.is_admin() lê/escreve rv_contracts e o bucket
-// contract-photos).
+// Queries do módulo de contratos.
+//
+// Dois donos possíveis: o superadmin (seller_id nulo, enxerga tudo) e o
+// garagista (seller_id da loja dele). O RLS já isola um do outro; aqui o
+// sellerId entra para o garagista não pedir ao banco o que não pode ver e
+// para o contrato nascer amarrado à loja certa.
 // ============================================================
 
 import {
@@ -33,6 +36,7 @@ export interface Contract {
   template_content: string;
   full_text_content: string;
   signed_photo_path: string | null;
+  seller_id: string | null;
   created_by: string | null;
   created_at: string;
   updated_at: string;
@@ -40,8 +44,11 @@ export interface Contract {
 
 export type ContractInput = Omit<
   Contract,
-  "id" | "created_by" | "created_at" | "updated_at" | "signed_photo_path"
+  "id" | "seller_id" | "created_by" | "created_at" | "updated_at" | "signed_photo_path"
 >;
+
+/** `null` = contratos da própria Revvio (superadmin); uuid = os da loja. */
+export type ContractOwner = string | null;
 
 export interface ContractFilters {
   from?: string; // yyyy-mm-dd (data de emissão)
@@ -61,16 +68,22 @@ function nextDay(isoDate: string): string {
   return d.toISOString().slice(0, 10);
 }
 
-export function useAdminContracts(
+export function useContracts(
+  owner: ContractOwner,
   filters: ContractFilters
 ): UseQueryResult<Contract[]> {
   return useQuery({
-    queryKey: ["admin-contracts", filters],
+    queryKey: ["contracts", owner, filters],
     placeholderData: keepPreviousData,
     queryFn: async () => {
       let q = contracts()
         .select("*")
         .order("created_at", { ascending: false });
+      // Cada painel enxerga só o que é dele. O admin fica com os contratos da
+      // própria Revvio (seller_id nulo): os das lojas não são receita dela e
+      // sujariam o relatório contábil exportado nesta tela.
+      if (owner) q = q.eq("seller_id", owner);
+      else q = q.is("seller_id", null);
       if (filters.type) q = q.eq("contract_type", filters.type);
       if (filters.from) q = q.gte("created_at", filters.from);
       if (filters.to) q = q.lt("created_at", nextDay(filters.to));
@@ -90,7 +103,7 @@ export function useAdminContracts(
 
 export function useContract(id?: string): UseQueryResult<Contract | null> {
   return useQuery({
-    queryKey: ["admin-contract", id],
+    queryKey: ["contract", id],
     enabled: !!id,
     queryFn: async () => {
       const { data, error } = await contracts()
@@ -104,17 +117,21 @@ export function useContract(id?: string): UseQueryResult<Contract | null> {
 }
 
 function invalidate(qc: ReturnType<typeof useQueryClient>, id?: string) {
-  qc.invalidateQueries({ queryKey: ["admin-contracts"] });
-  if (id) qc.invalidateQueries({ queryKey: ["admin-contract", id] });
+  qc.invalidateQueries({ queryKey: ["contracts"] });
+  if (id) qc.invalidateQueries({ queryKey: ["contract", id] });
 }
 
-export function useCreateContract() {
+export function useCreateContract(owner: ContractOwner) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: ContractInput): Promise<Contract> => {
       const { data: auth } = await supabase.auth.getUser();
       const { data, error } = await contracts()
-        .insert({ ...input, created_by: auth.user?.id ?? null } as never)
+        .insert({
+          ...input,
+          seller_id: owner,
+          created_by: auth.user?.id ?? null,
+        } as never)
         .select()
         .single();
       if (error) throw error;
@@ -155,7 +172,7 @@ export function useDeleteContract() {
 }
 
 /** Sobe a foto capturada pela câmera e grava o path no contrato. */
-export function useUploadContractPhoto() {
+export function useUploadContractPhoto(owner: ContractOwner) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: {
@@ -163,7 +180,10 @@ export function useUploadContractPhoto() {
       blob: Blob;
       previousPath: string | null;
     }) => {
-      const path = `${input.contractId}/${crypto.randomUUID()}.jpg`;
+      // A policy do garagista libera só a pasta da própria loja (primeiro
+      // segmento do path). O admin continua gravando na raiz, como já era.
+      const prefixo = owner ? `${owner}/` : "";
+      const path = `${prefixo}${input.contractId}/${crypto.randomUUID()}.jpg`;
       const { error: upErr } = await supabase.storage
         .from("contract-photos")
         .upload(path, input.blob, { contentType: "image/jpeg", upsert: false });

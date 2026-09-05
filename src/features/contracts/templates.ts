@@ -78,6 +78,23 @@ const BLANK = "____________________";
  * valores monetários são formatados em BRL; [data_atual] vira a data
  * de emissão por extenso.
  */
+/** Tags que o editor de cláusulas substitui — usada na ajuda das telas. */
+export const CONTRACT_TAGS = [
+  "vendedor_name",
+  "vendedor_cpf_cnpj",
+  "vendedor_address",
+  "comprador_name",
+  "comprador_cpf_cnpj",
+  "comprador_address",
+  "vehicle_brand_model",
+  "vehicle_year_model",
+  "vehicle_plate",
+  "vehicle_renavam",
+  "sale_value",
+  "commission_value",
+  "data_atual",
+] as const;
+
 export function interpolate(
   template: string,
   fields: ContractFields,
