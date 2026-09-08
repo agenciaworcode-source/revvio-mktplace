@@ -1,10 +1,11 @@
 // ============================================================
 // Escopo de contratos do garagista.
 //
-// Diferenças para o superadmin: emite só o contrato de compra e venda (a
-// intermediação e a procuração são atos da Revvio, não da loja), enxerga
-// apenas os próprios documentos e timbra a folha com a logo do perfil dele —
-// caindo na marca Revvender quando a loja ainda não subiu uma.
+// Diferenças para o superadmin: emite apenas os modelos que o superadmin
+// liberou para as lojas (por padrão só o de compra e venda — a intermediação
+// e a procuração são atos da Revvio), enxerga apenas os próprios documentos e
+// timbra a folha com a logo do perfil dele — caindo na marca Revvender quando
+// a loja ainda não subiu uma.
 // ============================================================
 
 import { useMemo } from "react";
@@ -17,10 +18,12 @@ import {
   type AutofillSources,
   type ContractScope,
 } from "@/features/contracts/scope";
+import { useContractModels } from "@/features/contracts/models";
 import { useVehicles } from "./queries";
 
 export function useSellerContractScope(): ContractScope {
   const { seller, lojaId } = useAuth();
+  const modelsQ = useContractModels("garagista");
 
   return useMemo(() => {
     // Sem logo própria o contrato sai com a marca da plataforma — melhor um
@@ -29,7 +32,7 @@ export function useSellerContractScope(): ContractScope {
     return {
       basePath: "/painel/contratos",
       sellerId: lojaId,
-      types: ["compra_venda"],
+      models: modelsQ.data ?? [],
       letterhead: temLogo
         ? {
             markUrl: seller!.avatar_url!,
@@ -45,9 +48,9 @@ export function useSellerContractScope(): ContractScope {
           },
       showSellerPicker: false,
       savedTemplate: seller?.contract_template ?? null,
-      subtitle: "Contratos de compra e venda da sua loja",
+      subtitle: "Contratos emitidos pela sua loja",
     };
-  }, [seller, lojaId]);
+  }, [seller, lojaId, modelsQ.data]);
 }
 
 export function useSellerAutofill(): AutofillSources {

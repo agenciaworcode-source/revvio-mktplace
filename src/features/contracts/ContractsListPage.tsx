@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { createPortal, flushSync } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -72,8 +72,14 @@ export function ContractsListPage({ scope }: { scope: ContractScope }) {
   const contractsQ = useContracts(scope.sellerId, filters);
   const deleteMut = useDeleteContract();
   const rows = contractsQ.data ?? [];
-  // Com um tipo só não há o que filtrar — o combo vira ruído na tela.
-  const multiType = scope.types.length > 1;
+  // O filtro é por natureza do documento, não por modelo: dois modelos de
+  // compra e venda geram contratos da mesma espécie. Com uma natureza só não
+  // há o que filtrar — o combo vira ruído na tela.
+  const types = useMemo(
+    () => Array.from(new Set(scope.models.map((m) => m.contractType))),
+    [scope.models]
+  );
+  const multiType = types.length > 1;
 
   /* Imprime direto da lista: monta a folha no <body> (mesmo portal do editor)
      e chama print. O flushSync commita o portal ANTES do print, sem sair do
@@ -99,7 +105,15 @@ export function ContractsListPage({ scope }: { scope: ContractScope }) {
         title="Contratos"
         subtitle={scope.subtitle}
         action={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            {scope.manageModelsPath && (
+              <Button
+                variant="outline"
+                onClick={() => navigate(scope.manageModelsPath!)}
+              >
+                <Icon name="settings" size={17} /> Modelos de contrato
+              </Button>
+            )}
             <Button
               variant="outline"
               onClick={() => exportCsv(rows)}
@@ -136,7 +150,7 @@ export function ContractsListPage({ scope }: { scope: ContractScope }) {
               }
             >
               <option value="">Todos</option>
-              {scope.types.map((t) => (
+              {types.map((t) => (
                 <option key={t} value={t}>
                   {CONTRACT_TYPE_LABEL[t]}
                 </option>

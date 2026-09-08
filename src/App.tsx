@@ -177,6 +177,11 @@ const AdminContratoEditor = lazy(() =>
     default: m.ContratoEditor,
   }))
 );
+const AdminModelosContrato = lazy(() =>
+  import("@/features/admin/pages/ModelosContrato").then((m) => ({
+    default: m.ModelosContrato,
+  }))
+);
 const AffiliateLayout = lazy(() =>
   import("@/features/affiliate/AffiliateLayout").then((m) => ({ default: m.AffiliateLayout }))
 );
@@ -384,6 +389,8 @@ export default function App() {
           )}
           <Route path="mini-lojas" element={<AdminStores />} />
           <Route path="contratos" element={<AdminContratos />} />
+          {/* Catálogo de modelos: precede a rota com :id, que casaria "modelos". */}
+          <Route path="contratos/modelos" element={<AdminModelosContrato />} />
           <Route path="contratos/novo" element={<AdminContratoEditor />} />
           <Route path="contratos/:id" element={<AdminContratoEditor />} />
           <Route path="aparencia" element={<AdminAparencia />} />

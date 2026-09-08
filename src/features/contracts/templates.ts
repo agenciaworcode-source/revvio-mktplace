@@ -1,8 +1,14 @@
 // ============================================================
-// Modelos de texto padrão dos contratos (carga inicial do editor).
+// Tags, tipos e textos de fábrica dos contratos.
 // As tags [campo] são substituídas em tempo real pelos inputs do
 // formulário; o texto final (já interpolado) é o que fica gravado
 // em rv_contracts.full_text_content.
+//
+// ⚠️ Os modelos que o editor oferece NÃO saem mais daqui: o catálogo vivo é
+// a tabela rv_contract_models, mantida pelo superadmin em
+// /dashboard/contratos/modelos (ver features/contracts/models.ts). Os textos
+// abaixo foram a carga inicial dela e ficam só como reserva para quando a
+// consulta ao catálogo falha — editar aqui não muda o que o painel mostra.
 // ============================================================
 
 import { formatCurrency } from "@/lib/format";

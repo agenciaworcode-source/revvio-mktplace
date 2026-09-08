@@ -22,8 +22,6 @@ import {
   useContractPhotoUrl,
 } from "./queries";
 import {
-  CONTRACT_TEMPLATES,
-  CONTRACT_TYPE_OPTIONS,
   EMPTY_FIELDS,
   PARTY_LABELS,
   COMMISSION_RATE,
@@ -32,6 +30,7 @@ import {
   type ContractFields,
   type ContractType,
 } from "./templates";
+import { SLUG_MOLDE_LOJA, type ContractModel } from "./models";
 import { CameraCapture } from "./CameraCapture";
 import { ContractSheet, isSinglePage } from "./ContractSheet";
 import type {
@@ -66,17 +65,25 @@ export function ContractEditorPage({
   const updateMut = useUpdateContract();
   const uploadMut = useUploadContractPhoto(scope.sellerId);
 
-  // Escopo com um tipo só (o garagista, que emite apenas compra e venda) não
-  // mostra o seletor de documento nem o aviso de troca de modelo.
-  const multiType = scope.types.length > 1;
-  const defaultType = scope.types[0];
-  // Molde salvo da loja tem precedência sobre o modelo padrão do sistema.
-  const baseTemplate = (t: ContractType) =>
-    (scope.savedTemplate?.trim() ? scope.savedTemplate : CONTRACT_TEMPLATES[t]) as string;
+  // Catálogo que o superadmin publicou para este painel. Com um modelo só (o
+  // caso comum do garagista) o seletor vira ruído e some da tela.
+  const models = scope.models;
+  const multiModel = models.length > 1;
 
-  const [type, setType] = useState<ContractType>(defaultType);
+  // O molde salvo da loja substitui apenas o modelo de compra e venda de
+  // fábrica; modelo novo publicado pelo superadmin abre com o texto dele.
+  const savedTemplate = scope.savedTemplate;
+  const usaMolde = (m: ContractModel | undefined) =>
+    !!savedTemplate?.trim() && m?.slug === SLUG_MOLDE_LOJA;
+  const baseTemplate = (m: ContractModel | undefined) =>
+    usaMolde(m) ? (savedTemplate as string) : (m?.body ?? "");
+
+  const [modelId, setModelId] = useState(() => models[0]?.id ?? "");
+  const [type, setType] = useState<ContractType>(
+    () => models[0]?.contractType ?? "compra_venda"
+  );
   const [fields, setFields] = useState<ContractFields>(EMPTY_FIELDS);
-  const [template, setTemplate] = useState(() => baseTemplate(defaultType));
+  const [template, setTemplate] = useState(() => baseTemplate(models[0]));
   const [templateDirty, setTemplateDirty] = useState(false);
   const [commissionTouched, setCommissionTouched] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -114,14 +121,28 @@ export function ContractEditorPage({
     setCommissionTouched(true);
   }, [contractQ.data]);
 
-  // O molde da loja vem do perfil, que pode chegar depois desta tela montar —
-  // aí o `useState` inicial já teria fixado o modelo padrão. Enquanto for
-  // contrato novo e ninguém tiver tocado nas cláusulas, o molde ainda entra.
-  const savedTemplate = scope.savedTemplate;
+  // Catálogo e molde da loja vêm de query e podem chegar depois desta tela
+  // montar — aí o `useState` inicial já teria fixado um texto vazio. Enquanto
+  // for contrato novo e ninguém tiver tocado nas cláusulas, o modelo escolhido
+  // (ou o primeiro do catálogo) ainda entra como carga inicial.
   useEffect(() => {
-    if (!isNew || templateDirty || !savedTemplate?.trim()) return;
-    setTemplate(savedTemplate);
-  }, [isNew, templateDirty, savedTemplate]);
+    if (!isNew || templateDirty) return;
+    const m = models.find((x) => x.id === modelId) ?? models[0];
+    if (!m) return;
+    setModelId(m.id);
+    setType(m.contractType);
+    setTemplate(baseTemplate(m));
+  }, [isNew, templateDirty, models, modelId, savedTemplate]);
+
+  // Contrato já emitido guarda a natureza do documento, não o modelo. Reencontra
+  // o equivalente só para o seletor não abrir vazio — o texto que vale continua
+  // sendo o que foi gravado.
+  useEffect(() => {
+    const c = contractQ.data;
+    if (isNew || !c || modelId) return;
+    const m = models.find((x) => x.contractType === c.contract_type);
+    if (m) setModelId(m.id);
+  }, [isNew, contractQ.data, models, modelId]);
 
   const photoUrlQ = useContractPhotoUrl(contractQ.data?.signed_photo_path);
 
@@ -196,16 +217,19 @@ export function ContractEditorPage({
     }
   }
 
-  function changeType(next: ContractType) {
+  function changeModel(id: string) {
+    const m = models.find((x) => x.id === id);
+    if (!m) return;
     if (
       templateDirty &&
       !window.confirm(
-        "Trocar o tipo de documento recarrega o modelo padrão e descarta as edições feitas nas cláusulas. Continuar?"
+        "Trocar o modelo do documento recarrega o texto padrão e descarta as edições feitas nas cláusulas. Continuar?"
       )
     )
       return;
-    setType(next);
-    setTemplate(baseTemplate(next));
+    setModelId(m.id);
+    setType(m.contractType);
+    setTemplate(baseTemplate(m));
     setTemplateDirty(false);
   }
 
@@ -276,6 +300,7 @@ export function ContractEditorPage({
 
   const saving = createMut.isPending || updateMut.isPending;
   const { vehicles, sellers, leads } = autofill;
+  const currentModel = models.find((m) => m.id === modelId);
 
   return (
     <div>
@@ -305,6 +330,15 @@ export function ContractEditorPage({
       {savedMsg && (
         <div className="mb-4">
           <Alert variant="success">Contrato salvo com sucesso.</Alert>
+        </div>
+      )}
+      {isNew && !models.length && (
+        <div className="mb-4">
+          <Alert variant="warning">
+            Nenhum modelo de contrato disponível para este painel. Peça ao
+            administrador da Revvio para publicar um modelo — enquanto isso, o
+            editor de cláusulas abre em branco.
+          </Alert>
         </div>
       )}
 
@@ -379,19 +413,19 @@ export function ContractEditorPage({
           </Card>
 
           <Card className="flex flex-col gap-4">
-            {multiType && (
-              <Field label="Tipo de documento">
-                <Select
-                  value={type}
-                  onChange={(e) => changeType(e.target.value as ContractType)}
-                >
-                  {CONTRACT_TYPE_OPTIONS.filter((t) => scope.types.includes(t.value)).map(
-                    (t) => (
-                      <option key={t.value} value={t.value}>
-                        {t.label}
-                      </option>
-                    )
+            {multiModel && (
+              <Field label="Modelo do documento">
+                <Select value={modelId} onChange={(e) => changeModel(e.target.value)}>
+                  {/* Contrato antigo cujo modelo saiu do catálogo: o texto
+                      gravado continua valendo, e a opção deixa isso explícito. */}
+                  {!currentModel && (
+                    <option value="">Modelo do próprio contrato</option>
                   )}
+                  {models.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name}
+                    </option>
+                  ))}
                 </Select>
               </Field>
             )}
@@ -518,20 +552,24 @@ export function ContractEditorPage({
               <p className="text-sm font-bold text-slate-800">Editor de cláusulas</p>
               <Button
                 variant="ghost"
+                disabled={!currentModel}
                 onClick={() => {
+                  if (!currentModel) return;
                   if (
                     window.confirm(
-                      scope.savedTemplate?.trim()
+                      usaMolde(currentModel)
                         ? "Restaurar o molde da loja descarta todas as edições. Continuar?"
                         : "Restaurar o modelo padrão descarta todas as edições. Continuar?"
                     )
                   ) {
-                    setTemplate(baseTemplate(type));
+                    setTemplate(baseTemplate(currentModel));
                     setTemplateDirty(false);
                   }
                 }}
               >
-                {scope.savedTemplate?.trim() ? "Restaurar molde da loja" : "Restaurar modelo padrão"}
+                {usaMolde(currentModel)
+                  ? "Restaurar molde da loja"
+                  : "Restaurar modelo padrão"}
               </Button>
             </div>
             <p className="text-xs text-slate-400">

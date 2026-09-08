@@ -2,12 +2,12 @@
 // Escopo do módulo de contratos.
 //
 // As mesmas telas servem o superadmin e o garagista; o que muda é quem é o
-// dono do documento, quais tipos podem ser emitidos e qual identidade visual
+// dono do documento, quais modelos podem ser emitidos e qual identidade visual
 // timbra a folha. Em vez de duplicar as páginas, o escopo carrega essas
 // diferenças e as telas leem tudo daqui.
 // ============================================================
 
-import type { ContractType } from "./templates";
+import type { ContractModel } from "./models";
 
 /** Timbre da folha: marca + dados de quem emite o documento. */
 export interface Letterhead {
@@ -67,8 +67,11 @@ export interface ContractScope {
   basePath: string;
   /** Loja dona dos contratos. `null` = superadmin (vê e emite por todas). */
   sellerId: string | null;
-  /** Tipos de documento que este escopo pode emitir. */
-  types: ContractType[];
+  /**
+   * Modelos padrão que este escopo pode emitir, já filtrados por público e
+   * situação. Vêm do catálogo que o superadmin mantém no painel.
+   */
+  models: ContractModel[];
   letterhead: Letterhead;
   /**
    * Combos que puxam veículo/lead/loja do sistema. O superadmin escolhe entre
@@ -77,6 +80,8 @@ export interface ContractScope {
   showSellerPicker: boolean;
   /** Molde salvo da loja, usado como carga inicial do editor de cláusulas. */
   savedTemplate?: string | null;
+  /** Rota da gestão do catálogo de modelos. Só o superadmin tem. */
+  manageModelsPath?: string;
   subtitle: string;
 }
 

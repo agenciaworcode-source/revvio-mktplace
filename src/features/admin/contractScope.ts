@@ -1,8 +1,10 @@
 // ============================================================
 // Escopo de contratos do superadmin.
 //
-// Emite os três documentos, timbra com a marca Revvender e puxa o
-// autopreenchimento do catálogo inteiro — veículos e lojas de todo mundo.
+// Emite os modelos do catálogo marcados para a Revvio, timbra com a marca
+// Revvender e puxa o autopreenchimento do catálogo inteiro — veículos e lojas
+// de todo mundo. Os modelos em si são mantidos por ele mesmo, na tela de
+// Modelos de contrato.
 // ============================================================
 
 import { useMemo } from "react";
@@ -14,14 +16,17 @@ import {
   type AutofillSources,
   type ContractScope,
 } from "@/features/contracts/scope";
+import { useContractModels } from "@/features/contracts/models";
 import { useAdminSellers, useAdminVehicles } from "./queries";
 
 export function useAdminContractScope(): ContractScope {
+  const modelsQ = useContractModels("admin");
+
   return useMemo(
     () => ({
       basePath: "/dashboard/contratos",
       sellerId: null,
-      types: ["intermediacao", "compra_venda", "procuracao"],
+      models: modelsQ.data ?? [],
       letterhead: {
         ...REVVENDER_LETTERHEAD,
         name: INTERMEDIADORA.name,
@@ -29,9 +34,10 @@ export function useAdminContractScope(): ContractScope {
         address: INTERMEDIADORA.address,
       },
       showSellerPicker: true,
+      manageModelsPath: "/dashboard/contratos/modelos",
       subtitle: "Emissão digital de contratos e relatório contábil",
     }),
-    []
+    [modelsQ.data]
   );
 }
 
