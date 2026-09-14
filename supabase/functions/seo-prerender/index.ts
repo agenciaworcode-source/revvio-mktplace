@@ -37,6 +37,25 @@ const brl = (v: number) =>
     Number(v ?? 0)
   );
 
+/**
+ * Converte a URL pública de um objeto do Storage na URL de transformação, em
+ * 1200x630 — a proporção que Facebook e WhatsApp esperam num card.
+ *
+ * Não é estética: a foto original do anúncio tem ~430 KB, e acima de ~300 KB o
+ * WhatsApp costuma desistir de renderizar a imagem e mostra o card só com
+ * texto, ou nenhum. A mesma foto transformada cai para ~110 KB.
+ *
+ * URL que não seja do Storage (a og-image padrão) passa intacta — ela já é
+ * 1200x630.
+ */
+function imagemOg(url: string): string {
+  const marca = "/storage/v1/object/public/";
+  if (!url.includes(marca)) return url;
+  const base = url.replace(marca, "/storage/v1/render/image/public/");
+  const sep = base.includes("?") ? "&" : "?";
+  return `${base}${sep}width=1200&height=630&resize=cover&quality=75`;
+}
+
 function escapar(s: string): string {
   return s
     .replace(/&/g, "&amp;")
@@ -179,7 +198,7 @@ function html(m: Meta): string {
   const url = `${SITE_URL}${m.caminho}`;
   const t = escapar(m.titulo);
   const d = escapar(m.descricao);
-  const img = escapar(m.imagem);
+  const img = escapar(imagemOg(m.imagem));
   // O corpo repete o que as tags declaram: o raspador lê o mesmo que a página
   // mostra, e uma pessoa que caia aqui por engano tem o link para o site.
   return `<!doctype html>
@@ -196,6 +215,9 @@ function html(m: Meta): string {
 <meta property="og:title" content="${t}">
 <meta property="og:description" content="${d}">
 <meta property="og:image" content="${img}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/jpeg">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${t}">
 <meta name="twitter:description" content="${d}">
