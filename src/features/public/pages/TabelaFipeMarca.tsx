@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { PublicShell } from "../PublicShell";
 import { Seo } from "@/components/Seo";
+import { breadcrumbJsonLd } from "@/lib/structuredData";
 import { Spinner } from "@/components/ui";
 import { Icon } from "../components/icons";
 import {
@@ -47,6 +48,14 @@ export function TabelaFipeMarca() {
         title={`Tabela FIPE ${marca?.nome ?? ""} — preços por modelo`}
         description={`Consulte o preço FIPE dos modelos ${marca?.nome ?? ""}. Escolha o modelo e o ano para ver o valor atualizado da tabela.`}
         path={slugMarca ? fipeUrl.marca(slugMarca) : undefined}
+        jsonLd={
+          marca && slugMarca
+            ? breadcrumbJsonLd([
+                { name: "Início", path: "/" }, { name: "Tabela FIPE", path: "/tabela-fipe" },
+                { name: marca.nome, path: fipeUrl.marca(slugMarca) },
+              ])
+            : null
+        }
       />
 
       <FipeContainer>

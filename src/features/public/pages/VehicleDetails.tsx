@@ -17,6 +17,7 @@ import { Icon } from "../components/icons";
 import { ImageLightbox } from "../components/ImageLightbox";
 import { Input, Textarea, Spinner } from "@/components/ui-light";
 import { Seo } from "@/components/Seo";
+import { vehicleJsonLd } from "@/lib/structuredData";
 
 /* ── Galeria (faixa de até 3 fotos, com navegação) ────────── */
 function VehicleGallery({ images }: { images: string[] }) {
@@ -433,9 +434,11 @@ export function VehicleDetails() {
       value: v.leilao ? "Sim (com passagem por leilão)" : "Não (sem passagem por leilão)",
     });
 
-  const seoTitle = `${v.make} ${v.model}${v.year ? ` ${v.year}` : ""} — ${formatCurrency(v.price)}`;
+  // Marca + modelo + ano: serve ao h1, ao título da aba e à descrição.
+  const nomeVeiculo = `${v.make} ${v.model}${v.year ? ` ${v.year}` : ""}`;
+  const seoTitle = `${nomeVeiculo} — ${formatCurrency(v.price)}`;
   const seoDesc = [
-    `${v.make} ${v.model}${v.year ? ` ${v.year}` : ""}`,
+    nomeVeiculo,
     v.mileage != null ? `${formatNumber(v.mileage)} km` : null,
     v.fuel ? fuelLabels[v.fuel] ?? v.fuel : null,
     v.transmission ? transmissionLabels[v.transmission] ?? v.transmission : null,
@@ -451,6 +454,23 @@ export function VehicleDetails() {
         path={`/veiculo/${v.id}`}
         image={v.images?.[0]}
         type="product"
+        jsonLd={vehicleJsonLd({
+          id: v.id,
+          make: v.make,
+          model: v.model,
+          year: v.year,
+          price: Number(v.price),
+          mileage: v.mileage,
+          color: v.color,
+          images: v.images,
+          fuelLabel: v.fuel ? fuelLabels[v.fuel] ?? v.fuel : null,
+          transmissionLabel: v.transmission
+            ? transmissionLabels[v.transmission] ?? v.transmission
+            : null,
+          bodyLabel: v.body_type ? bodyLabels[v.body_type] ?? v.body_type : null,
+          sellerName: v.seller?.name,
+          sellerSlug: v.seller?.slug,
+        })}
       />
       <VehicleGallery images={v.images} />
 
@@ -469,6 +489,11 @@ export function VehicleDetails() {
             </>
           )}
         </nav>
+
+        {/* O título visível é um link de volta com a marca, e o modelo vem num
+            <p> — a página ficava sem h1 nenhum. Este dá o nome completo do
+            veículo ao buscador e ao leitor de tela, sem mexer no desenho. */}
+        <h1 className="sr-only">{nomeVeiculo}</h1>
 
         {/* título */}
         <div className="mt-3 flex flex-wrap items-start justify-between gap-3">

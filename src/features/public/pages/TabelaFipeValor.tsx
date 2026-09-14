@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import { PublicShell } from "../PublicShell";
 import { Seo } from "@/components/Seo";
+import { breadcrumbJsonLd } from "@/lib/structuredData";
 import { Spinner } from "@/components/ui";
 import { Icon } from "../components/icons";
 import {
@@ -79,6 +80,17 @@ export function TabelaFipeValor() {
           slugMarca && slugModelo && slugAno
             ? fipeUrl.valor(slugMarca, slugModelo, slugAno)
             : undefined
+        }
+        jsonLd={
+          marca && modelo && ano && slugMarca && slugModelo && slugAno
+            ? breadcrumbJsonLd([
+                { name: "Início", path: "/" },
+                { name: "Tabela FIPE", path: fipeUrl.raiz },
+                { name: marca.nome, path: fipeUrl.marca(slugMarca) },
+                { name: modelo.nome, path: fipeUrl.modelo(slugMarca, slugModelo) },
+                { name: ano.label, path: fipeUrl.valor(slugMarca, slugModelo, slugAno) },
+              ])
+            : null
         }
       />
 

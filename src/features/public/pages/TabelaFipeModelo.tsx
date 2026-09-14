@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { PublicShell } from "../PublicShell";
 import { Seo } from "@/components/Seo";
+import { breadcrumbJsonLd } from "@/lib/structuredData";
 import { Spinner } from "@/components/ui";
 import { Breadcrumb, FipeAviso, FipeContainer, TileLink } from "../components/fipe";
 import {
@@ -33,6 +34,15 @@ export function TabelaFipeModelo() {
         description={`Preço FIPE do ${marca?.nome ?? ""} ${modelo?.nome ?? ""} por ano de fabricação. Escolha o ano para ver o valor atualizado.`}
         path={
           slugMarca && slugModelo ? fipeUrl.modelo(slugMarca, slugModelo) : undefined
+        }
+        jsonLd={
+          marca && modelo && slugMarca && slugModelo
+            ? breadcrumbJsonLd([
+                { name: "Início", path: "/" }, { name: "Tabela FIPE", path: "/tabela-fipe" },
+                { name: marca.nome, path: fipeUrl.marca(slugMarca) },
+                { name: modelo.nome, path: fipeUrl.modelo(slugMarca, slugModelo) },
+              ])
+            : null
         }
       />
 

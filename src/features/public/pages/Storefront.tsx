@@ -11,6 +11,7 @@ import { useAuth } from "@/features/auth/AuthProvider";
 import { BuyerAuthModal } from "@/features/auth/components/BuyerAuthModal";
 import { useLogClickEvent, type ClickKind } from "@/features/tracking/queries";
 import { Seo } from "@/components/Seo";
+import { storeJsonLd } from "@/lib/structuredData";
 import { neutral, status, withAlpha } from "@/theme/palette";
 
 function StoreStat({ value, label }: { value: string | number; label: string }) {
@@ -93,6 +94,17 @@ export function Storefront() {
           `Veículos à venda na ${seller.name}${location ? ` em ${location}` : ""}. Confira o estoque e fale direto com a loja pela Revvender.`
         }
         path={`/loja/${seller.slug}`}
+        image={seller.banner_url || seller.avatar_url || undefined}
+        jsonLd={storeJsonLd({
+          name: seller.name,
+          slug: seller.slug,
+          bio: seller.bio,
+          city: seller.city,
+          state: seller.state,
+          whatsapp: seller.whatsapp,
+          avatarUrl: seller.avatar_url,
+          bannerUrl: seller.banner_url,
+        })}
       />
       <PublicTopBar />
 
@@ -292,7 +304,7 @@ export function Storefront() {
         <div className="mb-2.5 font-display text-lg font-extrabold tracking-tight text-white">
           REVV<span className="text-brand">IO</span>
         </div>
-        Mini-loja oficial · powered by Revvender Marketplace
+        Mini-loja oficial · powered by REVVIO Marketplace
       </footer>
 
       <BuyerAuthModal

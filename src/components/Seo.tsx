@@ -20,6 +20,7 @@ export function Seo({
   image,
   type = "website",
   noindex = false,
+  jsonLd,
 }: {
   /** Título específico da página; recebe o sufixo " | Revvender". */
   title: string;
@@ -30,6 +31,13 @@ export function Seo({
   image?: string;
   type?: "website" | "article" | "product";
   noindex?: boolean;
+  /**
+   * Dados estruturados (schema.org) da página. Aceita um objeto ou uma lista;
+   * cada item vira um `<script type="application/ld+json">`.
+   * Os construtores estão em `@/lib/structuredData` e devolvem `null` quando
+   * não há dado suficiente — por isso os nulos são descartados aqui.
+   */
+  jsonLd?: object | (object | null)[] | null;
 }) {
   // O sufixo sai de SITE_NAME para a marca viver num lugar só — e a checagem usa
   // o mesmo valor, senão um título que já nomeia a marca ganharia o sufixo de novo.
@@ -42,6 +50,9 @@ export function Seo({
       ? image
       : `${SITE_URL}${image}`
     : DEFAULT_IMAGE;
+  const schemas = (Array.isArray(jsonLd) ? jsonLd : [jsonLd]).filter(
+    (s): s is object => Boolean(s)
+  );
 
   return (
     <Helmet>
@@ -59,6 +70,12 @@ export function Seo({
       <meta name="twitter:title" content={fullTitle} />
       {description && <meta name="twitter:description" content={description} />}
       <meta name="twitter:image" content={img} />
+
+      {schemas.map((s, i) => (
+        <script key={i} type="application/ld+json">
+          {JSON.stringify(s)}
+        </script>
+      ))}
     </Helmet>
   );
 }

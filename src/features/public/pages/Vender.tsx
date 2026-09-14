@@ -5,6 +5,7 @@ import { Icon } from "../components/icons";
 import { usePricingPlans, type PricingPlan } from "../queries";
 import { Spinner } from "@/components/ui";
 import { Seo } from "@/components/Seo";
+import { faqJsonLd } from "@/lib/structuredData";
 import { brand, neutral, status, withAlpha } from "@/theme/palette";
 import { CONTACT_EMAIL } from "@/config/site";
 
@@ -241,6 +242,7 @@ export function Vender() {
         title="Anuncie e venda seu veículo"
         description="Crie a sua mini-loja na Revvender e anuncie carros, motos e caminhões. Sem comissão por venda, contato direto com o comprador pelo WhatsApp."
         path="/vender"
+        jsonLd={faqJsonLd(FAQ)}
       />
       <PublicTopBar current="vender" />
 
