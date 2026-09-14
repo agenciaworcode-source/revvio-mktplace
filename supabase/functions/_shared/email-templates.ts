@@ -23,7 +23,7 @@ function layout(opts: {
     : "";
   return `<!doctype html><html><body style="margin:0;background:#0f172a;font-family:system-ui,Segoe UI,sans-serif;color:#e2e8f0">
   <div style="max-width:520px;margin:0 auto;padding:32px 24px">
-    <div style="font-size:22px;font-weight:800;letter-spacing:-.5px;margin-bottom:24px">REVV<span style="color:${BRAND}">IO</span></div>
+    <div style="font-size:22px;font-weight:800;letter-spacing:-.5px;margin-bottom:24px">REVV<span style="color:${BRAND}">ENDER</span></div>
     <div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:28px">
       <h1 style="font-size:19px;margin:0 0 12px;color:#fff">${opts.heading}</h1>
       <div style="font-size:14px;line-height:1.6;color:#cbd5e1">${opts.body}</div>
