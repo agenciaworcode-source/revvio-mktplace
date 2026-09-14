@@ -58,8 +58,12 @@ export function Login() {
       setAuthError("Informe seu e-mail acima para recuperar a senha.");
       return;
     }
+    // O destino é /definir-senha, não /login: é a página que troca o token por
+    // sessão e oferece o campo da nova senha. Apontando para /login a pessoa
+    // caía no formulário de entrada — com a sessão criada, mas sem nada
+    // pedindo a senha nova, e sem saber o que fazer.
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/login`,
+      redirectTo: `${window.location.origin}/definir-senha`,
     });
     if (error) setAuthError(friendlyError(error.message));
     else setInfo("Enviamos um link de recuperação para o seu e-mail.");
