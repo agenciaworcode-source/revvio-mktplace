@@ -58,3 +58,9 @@ verify_jwt = false
 # cnpj-lookup: consulta pública de CNPJ p/ o cadastro do garagista → sem JWT.
 [functions.cnpj-lookup]
 verify_jwt = false
+
+# seo-prerender é chamada pelo nginx em nome de raspadores sociais, que não
+# mandam JWT nenhum → verificação desligada. Ela só LÊ, com a anon key e a
+# mesma RLS do site, então não há o que proteger com token.
+[functions.seo-prerender]
+verify_jwt = false
