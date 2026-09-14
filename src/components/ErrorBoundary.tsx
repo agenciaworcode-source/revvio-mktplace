@@ -21,7 +21,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, State> {
       return (
         <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-6 text-center">
           <span className="text-xs font-bold uppercase tracking-[2px] text-brand">
-            REVVIO
+            Revvender
           </span>
           <h1 className="text-2xl font-black">Algo deu errado</h1>
           <p className="max-w-md text-sm text-slate-400">

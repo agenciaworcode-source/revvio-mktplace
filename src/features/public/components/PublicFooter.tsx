@@ -163,7 +163,7 @@ export function PublicFooter() {
               Termos e Condições
             </Link>
           </div>
-          <span>© 2026 REVVIO — Todos os direitos reservados.</span>
+          <span>© 2026 Revvender — Todos os direitos reservados.</span>
           <span>
             Desenvolvido por{" "}
             <span className="font-bold text-slate-700">MindCorp</span>

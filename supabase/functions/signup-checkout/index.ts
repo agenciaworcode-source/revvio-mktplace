@@ -12,7 +12,7 @@ import { sendEmail } from "../_shared/resend.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const APP_URL = Deno.env.get("APP_URL") ?? "https://loja.revvio.com.br";
+const APP_URL = Deno.env.get("APP_URL") ?? "https://revvender.com.br";
 
 const today = () => new Date().toISOString().slice(0, 10);
 

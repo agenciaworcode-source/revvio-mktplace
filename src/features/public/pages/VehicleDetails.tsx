@@ -213,7 +213,7 @@ function LeadForm({ v }: { v: PublicVehicle }) {
       });
     }
     const linhas = [
-      `Olá! Tenho interesse no ${carro} (${formatCurrency(v.price)}) anunciado na REVVIO.`,
+      `Olá! Tenho interesse no ${carro} (${formatCurrency(v.price)}) anunciado na Revvender.`,
       // Amarra a conversa ao anúncio: o WhatsApp é o único ponto do fluxo onde
       // essa ligação se perdia (o lead no painel já guarda o vehicle_id).
       `Ref.: ${vehicleRef(v.id)}`,
@@ -441,7 +441,7 @@ export function VehicleDetails() {
     v.transmission ? transmissionLabels[v.transmission] ?? v.transmission : null,
   ]
     .filter(Boolean)
-    .join(" · ") + ` — à venda na Revvio por ${formatCurrency(v.price)}.`;
+    .join(" · ") + ` — à venda na Revvender por ${formatCurrency(v.price)}.`;
 
   return (
     <PublicShell current="comprar">

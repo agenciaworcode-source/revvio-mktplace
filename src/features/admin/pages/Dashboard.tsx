@@ -18,7 +18,7 @@ export function Dashboard() {
     <div>
       <PanelHeader
         title="Visão Geral"
-        subtitle="Controle global da plataforma REVVIO SaaS"
+        subtitle="Controle global da plataforma Revvender SaaS"
         actions={<AdminActions rows={o.sellers} filename="assinantes" />}
       />
 

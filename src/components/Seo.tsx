@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { normalizeSiteUrl } from "@/config/site";
+import { normalizeSiteUrl, SITE_NAME } from "@/config/site";
 
 /** Origem canônica do site. Vem de VITE_SITE_URL; o padrão está em
  *  src/config/site.ts, que é o mesmo lido pelo build para gerar as meta
@@ -21,7 +21,7 @@ export function Seo({
   type = "website",
   noindex = false,
 }: {
-  /** Título específico da página; recebe o sufixo " | Revvio". */
+  /** Título específico da página; recebe o sufixo " | Revvender". */
   title: string;
   description?: string;
   /** Caminho da rota (ex.: "/comprar") — vira canonical e og:url. */
@@ -31,7 +31,11 @@ export function Seo({
   type?: "website" | "article" | "product";
   noindex?: boolean;
 }) {
-  const fullTitle = title.toLowerCase().includes("revvio") ? title : `${title} | Revvio`;
+  // O sufixo sai de SITE_NAME para a marca viver num lugar só — e a checagem usa
+  // o mesmo valor, senão um título que já nomeia a marca ganharia o sufixo de novo.
+  const fullTitle = title.toLowerCase().includes(SITE_NAME.toLowerCase())
+    ? title
+    : `${title} | ${SITE_NAME}`;
   const url = path ? `${SITE_URL}${path}` : undefined;
   const img = image
     ? image.startsWith("http")

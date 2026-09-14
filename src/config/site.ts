@@ -11,9 +11,9 @@
  */
 
 /** Usado quando `VITE_SITE_URL` não está definida. */
-export const DEFAULT_SITE_URL = "https://loja.revvio.com.br";
+export const DEFAULT_SITE_URL = "https://revvender.com.br";
 
-export const CONTACT_EMAIL = "contato@revvio.com.br";
+export const CONTACT_EMAIL = "contato@revvender.com.br";
 
 export const SITE_NAME = "Revvender";
 

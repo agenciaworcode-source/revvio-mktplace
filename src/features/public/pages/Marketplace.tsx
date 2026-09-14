@@ -142,7 +142,7 @@ export function Marketplace() {
     <PublicShell current="comprar">
       <Seo
         title="Comprar veículos"
-        description="Encontre carros, motos e caminhões com procedência no marketplace da Revvio. Filtre por marca, modelo, ano e preço e fale direto com a loja."
+        description="Encontre carros, motos e caminhões com procedência no marketplace da Revvender. Filtre por marca, modelo, ano e preço e fale direto com a loja."
         path="/comprar"
       />
       {/* Hero */}

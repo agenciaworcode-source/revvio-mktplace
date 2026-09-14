@@ -11,7 +11,7 @@ const SECTIONS: LegalSection[] = [
           O REVVIO tem o compromisso de proteger a privacidade e os dados pessoais de seus
           usuários, em conformidade com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018 —
           LGPD). Esta Política descreve como coletamos, usamos, armazenamos e protegemos as suas
-          informações ao utilizar a plataforma <strong>revvio.com.br</strong>.
+          informações ao utilizar a plataforma <strong>revvender.com.br</strong>.
         </p>
         <p>
           Ao acessar ou utilizar o site, você declara estar ciente e de acordo com as práticas

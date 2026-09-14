@@ -61,7 +61,7 @@ export function Storefront() {
   }
 
   const { seller, vehicles, soldCount } = data;
-  const wa = whatsappLink(seller.whatsapp, `Olá ${seller.name}! Vi sua loja na REVVIO.`);
+  const wa = whatsappLink(seller.whatsapp, `Olá ${seller.name}! Vi sua loja na Revvender.`);
   const instaUrl = seller.instagram
     ? `https://instagram.com/${seller.instagram.replace(/^@/, "")}`
     : null;
@@ -87,10 +87,10 @@ export function Storefront() {
   return (
     <div className="min-h-screen bg-white font-sans">
       <Seo
-        title={`${seller.name} — Loja na Revvio`}
+        title={`${seller.name} — Loja na Revvender`}
         description={
           seller.bio ||
-          `Veículos à venda na ${seller.name}${location ? ` em ${location}` : ""}. Confira o estoque e fale direto com a loja pela Revvio.`
+          `Veículos à venda na ${seller.name}${location ? ` em ${location}` : ""}. Confira o estoque e fale direto com a loja pela Revvender.`
         }
         path={`/loja/${seller.slug}`}
       />
@@ -292,7 +292,7 @@ export function Storefront() {
         <div className="mb-2.5 font-display text-lg font-extrabold tracking-tight text-white">
           REVV<span className="text-brand">IO</span>
         </div>
-        Mini-loja oficial · powered by REVVIO Marketplace
+        Mini-loja oficial · powered by Revvender Marketplace
       </footer>
 
       <BuyerAuthModal

@@ -1,7 +1,7 @@
 // Cliente mínimo da API do Resend (https://resend.com/docs).
 // Chave no secret RESEND_API_KEY; remetente em RESEND_FROM.
 
-const FROM = Deno.env.get("RESEND_FROM") ?? "REVVIO <no-reply@revvio.com.br>";
+const FROM = Deno.env.get("RESEND_FROM") ?? "Revvender <no-reply@revvender.com.br>";
 
 export async function sendEmail(input: {
   to: string | string[];

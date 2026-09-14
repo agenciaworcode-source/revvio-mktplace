@@ -88,7 +88,7 @@ function AsaasInvoices({ lojaId }: { lojaId?: string }) {
                 return (
                   <tr key={ch.id}>
                     <td className="px-5 py-3 text-slate-900">
-                      {ch.description || "Plano Revvio"}
+                      {ch.description || "Plano Revvender"}
                     </td>
                     <td className="px-5 py-3 text-slate-600">
                       {ch.billing_type ? billingLabels[ch.billing_type] ?? ch.billing_type : "—"}

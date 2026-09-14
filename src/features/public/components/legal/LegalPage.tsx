@@ -35,7 +35,7 @@ export function LegalPage({
       <section className="border-b border-hair bg-cloud">
         <div className="mx-auto max-w-[980px] px-5 py-12 sm:px-7">
           <span className="inline-block rounded-full bg-brand/10 px-3.5 py-1.5 text-[11.5px] font-bold uppercase tracking-wider text-brand">
-            Revvio
+            Revvender
           </span>
           <h1 className="mt-4 font-display text-[clamp(28px,4vw,40px)] font-extrabold tracking-tight text-slate-900">
             {title}

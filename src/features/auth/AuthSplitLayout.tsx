@@ -72,7 +72,7 @@ export function AuthSplitLayout({
           </div>
         </div>
 
-        <p className="text-xs text-slate-600">© 2026 REVVIO · Marketplace Multi-Vendedores</p>
+        <p className="text-xs text-slate-600">© 2026 Revvender · Marketplace Multi-Vendedores</p>
       </div>
 
       {/* ── Painel direito (formulário) ── */}

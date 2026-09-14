@@ -12,7 +12,7 @@ function str(d: Data, k: string, fallback = ""): string {
   return v == null ? fallback : String(v);
 }
 
-/** Moldura HTML comum (dark, identidade REVVIO). */
+/** Moldura HTML comum (dark, identidade Revvender). */
 function layout(opts: {
   heading: string;
   body: string;
@@ -29,14 +29,14 @@ function layout(opts: {
       <div style="font-size:14px;line-height:1.6;color:#cbd5e1">${opts.body}</div>
       ${button ? `<div style="margin-top:22px">${button}</div>` : ""}
     </div>
-    <p style="font-size:12px;color:#64748b;margin-top:20px;text-align:center">REVVIO · Marketplace Multi-Vendedores</p>
+    <p style="font-size:12px;color:#64748b;margin-top:20px;text-align:center">Revvender · Marketplace Multi-Vendedores</p>
   </div></body></html>`;
 }
 
 export const templates: Record<string, Template> = {
   // #7 — cadastro recebido (→ garagista) · fluxo pay-first
   seller_registered: (d) => ({
-    subject: "Recebemos seu cadastro — conclua o pagamento — REVVIO",
+    subject: "Recebemos seu cadastro — conclua o pagamento — Revvender",
     html: layout({
       heading: `Olá, ${str(d, "name", "garagista")}!`,
       body: "Recebemos seu cadastro. Para liberar o acesso à plataforma, <strong>conclua o pagamento do plano escolhido</strong>. Assim que o pagamento for confirmado, sua mini-loja é ativada automaticamente.",
@@ -57,9 +57,9 @@ export const templates: Record<string, Template> = {
   // boas-vindas (→ garagista) · enviado pelo webhook quando a conta é criada
   // após o pagamento; traz o link para definir a senha e acessar.
   garagista_welcome: (d) => ({
-    subject: "Pagamento confirmado 🎉 — defina sua senha — REVVIO",
+    subject: "Pagamento confirmado 🎉 — defina sua senha — Revvender",
     html: layout({
-      heading: `Bem-vindo à REVVIO, ${str(d, "name", "garagista")}!`,
+      heading: `Bem-vindo à Revvender, ${str(d, "name", "garagista")}!`,
       body: "Seu <strong>pagamento foi confirmado</strong> e sua mini-loja foi criada. Para acessar, defina sua senha no botão abaixo.",
       cta: { label: "Definir senha e acessar", href: str(d, "set_password_url", `${APP_URL}/login`) },
     }),
@@ -68,12 +68,12 @@ export const templates: Record<string, Template> = {
   // boas-vindas do vendedor (→ vendedor) · enviado pela invite-vendedor
   // quando o garagista convida; traz o link para definir a senha e acessar.
   vendedor_welcome: (d) => ({
-    subject: "Você foi convidado para a REVVIO — defina sua senha",
+    subject: "Você foi convidado para a Revvender — defina sua senha",
     html: layout({
       heading: `Olá, ${str(d, "name", "vendedor")}!`,
       body: `Você foi convidado como <strong>vendedor</strong>${
         str(d, "loja") ? ` da loja <strong>${str(d, "loja")}</strong>` : ""
-      } na REVVIO. Para acessar e começar a registrar vendas, defina sua senha no botão abaixo.`,
+      } na Revvender. Para acessar e começar a registrar vendas, defina sua senha no botão abaixo.`,
       cta: { label: "Definir senha e acessar", href: str(d, "set_password_url", `${APP_URL}/login`) },
     }),
   }),
@@ -81,19 +81,19 @@ export const templates: Record<string, Template> = {
   // boas-vindas do afiliado (→ afiliado) · enviado pela invite-affiliate
   // quando o garagista convida; traz o link para definir a senha e acessar.
   afiliado_welcome: (d) => ({
-    subject: "Você foi convidado como afiliado na REVVIO — defina sua senha",
+    subject: "Você foi convidado como afiliado na Revvender — defina sua senha",
     html: layout({
       heading: `Olá, ${str(d, "name", "afiliado")}!`,
       body: `Você foi convidado como <strong>afiliado</strong>${
         str(d, "loja") ? ` da loja <strong>${str(d, "loja")}</strong>` : ""
-      } na REVVIO. Como afiliado, você divulga os veículos da loja com o seu link próprio e acompanha o seu desempenho. Para acessar, defina sua senha no botão abaixo.`,
+      } na Revvender. Como afiliado, você divulga os veículos da loja com o seu link próprio e acompanha o seu desempenho. Para acessar, defina sua senha no botão abaixo.`,
       cta: { label: "Definir senha e acessar", href: str(d, "set_password_url", `${APP_URL}/login`) },
     }),
   }),
 
   // afiliado sinalizou uma venda (→ garagista)
   affiliate_sale_signal: (d) => ({
-    subject: "Um afiliado sinalizou uma venda — REVVIO",
+    subject: "Um afiliado sinalizou uma venda — Revvender",
     html: layout({
       heading: "Venda sinalizada por afiliado",
       body: `<p>O afiliado <strong>${str(d, "affiliate")}</strong> avisou que ajudou numa venda${
@@ -107,7 +107,7 @@ export const templates: Record<string, Template> = {
 
   // #9 — pagamento confirmado, acesso liberado (→ garagista) · dispara no webhook (pending→active)
   seller_approved: (d) => ({
-    subject: "Pagamento confirmado, acesso liberado 🎉 — REVVIO",
+    subject: "Pagamento confirmado, acesso liberado 🎉 — Revvender",
     html: layout({
       heading: `Tudo certo, ${str(d, "name", "garagista")}!`,
       body: "Seu <strong>pagamento foi confirmado</strong> e o acesso à plataforma está liberado. Você já pode publicar veículos, montar sua equipe e registrar vendas.",
@@ -117,7 +117,7 @@ export const templates: Record<string, Template> = {
 
   // #10 — rejeitado / suspenso (→ garagista)
   seller_suspended: () => ({
-    subject: "Atualização do seu acesso — REVVIO",
+    subject: "Atualização do seu acesso — Revvender",
     html: layout({
       heading: "Acesso suspenso",
       body: "Seu acesso à plataforma foi <strong>suspenso</strong> pelo administrador. Entre em contato com a gestão para regularizar sua situação.",
@@ -126,7 +126,7 @@ export const templates: Record<string, Template> = {
 
   // #11 — reativado (→ garagista)
   seller_reactivated: (d) => ({
-    subject: "Seu acesso foi reativado — REVVIO",
+    subject: "Seu acesso foi reativado — Revvender",
     html: layout({
       heading: `Bem-vindo de volta, ${str(d, "name", "vendedor")}!`,
       body: "Seu acesso foi <strong>reativado</strong>. Tudo voltou ao normal no seu painel.",
@@ -145,7 +145,7 @@ export const templates: Record<string, Template> = {
 
   // #13 — venda registrada (→ garagista)
   sale_confirmation: (d) => ({
-    subject: "Venda registrada — REVVIO",
+    subject: "Venda registrada — Revvender",
     html: layout({
       heading: "Venda registrada com sucesso",
       body: `Venda de <strong>${str(d, "vehicle")}</strong> para ${str(d, "buyer_name")} por ${str(d, "sale_price")}. A comissão da plataforma foi gerada automaticamente.`,
@@ -155,7 +155,7 @@ export const templates: Record<string, Template> = {
 
   // #16/D — nova cobrança gerada (→ garagista)
   charge_created: (d) => ({
-    subject: "Nova cobrança disponível — REVVIO",
+    subject: "Nova cobrança disponível — Revvender",
     html: layout({
       heading: "Você tem uma nova cobrança",
       body: `Referente a: ${str(d, "description", "plano")}. Valor ${str(d, "value")} · vencimento ${str(d, "due_date")}.`,
@@ -165,7 +165,7 @@ export const templates: Record<string, Template> = {
 
   // #17 — pagamento confirmado (→ garagista)
   payment_confirmed: (d) => ({
-    subject: "Pagamento confirmado — REVVIO",
+    subject: "Pagamento confirmado — Revvender",
     html: layout({
       heading: "Recebemos seu pagamento ✅",
       body: `Confirmamos o pagamento de ${str(d, "value")} referente a ${str(d, "description", "sua cobrança")}. Obrigado!`,
@@ -174,7 +174,7 @@ export const templates: Record<string, Template> = {
 
   // #18/D — cobrança vencida (→ garagista)
   charge_overdue: (d) => ({
-    subject: "Cobrança vencida — REVVIO",
+    subject: "Cobrança vencida — Revvender",
     html: layout({
       heading: "Sua cobrança está vencida",
       body: `A cobrança de ${str(d, "value")} (${str(d, "description", "plano")}) venceu em ${str(d, "due_date")}. Regularize para manter sua conta ativa.`,

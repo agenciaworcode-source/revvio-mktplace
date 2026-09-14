@@ -18,7 +18,7 @@ export function HomeQuemSomos() {
             A vitrine digital para <span className="text-brand">comprar e vender</span> veículos
           </h2>
           <p className="mt-4 text-[15px] leading-relaxed text-slate-500">
-            O REVVIO conecta compradores e lojas com procedência, contato direto e um catálogo
+            A Revvender conecta compradores e lojas com procedência, contato direto e um catálogo
             fácil de usar em qualquer dispositivo.
           </p>
           <div className="mt-6 flex flex-col gap-3">
@@ -38,7 +38,7 @@ export function HomeQuemSomos() {
         <div className="relative">
           <img
             src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=720&h=560&q=75"
-            alt="Veículo em destaque na Revvio"
+            alt="Veículo em destaque na Revvender"
             className="aspect-[4/3] w-full rounded-2xl object-cover"
           />
           <span className="absolute bottom-4 left-4 inline-flex items-center gap-1.5 rounded-lg bg-brand px-3.5 py-2 text-sm font-bold text-white">

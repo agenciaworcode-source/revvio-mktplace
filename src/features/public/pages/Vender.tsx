@@ -12,14 +12,14 @@ import { CONTACT_EMAIL } from "@/config/site";
 const SLATE_400 = "#94a3b8";
 
 /* ============================================================
-   REVVIO — Página "Vender" (captação de garagistas + planos)
+   Revvender — Página "Vender" (captação de garagistas + planos)
    Os planos vêm do banco (rv_pricing_plans, migration 0009) via
    usePricingPlans(). Steps/benefícios/comparativo/FAQ são estáticos.
    ============================================================ */
 
 const STEPS = [
   { icon: "edit", t: "Crie sua conta", d: "Cadastro em 2 minutos com CNPJ. Aprovação no mesmo dia." },
-  { icon: "store", t: "Monte sua mini-loja", d: "Banner, logo, bio e endereço. Sua vitrine em revvio.com.br/loja/sua-marca." },
+  { icon: "store", t: "Monte sua mini-loja", d: "Banner, logo, bio e endereço. Sua vitrine em revvender.com.br/loja/sua-marca." },
   { icon: "car", t: "Publique seus veículos", d: "Cadastre com fotos, preço e comparação automática com a FIPE." },
   { icon: "whatsapp", t: "Receba leads no WhatsApp", d: "Cada interessado cai direto no seu WhatsApp, pronto pra fechar." },
 ];
@@ -29,12 +29,12 @@ const BENEFITS = [
   { icon: "badge", t: "Selo abaixo da FIPE", d: "O sistema compara seu preço com a tabela FIPE e destaca as oportunidades." },
   { icon: "whatsapp", t: "Leads direto no WhatsApp", d: "Gerador de mensagem automática com os dados do veículo. Zero fricção." },
   { icon: "trendUp", t: "Relatórios de desempenho", d: "Veja visitas, leads e veículos mais procurados para vender mais rápido." },
-  { icon: "eye", t: "Vitrine no marketplace", d: "Seus carros aparecem para milhares de compradores que já buscam na REVVIO." },
+  { icon: "eye", t: "Vitrine no marketplace", d: "Seus carros aparecem para milhares de compradores que já buscam na Revvender." },
   { icon: "shield", t: "Procedência e confiança", d: "Laudo, histórico e selo de loja verificada que aumentam sua conversão." },
 ];
 
 const FAQ: [string, string][] = [
-  ["Preciso de CNPJ para vender?", "Sim. A REVVIO é uma plataforma para garagens e revendas, então o cadastro é feito com CNPJ ativo. A aprovação costuma sair no mesmo dia útil."],
+  ["Preciso de CNPJ para vender?", "Sim. A Revvender é uma plataforma para garagens e revendas, então o cadastro é feito com CNPJ ativo. A aprovação costuma sair no mesmo dia útil."],
   ["Posso mudar de plano depois?", "A qualquer momento. O upgrade é imediato e o downgrade vale a partir do próximo ciclo. Você só paga a diferença proporcional."],
   ["Existe taxa por venda ou comissão?", "Não. Você paga apenas a mensalidade do plano. As vendas e negociações acontecem direto entre você e o comprador, sem intermediação de valores."],
   ['Como funciona o selo "Abaixo da FIPE"?', "Ao cadastrar o preço, o sistema consulta a tabela FIPE e calcula o percentual de desconto. Veículos abaixo da tabela ganham destaque automático no marketplace."],
@@ -228,7 +228,7 @@ export function Vender() {
   const choose = (p: PricingPlan) => {
     if (p.key === "enterprise" || /falar com vendas/i.test(p.cta_label)) {
       window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
-        "Interesse no plano Enterprise — Revvio"
+        "Interesse no plano Enterprise — Revvender"
       )}`;
       return;
     }
@@ -239,7 +239,7 @@ export function Vender() {
     <div className="min-h-screen bg-white font-sans">
       <Seo
         title="Anuncie e venda seu veículo"
-        description="Crie a sua mini-loja na Revvio e anuncie carros, motos e caminhões. Sem comissão por venda, contato direto com o comprador pelo WhatsApp."
+        description="Crie a sua mini-loja na Revvender e anuncie carros, motos e caminhões. Sem comissão por venda, contato direto com o comprador pelo WhatsApp."
         path="/vender"
       />
       <PublicTopBar current="vender" />
@@ -312,7 +312,7 @@ export function Vender() {
               <div className="bg-slate-950 px-[18px] pb-[18px] pt-7">
                 <div className="text-[15px] font-bold text-white">Auto Prime Veículos</div>
                 <div className="mb-3.5 text-[12.5px] text-slate-400">
-                  revvio.com.br/loja/auto-prime
+                  revvender.com.br/loja/auto-prime
                 </div>
                 <div className="grid grid-cols-2 gap-2.5">
                   {[
@@ -373,7 +373,7 @@ export function Vender() {
       <section className="bg-cloud">
         <div className="mx-auto max-w-[1180px] px-7 py-[70px]">
           <SectionHead
-            eyebrow="Por que a REVVIO"
+            eyebrow="Por que a Revvender"
             title="Tudo que sua revenda precisa para vender mais"
           />
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -509,7 +509,7 @@ export function Vender() {
             ))}
           </div>
           <p className="m-0 text-[clamp(20px,2.4vw,28px)] font-semibold leading-[1.5] tracking-[-.5px]">
-            "Em 3 meses na REVVIO a gente dobrou os leads e parou de depender só do balcão. A
+            "Em 3 meses na Revvender a gente dobrou os leads e parou de depender só do balcão. A
             mini-loja virou nosso cartão de visita no WhatsApp."
           </p>
           <div className="mt-7 flex items-center justify-center gap-3.5">
@@ -563,7 +563,7 @@ export function Vender() {
               Escolher meu plano
             </button>
             <a
-              href="https://wa.me/5514981800854?text=Ol%C3%A1!%20Quero%20anunciar%20na%20Revvio."
+              href="https://wa.me/5514981800854?text=Ol%C3%A1!%20Quero%20anunciar%20na%20Revvender."
               target="_blank"
               rel="noreferrer"
               className="rounded-xl border border-white/30 bg-white/15 px-8 py-[15px] text-[15.5px] font-bold text-white hover:bg-white/25"
@@ -580,7 +580,7 @@ export function Vender() {
           REVV<span className="text-brand">IO</span>
         </div>
         Av. Ipiranga, 207 — Centro, Marília — SP · (14) 98180-0854 · {CONTACT_EMAIL}
-        <div className="mt-1.5">REVVIO Marketplace · Gestão e venda de veículos · © 2026</div>
+        <div className="mt-1.5">Revvender Marketplace · Gestão e venda de veículos · © 2026</div>
       </footer>
     </div>
   );

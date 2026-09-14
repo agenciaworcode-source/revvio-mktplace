@@ -74,7 +74,7 @@ export function TabelaFipeValor() {
         title={`Tabela FIPE ${titulo}`}
         description={`Valor do ${titulo} na tabela FIPE${
           valor.data ? `: ${valor.data.valorLabel} (${valor.data.mesReferencia})` : ""
-        }. Veja o código FIPE, as demais versões do mesmo ano e ofertas na Revvio.`}
+        }. Veja o código FIPE, as demais versões do mesmo ano e ofertas na Revvender.`}
         path={
           slugMarca && slugModelo && slugAno
             ? fipeUrl.valor(slugMarca, slugModelo, slugAno)
@@ -177,7 +177,7 @@ export function TabelaFipeValor() {
                 to={`/comprar?q=${encodeURIComponent(modelo.grupo)}`}
                 className="inline-flex items-center gap-2 rounded-full border border-stroke bg-white px-6 py-2.5 text-sm font-bold text-slate-900 shadow-card transition-colors hover:bg-cloud"
               >
-                <Icon name="car" size={15} /> Ver ofertas na Revvio
+                <Icon name="car" size={15} /> Ver ofertas na Revvender
               </Link>
             </div>
 

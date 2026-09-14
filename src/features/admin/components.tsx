@@ -72,7 +72,7 @@ export function AdminActions({
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${filename ?? "revvio-export"}.csv`;
+    a.download = `${filename ?? "revvender-export"}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }

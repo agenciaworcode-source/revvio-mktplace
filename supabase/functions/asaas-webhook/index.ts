@@ -10,7 +10,7 @@ const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 // barreira contra um POST forjado criando conta grátis ou cobrança falsa.
 const WEBHOOK_TOKEN = Deno.env.get("ASAAS_WEBHOOK_TOKEN");
 if (!WEBHOOK_TOKEN) throw new Error("ASAAS_WEBHOOK_TOKEN não configurada.");
-const APP_URL = Deno.env.get("APP_URL") ?? "https://loja.revvio.com.br";
+const APP_URL = Deno.env.get("APP_URL") ?? "https://revvender.com.br";
 
 const brl = (v: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(

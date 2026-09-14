@@ -3,7 +3,7 @@ import { Field, Input, Select } from "@/components/ui-light";
 
 // Como a venda foi realizada (canal). Rótulo exibido: "Venda realizada".
 export const SALE_REASONS = [
-  "Através da Plataforma Revvio",
+  "Através da Plataforma Revvender",
   "Cliente veio presencialmente na loja",
   "Por indicação",
   "Outro",

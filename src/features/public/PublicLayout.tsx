@@ -40,7 +40,7 @@ export function PublicLayout({ children }: { children: ReactNode }) {
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
 
       <footer className="border-t border-slate-800 py-8 text-center text-xs text-slate-500">
-        REVVIO · Marketplace Multi-Vendedores
+        Revvender · Marketplace Multi-Vendedores
       </footer>
     </div>
   );

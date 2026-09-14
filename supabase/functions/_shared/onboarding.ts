@@ -6,7 +6,7 @@
 // de definição de senha — é idêntico nos dois casos.
 import { type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const APP_URL = Deno.env.get("APP_URL") ?? "https://loja.revvio.com.br";
+const APP_URL = Deno.env.get("APP_URL") ?? "https://revvender.com.br";
 
 function slugify(s: string): string {
   return (

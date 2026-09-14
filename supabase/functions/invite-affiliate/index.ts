@@ -6,7 +6,7 @@ import { sendEmail } from "../_shared/resend.ts";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const APP_URL = Deno.env.get("APP_URL") ?? "https://loja.revvio.com.br";
+const APP_URL = Deno.env.get("APP_URL") ?? "https://revvender.com.br";
 
 // código curto do afiliado p/ o link público (?ref=). base36, 8 chars.
 function genRefCode(): string {
