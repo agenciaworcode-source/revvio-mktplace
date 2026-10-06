@@ -254,7 +254,7 @@ VEÍCULO: [vehicle_brand_model], ano/modelo [vehicle_year_model], placa [vehicle
 
 PODERES: Pelo presente instrumento particular, o OUTORGANTE nomeia e constitui o OUTORGADO seu bastante procurador, conferindo-lhe poderes específicos, exclusivamente quanto ao veículo acima identificado, para: representá-lo perante o DETRAN, CIRETRAN e demais órgãos executivos de trânsito; requerer, assinar e retirar documentos do veículo, incluindo CRV, CRLV e segundas vias; promover a transferência de propriedade, assinando o documento único de transferência (ATPV-e) e reconhecendo firmas quando exigido; quitar débitos, multas, taxas, IPVA, licenciamento e demais encargos; solicitar baixa de restrições, emissão de certidões e vistorias; e substabelecer, no todo ou em parte, quando indispensável ao cumprimento do mandato.
 
-Os poderes são outorgados em caráter específico para os fins acima, vedada a utilização para qualquer outra finalidade. Validade de 90 (noventa) dias a contar da assinatura, salvo revogação expressa anterior.
+Os poderes são outorgados em caráter específico para os fins acima, vedada a utilização para qualquer outra finalidade.
 
 Local e data: ${INTERMEDIADORA.cidade}, [data_atual]
 
