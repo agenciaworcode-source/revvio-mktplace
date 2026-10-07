@@ -2,6 +2,7 @@ import { useAuth } from "@/features/auth/AuthProvider";
 import { useAcesso, podeAcessar } from "@/features/auth/acesso";
 import { PanelShell, type PanelNavItem } from "@/components/PanelShell";
 import { AFFILIATES_ENABLED } from "@/config/features";
+import { PesquisaVeicularLink } from "./PesquisaVeicularLink";
 
 export function PainelLayout() {
   const { seller, isGaragista, isAdmin } = useAuth();
@@ -54,6 +55,10 @@ export function PainelLayout() {
       : []),
   ];
   return (
-    <PanelShell nav={nav} badge={manager ? "Lojista" : seller ? "Vendedor" : "Painel"} />
+    <PanelShell
+      nav={nav}
+      badge={manager ? "Lojista" : seller ? "Vendedor" : "Painel"}
+      sidebarExtra={<PesquisaVeicularLink />}
+    />
   );
 }

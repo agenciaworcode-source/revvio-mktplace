@@ -29,11 +29,14 @@ export function PanelShell({
   nav,
   badge,
   topRight,
+  sidebarExtra,
 }: {
   nav: PanelNavItem[];
   badge: string;
   /** Conteúdo opcional ao lado do logo (ex.: link da mini-loja). */
   topRight?: ReactNode;
+  /** Conteúdo logo abaixo do menu (ex.: atalho da pesquisa veicular). */
+  sidebarExtra?: ReactNode;
 }) {
   const { signOut, seller, isGaragista } = useAuth();
   const navigate = useNavigate();
@@ -136,6 +139,7 @@ export function PanelShell({
             </NavLink>
           ))}
         </nav>
+        {sidebarExtra}
 
         <div className="mt-auto flex flex-col gap-1 border-t border-white/[0.07] pt-4">
           <NavLink
