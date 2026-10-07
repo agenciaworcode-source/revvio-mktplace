@@ -67,16 +67,17 @@ export function PesquisaVeicularLink() {
   useEffect(() => () => window.clearTimeout(closeTimer.current), []);
 
   return (
-    <div className="mt-3 flex items-center gap-1.5">
+    <div className="mt-3 flex items-center gap-1">
       <a
         href={PESQUISA_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex min-w-0 flex-1 items-center gap-3 rounded-[11px] bg-emerald-500 px-3.5 py-[11px] text-sm font-bold text-white shadow-[0_6px_16px_rgba(48,153,116,0.35)] transition-colors hover:bg-emerald-600"
+        // Sem ícone de link externo e sem truncate: na sidebar de 248px os dois
+        // juntos cortavam o texto em "Pesquisa ve…". Se faltar espaço, quebra linha.
+        className="flex min-w-0 flex-1 items-center gap-2.5 rounded-[11px] bg-emerald-500 px-3 py-[11px] text-sm font-bold leading-tight text-white shadow-[0_6px_16px_rgba(48,153,116,0.35)] transition-colors hover:bg-emerald-600"
       >
         <Icon name="search" size={19} />
-        <span className="truncate">Pesquisa veicular</span>
-        <Icon name="externalLink" size={14} className="ml-auto opacity-80" />
+        <span>Pesquisa veicular</span>
       </a>
       <button
         ref={btnRef}
@@ -84,7 +85,7 @@ export function PesquisaVeicularLink() {
         onClick={() => (open ? setOpen(false) : show())}
         onMouseEnter={show}
         onMouseLeave={scheduleClose}
-        className="grid h-[42px] w-9 flex-shrink-0 place-items-center rounded-[11px] text-slate-400 transition-colors hover:bg-white/5 hover:text-slate-200"
+        className="grid h-[42px] w-8 flex-shrink-0 place-items-center rounded-[11px] text-slate-400 transition-colors hover:bg-white/5 hover:text-slate-200"
         aria-label="O que é a pesquisa veicular?"
         aria-expanded={open}
         aria-controls="pesquisa-veicular-ajuda"
