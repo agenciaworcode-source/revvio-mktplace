@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Icon } from "@/features/public/components/icons";
 
@@ -37,6 +37,20 @@ export function PesquisaVeicularLink() {
     }
     setOpen(true);
   }
+
+  // A altura do balão só existe depois de montado: se ele passar do rodapé
+  // (notebook com tela baixa), sobe até caber — ou vira para cima do botão
+  // quando estava abaixo dele. Roda antes da pintura, então não pisca.
+  useLayoutEffect(() => {
+    const h = popRef.current?.offsetHeight;
+    const r = btnRef.current?.getBoundingClientRect();
+    if (!open || !h || !r) return;
+    const max = window.innerHeight - h - 16;
+    if (pos.top <= max) return;
+    const below = pos.top > r.top;
+    const top = below && r.top - 8 - h >= 16 ? r.top - 8 - h : Math.max(16, max);
+    if (top !== pos.top) setPos((p) => ({ ...p, top }));
+  }, [open, pos.top]);
 
   // Pequeno atraso para dar tempo de levar o mouse do "?" até o balão.
   function scheduleClose() {
