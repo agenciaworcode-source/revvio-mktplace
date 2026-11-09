@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Icon } from "@/features/public/components/icons";
 
-const PESQUISA_URL = "https://revvio.com.br";
+const PESQUISA_URL = "https://revvender.com.br/pesquisaveicular";
 const POPOVER_W = 296;
 
 /**
